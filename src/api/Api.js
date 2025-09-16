@@ -1,0 +1,14 @@
+import axios from 'axios';
+const API = axios.create({ baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:5000' });
+export default API;
+export const fetchRandomWord = () => API.get('/api/word/random');
+export const startMemory = () => API.get('/api/memory/start');
+export const fetchMathQuestions = () => API.get('/api/math/questions');
+export const fetchTypingPassage = () => API.get('/api/typing/passage');
+export const fetchScramble = () => API.get('/api/word-scramble/start');
+export const fetchQuiz = () => API.get('/api/quiz/questions');
+export const fetchEmoji = () => API.get('/api/emoji/start');
+export const startWhack = () => API.get('/api/whack/start');
+export const startSimon = () => API.get('/api/simon/start');
+export const submitScore = (payload) => API.post('/api/common/score', payload);
+export const getLeaderboard = (game, limit=10) => API.get('/api/common/leaderboard', { params:{ game, limit }});
