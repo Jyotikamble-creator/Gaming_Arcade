@@ -9,9 +9,15 @@ export default function SimonSays(){
 
   useEffect(()=> init(), []);
   async function init(){
-    const r = await startSimon();
-    setColors(r.data.colors);
-    nextRound([]);
+    try {
+      const r = await startSimon();
+      setColors(r.data.colors || ['red', 'blue', 'green', 'yellow']);
+      nextRound([]);
+    } catch (error) {
+      console.error('Failed to start Simon Says:', error);
+      setColors(['red', 'blue', 'green', 'yellow']);
+      nextRound([]);
+    }
   }
 
   function nextRound(prev){

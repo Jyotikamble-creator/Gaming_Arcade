@@ -14,7 +14,7 @@ export const fetchRandomWord = async () => {
 }
 
 // Generic stubs for other games - they will call conventional endpoints if implemented on the server
-export const startMemory = () => API.get('/api/games/memory-card/words')
+export const startMemory = () => API.get('/api/games/memory-card/start')
 export const fetchMathQuestions = () => API.get('/api/questions/math-quiz')
 export const fetchTypingPassage = () => API.get('/api/typing/passage')
 export const fetchScramble = () => API.get('/api/games/word-scramble/words')

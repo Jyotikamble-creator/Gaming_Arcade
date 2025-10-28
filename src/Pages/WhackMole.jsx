@@ -9,12 +9,17 @@ export default function WhackAMole(){
 
   useEffect(()=> init(), []);
   async function init(){
-    const r = await startWhack();
-    setGrid(Array.from({length:r.data.gridSize}, (_,i)=>i));
-    setScore(0);
-    // pop moles
-    timerRef.current = setInterval(()=> setActive(Math.floor(Math.random()*r.data.gridSize)), 800);
-    setTimeout(()=> endGame(), r.data.duration*1000);
+    try {
+      const r = await startWhack();
+      setGrid(Array.from({length: r.data.gridSize || 9}, (_,i)=>i));
+      setScore(0);
+      // pop moles
+      timerRef.current = setInterval(()=> setActive(Math.floor(Math.random()*(r.data.gridSize || 9))), 800);
+      setTimeout(()=> endGame(), (r.data.duration || 30)*1000);
+    } catch (error) {
+      console.error('Failed to start whack-a-mole:', error);
+      setGrid(Array.from({length: 9}, (_,i)=>i));
+    }
   }
 
   function whack(i){

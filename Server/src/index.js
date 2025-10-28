@@ -40,21 +40,144 @@ CREATE TABLE IF NOT EXISTS scores (
   score INTEGER,
   created_at TEXT
 );
+CREATE TABLE IF NOT EXISTS questions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  game TEXT NOT NULL,
+  question TEXT NOT NULL,
+  options TEXT NOT NULL,
+  answer TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS passages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  game TEXT NOT NULL,
+  text TEXT NOT NULL
+);
 `)
 
 // Seed example words for word-guess if empty
-const count = db.prepare('SELECT COUNT(*) as c FROM words WHERE game = ?').get('word-guess').c
-if (count === 0) {
-  const insert = db.prepare('INSERT INTO words (game, word, description) VALUES (?, ?, ?)')
-  insert.run('word-guess', 'APPLE', 'A fruit')
-  insert.run('word-guess', 'MANGO', 'Tropical fruit')
-  insert.run('word-guess', 'HOUSE', 'Place to live')
+const wordCount = db.prepare('SELECT COUNT(*) as c FROM words WHERE game = ?').get('word-guess').c
+if (wordCount === 0) {
+  const insertWord = db.prepare('INSERT INTO words (game, word, description) VALUES (?, ?, ?)')
+  insertWord.run('word-guess', 'APPLE', 'A fruit')
+  insertWord.run('word-guess', 'MANGO', 'Tropical fruit')
+  insertWord.run('word-guess', 'HOUSE', 'Place to live')
+  insertWord.run('word-guess', 'COMPUTER', 'Electronic device')
+  insertWord.run('word-guess', 'GARDEN', 'Place for plants')
+}
+
+// Seed memory card data
+const memoryCount = db.prepare('SELECT COUNT(*) as c FROM words WHERE game = ?').get('memory-card').c
+if (memoryCount === 0) {
+  const insertMemory = db.prepare('INSERT INTO words (game, word, description) VALUES (?, ?, ?)')
+  const pairs = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼']
+  pairs.forEach(emoji => {
+    insertMemory.run('memory-card', emoji, emoji)
+  })
+}
+
+// Seed math quiz questions
+const mathCount = db.prepare('SELECT COUNT(*) as c FROM questions WHERE game = ?').get('math-quiz').c
+if (mathCount === 0) {
+  const insertQuestion = db.prepare('INSERT INTO questions (game, question, options, answer) VALUES (?, ?, ?, ?)')
+  insertQuestion.run('math-quiz', 'What is 15 + 27?', JSON.stringify([42, 41, 43, 40]), '42')
+  insertQuestion.run('math-quiz', 'What is 8 × 7?', JSON.stringify([56, 54, 58, 52]), '56')
+  insertQuestion.run('math-quiz', 'What is 144 ÷ 12?', JSON.stringify([12, 11, 13, 10]), '12')
+  insertQuestion.run('math-quiz', 'What is 25²?', JSON.stringify([625, 525, 725, 425]), '625')
+  insertQuestion.run('math-quiz', 'What is √81?', JSON.stringify([9, 8, 10, 7]), '9')
+}
+
+// Seed typing passages
+const typingCount = db.prepare('SELECT COUNT(*) as c FROM passages WHERE game = ?').get('typing-test').c
+if (typingCount === 0) {
+  const insertPassage = db.prepare('INSERT INTO passages (game, text) VALUES (?, ?)')
+  insertPassage.run('typing-test', 'The quick brown fox jumps over the lazy dog. This pangram contains all letters of the alphabet.')
+  insertPassage.run('typing-test', 'Programming is the art of telling a computer what you want it to do. Code is poetry written for machines.')
+  insertPassage.run('typing-test', 'React is a JavaScript library for building user interfaces. It makes interactive UIs painless to create.')
 }
 
 app.get('/api/games/:game/words', (req, res) => {
   const game = req.params.game
   const words = db.prepare('SELECT id, word, description FROM words WHERE game = ?').all(game)
   res.json(words)
+})
+
+// Memory card endpoint - returns shuffled cards
+app.get('/api/games/memory-card/start', (req, res) => {
+  const cards = db.prepare('SELECT word as value FROM words WHERE game = ?').all('memory-card')
+  // Create pairs and shuffle
+  const pairs = []
+  cards.forEach((card, index) => {
+    pairs.push({ id: index * 2, value: card.value })
+    pairs.push({ id: index * 2 + 1, value: card.value })
+  })
+  // Simple shuffle
+  for (let i = pairs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pairs[i], pairs[j]] = [pairs[j], pairs[i]]
+  }
+  res.json({ cards: pairs })
+})
+
+// Math quiz questions endpoint
+app.get('/api/questions/math-quiz', (req, res) => {
+  const questions = db.prepare('SELECT question as q, options, answer as ans FROM questions WHERE game = ?').all('math-quiz')
+  const formattedQuestions = questions.map(q => ({
+    ...q,
+    options: JSON.parse(q.options)
+  }))
+  res.json({ questions: formattedQuestions })
+})
+
+// Typing test passage endpoint
+app.get('/api/typing/passage', (req, res) => {
+  const passages = db.prepare('SELECT text FROM passages WHERE game = ?').all('typing-test')
+  const randomPassage = passages[Math.floor(Math.random() * passages.length)]
+  res.json({ text: randomPassage.text })
+})
+
+// Word scramble endpoint
+app.get('/api/games/word-scramble/words', (req, res) => {
+  const words = db.prepare('SELECT word FROM words WHERE game = ?').all('word-guess')
+  if (words.length === 0) {
+    return res.json({ word: 'EXAMPLE', scrambled: 'MELXPAE' })
+  }
+  const randomWord = words[Math.floor(Math.random() * words.length)]
+  const word = randomWord.word
+  const scrambled = word.split('').sort(() => Math.random() - 0.5).join('')
+  res.json({ word, scrambled })
+})
+
+// Quiz questions endpoint (reuse math questions for now)
+app.get('/api/questions/quiz', (req, res) => {
+  const questions = db.prepare('SELECT question as q, options, answer as ans FROM questions WHERE game = ?').all('math-quiz')
+  const formattedQuestions = questions.map(q => ({
+    ...q,
+    options: JSON.parse(q.options)
+  }))
+  res.json({ questions: formattedQuestions })
+})
+
+// Emoji guess endpoint
+app.get('/api/games/emoji-guess/words', (req, res) => {
+  const emojis = [
+    { emojis: '🐶🏠', answer: 'doghouse' },
+    { emojis: '🚗🔑', answer: 'car key' },
+    { emojis: '📱💔', answer: 'broken phone' },
+    { emojis: '🌧️🌈', answer: 'rainbow' },
+    { emojis: '🍕❤️', answer: 'love pizza' }
+  ]
+  const random = emojis[Math.floor(Math.random() * emojis.length)]
+  res.json(random)
+})
+
+// Whack-a-mole start endpoint
+app.get('/api/games/whack/start', (req, res) => {
+  res.json({ gridSize: 9, duration: 30 })
+})
+
+// Simon Says start endpoint
+app.get('/api/games/simon/start', (req, res) => {
+  res.json({ colors: ['red', 'blue', 'green', 'yellow'] })
 })
 
 app.post('/api/scores',

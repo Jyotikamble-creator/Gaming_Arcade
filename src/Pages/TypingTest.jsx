@@ -8,7 +8,15 @@ export default function TypingTest(){
   const [done, setDone] = useState(false);
 
   useEffect(()=> load(), []);
-  async function load(){ const res = await fetchTypingPassage(); setText(res.data.text); }
+  async function load(){ 
+    try {
+      const res = await fetchTypingPassage(); 
+      setText(res.data.text || 'Loading failed. Please try again.');
+    } catch (error) {
+      console.error('Failed to load passage:', error);
+      setText('Failed to load typing passage. Please refresh.');
+    }
+  }
 
   function onChange(e){
     if(!startTime) setStartTime(Date.now());

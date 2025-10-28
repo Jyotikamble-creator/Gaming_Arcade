@@ -6,7 +6,15 @@ export default function Quiz(){
   const [i, setI] = useState(0);
   const [score, setScore] = useState(0);
   useEffect(()=> load(), []);
-  async function load(){ const r = await fetchQuiz(); setQs(r.data.questions); }
+  async function load(){ 
+    try {
+      const r = await fetchQuiz(); 
+      setQs(r.data.questions || []);
+    } catch (error) {
+      console.error('Failed to load quiz:', error);
+      setQs([]);
+    }
+  }
 
   function answer(opt){
     if(qs[i].ans === opt) setScore(s=>s+10);

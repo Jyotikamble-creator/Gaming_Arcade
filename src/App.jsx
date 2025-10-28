@@ -45,7 +45,8 @@
 
 
 import React from 'react'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
+import GameLayout from './components/GameLayout'
 import WordGuess from './pages/WordGuess'
 import MemoryCard from './pages/MemoryCard'
 import MathQuiz from './pages/MathQuiz'
@@ -57,25 +58,40 @@ import EmojiGuess from './pages/EmojiGuess'
 import WhackAMole from './pages/WhackMole'
 import SimonSays from './pages/SimonSays'
 
+function Home() {
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>Gaming Arcade</h1>
+      <p>Choose a game from the header or Games hub.</p>
+    </div>
+  )
+}
+
+function NotFound() {
+  return (
+    <div style={{ padding: 20 }}>
+      <h2>404 — Page not found</h2>
+    </div>
+  )
+}
+
 export default function App() {
   return (
-    <BrowserRouter>
-      <header style={{ padding: 12, borderBottom: '1px solid #ddd' }}>
-        <Link to="/">Home</Link> | <Link to="/word">Word</Link> | <Link to="/memory">Memory</Link> | <Link to="/math">Math</Link>
-      </header>
-      <Routes>
-        <Route path="/" element={<div style={{ padding: 20 }}><h1>Gaming Arcade</h1></div>} />
-        <Route path="/word" element={<WordGuess />} />
-        <Route path="/memory" element={<MemoryCard />} />
-        <Route path="/math" element={<MathQuiz />} />
-        <Route path="/typing" element={<TypingTest />} />
-        <Route path="/2048" element={<Game2048 />} />
-        <Route path="/scramble" element={<WordScramble />} />
-        <Route path="/quiz" element={<Quiz />} />
-        <Route path="/emoji" element={<EmojiGuess />} />
-        <Route path="/whack" element={<WhackAMole />} />
-        <Route path="/simon" element={<SimonSays />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<GameLayout />}>
+        <Route index element={<Home />} />
+        <Route path="word" element={<WordGuess />} />
+        <Route path="memory" element={<MemoryCard />} />
+        <Route path="math" element={<MathQuiz />} />
+        <Route path="typing" element={<TypingTest />} />
+        <Route path="2048" element={<Game2048 />} />
+        <Route path="scramble" element={<WordScramble />} />
+        <Route path="quiz" element={<Quiz />} />
+        <Route path="emoji" element={<EmojiGuess />} />
+        <Route path="whack" element={<WhackAMole />} />
+        <Route path="simon" element={<SimonSays />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
   )
 }

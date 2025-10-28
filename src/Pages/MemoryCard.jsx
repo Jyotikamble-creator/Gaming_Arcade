@@ -10,8 +10,17 @@ export default function MemoryCard(){
 
   useEffect(()=> start(), []);
   async function start(){
-    const res = await startMemory();
-    setCards(res.data.cards); setFlipped([]); setMatched([]); setMoves(0); setStartTime(Date.now());
+    try {
+      const res = await startMemory();
+      setCards(res.data.cards || []); 
+      setFlipped([]); 
+      setMatched([]); 
+      setMoves(0); 
+      setStartTime(Date.now());
+    } catch (error) {
+      console.error('Failed to start memory game:', error);
+      setCards([]);
+    }
   }
 
   function flipCard(id){
@@ -22,7 +31,14 @@ export default function MemoryCard(){
       setMoves(m=>m+1);
       const a = cards.find(c=>c.id===next[0]).value;
       const b = cards.find(c=>c.id===next[1]).value;
-      if(a===b){ setMatched(m=>[...m, ...next]); setFlipped([]); if(matched.length+2===cards.length){ onWin(); } }
+      if(a===b){ 
+        const newMatched = [...matched, ...next];
+        setMatched(newMatched); 
+        setFlipped([]); 
+        if(newMatched.length===cards.length){ 
+          setTimeout(() => onWin(), 500); 
+        } 
+      }
       else setTimeout(()=> setFlipped([]), 800);
     }
   }

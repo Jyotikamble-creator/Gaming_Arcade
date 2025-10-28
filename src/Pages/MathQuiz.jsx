@@ -8,17 +8,24 @@ export default function MathQuiz(){
 
   useEffect(()=> load(), []);
   async function load(){
-    const res = await fetchMathQuestions();
-    setQuestions(res.data.questions);
+    try {
+      const res = await fetchMathQuestions();
+      setQuestions(res.data.questions || []);
+    } catch (error) {
+      console.error('Failed to load questions:', error);
+      setQuestions([]);
+    }
   }
 
   function answer(opt){
     if(questions[index].ans === opt){ setScore(s=>s+10); }
-    setIndex(i=>i+1);
-    if(index+1 === questions.length){
+    const nextIndex = index + 1;
+    if(nextIndex >= questions.length){
       submitScore({ game:'math-quiz', score, player:'guest' });
       alert('Quiz finished. Score: '+score);
+      return;
     }
+    setIndex(nextIndex);
   }
 
   if(!questions.length) return <div>Loading...</div>;

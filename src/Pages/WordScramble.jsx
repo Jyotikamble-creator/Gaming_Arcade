@@ -5,7 +5,16 @@ export default function WordScramble(){
   const [data, setData] = useState(null);
   const [guess, setGuess] = useState('');
   useEffect(()=> load(), []);
-  async function load(){ const r = await fetchScramble(); setData(r.data); setGuess(''); }
+  async function load(){ 
+    try {
+      const r = await fetchScramble(); 
+      setData(r.data); 
+      setGuess('');
+    } catch (error) {
+      console.error('Failed to load scramble:', error);
+      setData(null);
+    }
+  }
 
   async function check(){
     if(guess.toUpperCase() === data.word.toUpperCase()){
