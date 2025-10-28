@@ -161,75 +161,138 @@
 
 
 
-import React, {useEffect, useState} from 'react';
-import { fetchRandomWord, submitScore } from '../api/Api';
+import React, { useEffect, useState } from 'react'
+import LettersRow from '../components/LettersRow'
+import { fetchWords } from '../api/wordApi'
+import { saveScore } from '../api/scoreApi'
+import Leaderboard from '../components/Leaderboard'
 
-export default function WordGuess(){
-  const [wordData, setWordData] = useState({word:'', description:''});
-  const [chosen, setChosen] = useState([]);
-  const [wrong, setWrong] = useState(0);
-  const [hints, setHints] = useState(3);
-  const [msg, setMsg] = useState('');
-  const [displayWord, setDisplayWord] = useState(false);
-  const [score, setScore] = useState(0);
+export default function WordGuess() {
+  const [wordData, setWordData] = useState({ word: '', description: '' })
+  const [chosen, setChosen] = useState([])
+  const [wrong, setWrong] = useState(0)
+  const [hints, setHints] = useState(3)
+  const [msg, setMsg] = useState('')
+  const [displayWord, setDisplayWord] = useState(false)
+  const [score, setScore] = useState(0)
 
-  useEffect(()=>{ load() }, []);
+  useEffect(() => {
+    load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  async function load(){
-    try{
-      const res = await fetchRandomWord();
-      setWordData(res.data);
-      setChosen([]); setWrong(0); setHints(3); setMsg(''); setDisplayWord(false); setScore(0);
-    }catch(e){ console.error(e) }
+  async function load() {
+    try {
+      const rows = await fetchWords('word-guess')
+      const pick = rows && rows.length ? rows[Math.floor(Math.random() * rows.length)] : { word: 'APPLE', description: 'A fruit' }
+      setWordData({ id: pick.id, word: String(pick.word || '').toUpperCase(), description: pick.description || '' })
+      setChosen([])
+      setWrong(0)
+      setHints(3)
+      setMsg('')
+      setDisplayWord(false)
+      setScore(0)
+    } catch (e) {
+      console.error('load word failed', e)
+      // fallback
+      setWordData({ word: 'APPLE', description: 'A fruit' })
+    }
   }
 
-  const select = (l) => {
-    if(chosen.includes(l) || msg) return;
-    setChosen(prev=>[...prev,l]);
-    if(!wordData.word.includes(l)){ setWrong(w=>w+1); setScore(s=>Math.max(0,s-2)); }
-    else setScore(s=>s+10);
-  };
-
-  useEffect(()=>{
-    if(wrong>=3){ setMsg('Game Over'); setDisplayWord(true); submitScore({game:'word-guess', score}); }
-  },[wrong]);
-
-  const useHint = () => {
-    if(hints<=0) return;
-    const idx = wordData.word.split('').findIndex(c=>!chosen.includes(c));
-    if(idx!==-1){ setChosen(prev=>[...prev, wordData.word[idx]]); setHints(h=>h-1); setScore(s=>Math.max(0,s-5)); }
+  function select(l) {
+    if (chosen.includes(l) || msg) return
+    setChosen(prev => [...prev, l])
+    if (!wordData.word.includes(l)) {
+      setWrong(w => w + 1)
+      setScore(s => Math.max(0, s - 2))
+    } else {
+      setScore(s => s + 10)
+    }
   }
 
-  const checkWin = async () => {
-    const ok = wordData.word.split('').every(c=>chosen.includes(c));
-    if(ok){ setMsg('You Win!'); await submitScore({game:'word-guess', score: score+50}); }
-    else{ setMsg('Wrong guess'); setDisplayWord(true); }
+  useEffect(() => {
+    if (wrong >= 3) {
+      setMsg('Game Over')
+      setDisplayWord(true)
+      // save score (best-effort)
+      saveScore({ game: 'word-guess', player: 'guest', score }).catch(() => {})
+    }
+  }, [wrong])
+
+  function useHint() {
+    if (hints <= 0) return
+    const unrevealed = wordData.word.split('').filter(c => !chosen.includes(c))
+    if (!unrevealed.length) return
+    const pick = unrevealed[Math.floor(Math.random() * unrevealed.length)]
+    setChosen(prev => [...prev, pick])
+    setHints(h => h - 1)
+    setScore(s => Math.max(0, s - 5))
+  }
+
+  async function checkWin() {
+    const ok = wordData.word.split('').every(c => chosen.includes(c))
+    if (ok) {
+      setMsg('You Win!')
+      try {
+        await saveScore({ game: 'word-guess', player: 'guest', score: score + 50 })
+      } catch (e) {
+        console.error('save score failed', e)
+      }
+    } else {
+      setMsg('Wrong guess')
+      setDisplayWord(true)
+    }
   }
 
   return (
-    <div style={{padding:20}}>
+    <div style={{ padding: 20 }}>
       <h2>Word Guess</h2>
-      <div style={{display:'flex', gap:8}}>
-      {Array.from(wordData.word).map((c,i)=> (
-        <div key={i} style={{width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',background:'#222',color:'#fff',borderRadius:6}}>
-          {chosen.includes(c)?c:'_'}
-        </div>
-      ))}
-      </div>
-      <p>{wordData.description}</p>
-      <div style={{marginTop:12}}>
-        {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l=>(
-          <button key={l} onClick={()=>select(l)} disabled={chosen.includes(l)||!!msg} style={{margin:3}}>{l}</button>
+
+      <div style={{ display: 'flex', gap: 8 }}>
+        {Array.from(wordData.word).map((c, i) => (
+          <div key={i} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#222', color: '#fff', borderRadius: 6 }}>
+            {chosen.includes(c) ? c : '_'}
+          </div>
         ))}
       </div>
-      <div style={{marginTop:12}}>
-        <button onClick={()=>{setChosen(prev=>prev.slice(0,-1))}} disabled={!chosen.length}>Remove</button>
-        <button onClick={useHint} disabled={hints<=0}>Hint({hints})</button>
-        <button onClick={checkWin} disabled={!chosen.length||!!msg}>Guess</button>
-        <button onClick={load}>Restart</button>
+
+      <p>{wordData.description}</p>
+
+      <div style={{ marginTop: 12 }}>
+        {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l => (
+          <button key={l} onClick={() => select(l)} disabled={chosen.includes(l) || !!msg} style={{ margin: 3 }}>
+            {l}
+          </button>
+        ))}
       </div>
-      <div>Wrong: {wrong}/3 — Score: {score}</div>
-      {msg && <div style={{marginTop:10}}>{msg}{displayWord && <div>Word: {wordData.word}</div>}</div>}
+
+      <div style={{ marginTop: 12 }}>
+        <button onClick={() => setChosen(prev => prev.slice(0, -1))} disabled={!chosen.length}>
+          Remove
+        </button>
+        <button onClick={useHint} disabled={hints <= 0} style={{ marginLeft: 8 }}>
+          Hint({hints})
+        </button>
+        <button onClick={checkWin} disabled={!chosen.length || !!msg} style={{ marginLeft: 8 }}>
+          Guess
+        </button>
+        <button onClick={load} style={{ marginLeft: 8 }}>
+          Restart
+        </button>
+      </div>
+
+      <div style={{ marginTop: 12 }}>Wrong: {wrong}/3 — Score: {score}</div>
+
+      {msg && (
+        <div style={{ marginTop: 10 }}>
+          {msg}
+          {displayWord && <div>Word: {wordData.word}</div>}
+        </div>
+      )}
+
+      <div style={{ marginTop: 20 }}>
+        <Leaderboard game="word-guess" />
+      </div>
     </div>
-  );
+  )
 }

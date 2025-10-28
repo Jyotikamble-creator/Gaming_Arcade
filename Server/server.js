@@ -38,33 +38,9 @@
 
 
 
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const connectDB = require('./config/db');
+// Legacy CommonJS server (kept for reference). The project now uses the
+// ES-module server at `Server/src/index.js`. Rename this file to avoid it
+// accidentally being started. If you need to restore it, remove the .legacy
+// suffix from the filename.
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-const MONGO = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/gaming_arcade';
-connectDB(MONGO);
-
-// common endpoints
-app.use('/api/common', require('./routes/common'));
-
-// game specific
-app.use('/api/word', require('./routes/word'));
-app.use('/api/memory', require('./routes/memory'));
-app.use('/api/math', require('./routes/math'));
-app.use('/api/typing', require('./routes/typing'));
-app.use('/api/word-scramble', require('./routes/word-scramble'));
-app.use('/api/quiz', require('./routes/quiz'));
-app.use('/api/emoji', require('./routes/emoji'));
-app.use('/api/whack', require('./routes/whack'));
-app.use('/api/simon', require('./routes/simon'));
-
-app.get('/', (req,res)=> res.send('Gaming Arcade API'));
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, ()=> console.log('Server listening on', PORT));
+/* LEGACY: server_legacy.js - moved. */
