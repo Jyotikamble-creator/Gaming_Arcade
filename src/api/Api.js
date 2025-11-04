@@ -3,6 +3,17 @@ import axios from 'axios'
 // Default backend URL: point to local Express server (port 4000)
 const API = axios.create({ baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:4000' })
 
+// Attach auth token from localStorage if present
+API.interceptors.request.use((config) => {
+	try {
+		const token = localStorage.getItem('token')
+		if (token) config.headers = { ...config.headers, Authorization: `Bearer ${token}` }
+	} catch (e) {
+		// ignore
+	}
+	return config
+})
+
 export default API
 
 // Fetch a random word for word-guess. Returns shape similar to older code: { data: { id, word, description } }

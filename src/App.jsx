@@ -57,6 +57,10 @@ import Quiz from './pages/Quiz'
 import EmojiGuess from './pages/EmojiGuess'
 import WhackAMole from './pages/WhackMole'
 import SimonSays from './pages/SimonSays'
+import Login from './pages/auth/Login'
+import Signup from './pages/auth/Signup'
+import Profile from './pages/Profile'
+import Dashboard from './pages/Dashboard'
 
 function Home() {
   return (
@@ -80,6 +84,10 @@ export default function App() {
     <Routes>
       <Route path="/" element={<GameLayout />}>
         <Route index element={<Home />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="word" element={<WordGuess />} />
         <Route path="memory" element={<MemoryCard />} />
         <Route path="math" element={<MathQuiz />} />
