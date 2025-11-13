@@ -215,7 +215,7 @@ export default function WordGuess() {
       setMsg('Game Over')
       setDisplayWord(true)
       // save score (best-effort)
-      saveScore({ game: 'word-guess', player: 'guest', score }).catch(() => {})
+      saveScore({ game: 'word-guess', playerName: 'guest', score }).catch(() => {})
     }
   }, [wrong])
 
@@ -234,7 +234,7 @@ export default function WordGuess() {
     if (ok) {
       setMsg('You Win!')
       try {
-        await saveScore({ game: 'word-guess', player: 'guest', score: score + 50 })
+        await saveScore({ game: 'word-guess', playerName: 'guest', score: score + 50 })
       } catch (e) {
         console.error('save score failed', e)
       }

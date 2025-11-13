@@ -18,7 +18,7 @@ export default function Quiz(){
 
   function answer(opt){
     if(qs[i].ans === opt) setScore(s=>s+10);
-    if(i+1 === qs.length){ submitScore({game:'quiz', score}); alert('Done: '+score); }
+    if(i+1 === qs.length){ submitScore({game:'quiz', playerName:'guest', score}); alert('Done: '+score); }
     else setI(i+1);
   }
 

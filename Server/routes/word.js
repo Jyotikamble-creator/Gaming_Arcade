@@ -1,4 +1,5 @@
-const express = require('express');
+import express from 'express';
+
 const router = express.Router();
 
 const sampleWords = [
@@ -10,27 +11,8 @@ const sampleWords = [
   { word: 'GEEKSFORGEEKS', description: 'Site' }
 ];
 
-router.get('/random', (req,res) => {
-  const idx = Math.floor(Math.random()*sampleWords.length);
-  res.json(sampleWords[idx]);
+router.get('/words', (req,res) => {
+  res.json(sampleWords);
 });
 
-module.exports = router;
-const express = require('express');
-const router = express.Router();
-
-const sampleWords = [
-  { word: 'HELLO', description: 'A common greeting' },
-  { word: 'WORLD', description: 'Our planet' },
-  { word: 'JAVASCRIPT', description: 'Web language' },
-  { word: 'REACT', description: 'UI library' },
-  { word: 'PROGRAMMING', description: 'Coding' },
-  { word: 'GEEKSFORGEEKS', description: 'Site' }
-];
-
-router.get('/random', (req,res) => {
-  const idx = Math.floor(Math.random()*sampleWords.length);
-  res.json(sampleWords[idx]);
-});
-
-module.exports = router;
+export default router;

@@ -25,7 +25,7 @@ export default function Leaderboard({ game = 'word-guess' }) {
       <h3>Leaderboard</h3>
       <ol>
         {scores.map((s, idx) => (
-          <li key={idx}>{s.player} — {s.score}</li>
+          <li key={idx}>{s.playerName || (s.user && (s.user.displayName || s.user.username)) || 'Anonymous'} — {s.score}</li>
         ))}
       </ol>
     </div>

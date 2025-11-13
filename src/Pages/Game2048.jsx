@@ -78,7 +78,7 @@ export default function Game2048(){
       // Check for 2048
       if(newBoard.some(row => row.some(cell => cell === 2048))) {
         alert('You reached 2048! You win!')
-        submitScore({ game: '2048', player: 'guest', score: score + result.score })
+        submitScore({ game: '2048', playerName: 'guest', score: score + result.score })
         setGameOver(true)
       }
     }

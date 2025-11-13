@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon --watch src --exec node --experimental-specifier-resolution=node src/index.js"
+    "start": "node index.js",
+    "dev": "nodemon --exec node --experimental-specifier-resolution=node index.js"
   },
   "dependencies": {
     "body-parser": "^1.20.2",
