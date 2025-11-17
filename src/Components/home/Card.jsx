@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-const Card = ({ icon, title, description }) => {
-  return (
+const Card = ({ icon, title, description, path }) => {
+  const content = (
     <div className="bg-card-bg p-6 rounded-lg shadow-xl hover:shadow-2xl transition duration-300 ease-in-out border border-transparent hover:border-primary-blue cursor-pointer">
       {/* Icon (Placeholder: replace with actual icons or SVGs) */}
       <div className="text-4xl font-bold text-primary-blue mb-4">
@@ -17,6 +18,8 @@ const Card = ({ icon, title, description }) => {
       </p>
     </div>
   );
+
+  return path ? <Link to={path}>{content}</Link> : content;
 };
 
 export default Card;

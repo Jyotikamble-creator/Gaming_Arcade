@@ -1,52 +1,5 @@
-// import React from 'react'
-// import { Routes, Route, Link } from 'react-router-dom'
-
-
-// import WordGuess from './Pages/WordGuess'
-
-// function Home() {
-// 	return (
-// 		<div style={{ padding: 20 }}>
-// 			<h1>Welcome to Game Arcade</h1>
-// 			<p>Choose a game from the Games hub.</p>
-// 		</div>
-// 	)
-// }
-
-// function GamesHub() {
-// 	return (
-// 		<div style={{ padding: 20 }}>
-// 			<h2>Games</h2>
-// 			<ul>
-// 				<li><Link to="/games/word-guess">Word Guess</Link></li>
-// 				{/* add other games here as you build them */}
-// 			</ul>
-// 		</div>
-// 	)
-// }
-
-// export default function App() {
-// 	return (
-// 		<div>
-// 			<header style={{padding:16, borderBottom:'1px solid #ddd'}}>
-// 				<Link to="/">Home</Link> | <Link to="/games">Games</Link>
-// 			</header>
-// 			<Routes>
-// 				<Route path="/" element={<Home />} />
-// 				<Route path="/games" element={<GamesHub />} />
-// 				<Route path="/games/word-guess" element={<WordGuess />} />
-// 			</Routes>
-// 		</div>
-// 	)
-// }
-
-
-
-
-
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
-import GameLayout from './components/GameLayout'
 import WordGuess from './pages/WordGuess'
 import MemoryCard from './pages/MemoryCard'
 import MathQuiz from './pages/MathQuiz'
@@ -55,21 +8,14 @@ import Game2048 from './pages/Game2048'
 import WordScramble from './pages/WordScramble'
 import Quiz from './pages/Quiz'
 import EmojiGuess from './pages/EmojiGuess'
-import WhackAMole from './pages/WhackMole'
+import WhackMole from './pages/WhackMole'
 import SimonSays from './pages/SimonSays'
+import TicTacToe from './pages/TicTacToe'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import Profile from './pages/Profile'
 import Dashboard from './pages/Dashboard'
-
-function Home() {
-  return (
-    <div style={{ padding: 20 }}>
-      <h1>Gaming Arcade</h1>
-      <p>Choose a game from the header or Games hub.</p>
-    </div>
-  )
-}
+import Home from './pages/Home'
 
 function NotFound() {
   return (
@@ -82,24 +28,23 @@ function NotFound() {
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<GameLayout />}>
-        <Route index element={<Home />} />
-        <Route path="login" element={<Login />} />
-        <Route path="signup" element={<Signup />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="word" element={<WordGuess />} />
-        <Route path="memory" element={<MemoryCard />} />
-        <Route path="math" element={<MathQuiz />} />
-        <Route path="typing" element={<TypingTest />} />
-        <Route path="2048" element={<Game2048 />} />
-        <Route path="scramble" element={<WordScramble />} />
-        <Route path="quiz" element={<Quiz />} />
-        <Route path="emoji" element={<EmojiGuess />} />
-        <Route path="whack" element={<WhackAMole />} />
-        <Route path="simon" element={<SimonSays />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/word-guess" element={<WordGuess />} />
+      <Route path="/memory-card" element={<MemoryCard />} />
+      <Route path="/math-quiz" element={<MathQuiz />} />
+      <Route path="/typing-test" element={<TypingTest />} />
+      <Route path="/2048" element={<Game2048 />} />
+      <Route path="/word-scramble" element={<WordScramble />} />
+      <Route path="/quiz" element={<Quiz />} />
+      <Route path="/emoji-guess" element={<EmojiGuess />} />
+      <Route path="/whack-a-mole" element={<WhackMole />} />
+      <Route path="/simon-says" element={<SimonSays />} />
+      <Route path="/tic-tac-toe" element={<TicTacToe />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }

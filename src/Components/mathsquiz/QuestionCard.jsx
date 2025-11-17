@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import TimerDisplay from './TimerDisplay';
+import ProgressBar from './ProgressBar';
 
 const QuestionCard = ({ currentQ, totalQ, question, feedbackStatus }) => {
   const [answer, setAnswer] = useState('');

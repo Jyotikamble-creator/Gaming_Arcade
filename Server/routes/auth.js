@@ -7,6 +7,19 @@ const router = express.Router()
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key'
 
+const authenticate = async (req, res, next) => {
+  try {
+    const auth = req.headers.authorization
+    if (!auth) return res.status(401).json({ error: 'no token' })
+    const token = auth.split(' ')[1]
+    const decoded = jwt.verify(token, JWT_SECRET)
+    req.user = decoded
+    next()
+  } catch (err) {
+    res.status(401).json({ error: 'invalid token' })
+  }
+}
+
 // POST /api/auth/signup
 router.post('/signup', async (req, res) => {
   try {
@@ -55,6 +68,21 @@ router.get('/me', async (req, res) => {
   } catch (err) {
     console.error('me err', err)
     res.status(401).json({ error: 'invalid token' })
+  }
+})
+
+// PUT /api/auth/profile
+router.put('/profile', authenticate, async (req, res) => {
+  try {
+    const { displayName } = req.body
+    const user = await User.findById(req.user.id)
+    if (!user) return res.status(404).json({ error: 'user not found' })
+    user.displayName = displayName
+    await user.save()
+    res.json({ user: { id: user._id, username: user.username, displayName: user.displayName } })
+  } catch (err) {
+    console.error('profile update err', err)
+    res.status(500).json({ error: 'server error' })
   }
 })
 

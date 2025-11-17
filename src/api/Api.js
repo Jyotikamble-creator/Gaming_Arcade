@@ -18,7 +18,7 @@ export default API
 
 // Fetch a random word for word-guess. Returns shape similar to older code: { data: { id, word, description } }
 export const fetchRandomWord = async () => {
-	const res = await API.get('/api/games/word-guess/words')
+	const res = await API.get('/api/games/word/words')
 	const rows = res.data || []
 	const pick = rows.length ? rows[Math.floor(Math.random() * rows.length)] : { id: null, word: 'APPLE', description: 'A fruit' }
 	return { data: pick }
@@ -26,11 +26,11 @@ export const fetchRandomWord = async () => {
 
 // Generic stubs for other games - they will call conventional endpoints if implemented on the server
 export const startMemory = () => API.get('/api/games/memory-card/start')
-export const fetchMathQuestions = () => API.get('/api/questions/math-quiz')
+export const fetchMathQuestions = () => API.get('/api/games/math/questions')
 export const fetchTypingPassage = () => API.get('/api/typing/passage')
 export const fetchScramble = () => API.get('/api/games/word-scramble/words')
 export const fetchQuiz = () => API.get('/api/games/quiz/questions')
-export const fetchEmoji = () => API.get('/api/games/emoji-guess/words')
+export const fetchEmoji = () => API.get('/api/games/emoji/start')
 export const startWhack = () => API.get('/api/games/whack/start')
 export const startSimon = () => API.get('/api/games/simon/start')
 

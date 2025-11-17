@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { me } from './api/../api/authApi'
+import { me } from '../api/authApi'
 
 export default function Profile() {
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null }
   })
   const [displayName, setDisplayName] = useState(user?.displayName || '')
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     async function load() {
@@ -20,12 +21,26 @@ export default function Profile() {
     load()
   }, [])
 
-  function save() {
-    // Minimal: store on client until server profile endpoint exists
-    const updated = { ...user, displayName }
-    localStorage.setItem('user', JSON.stringify(updated))
-    setUser(updated)
-    alert('Profile saved locally. Server update endpoint not implemented.')
+  async function save() {
+    try {
+      setError(null)
+      // Call the new profile update API
+      const response = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ displayName })
+      })
+      if (!response.ok) throw new Error('Failed to update profile')
+      const data = await response.json()
+      setUser(data.user)
+      localStorage.setItem('user', JSON.stringify(data.user))
+      alert('Profile updated successfully!')
+    } catch (err) {
+      setError(err.message || 'Failed to update profile')
+    }
   }
 
   if (!user) return <div style={{ padding: 20 }}>Not signed in</div>
@@ -38,6 +53,7 @@ export default function Profile() {
         <label>Display name</label>
         <input value={displayName} onChange={e => setDisplayName(e.target.value)} />
       </div>
+      {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
       <div style={{ marginTop: 12 }}>
         <button onClick={save}>Save profile</button>
       </div>

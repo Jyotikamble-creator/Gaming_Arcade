@@ -2,14 +2,38 @@ import express from 'express';
 
 const router = express.Router();
 
-const questions = [
-  { id:1, q: 'If x+2=7, x^2 = ?', options: ['25','35','20','49'], ans:'25' },
-  { id:2, q: 'Solve: 5*(2+3)-4^2 = ?', options:['5','9','1','-3'], ans:'5' },
-  { id:3, q: 'What is 15% of 200?', options:['20','30','15','25'], ans:'30' },
-  { id:4, q: 'Tricky: (1/2 + 1/3) * 6 = ?', options:['4','3','2','5'], ans:'4' }
-];
+function generateMathQuestion() {
+  const operations = ['+', '-', '*'];
+  const op = operations[Math.floor(Math.random() * operations.length)];
+  let a, b, ans;
+  if (op === '+') {
+    a = Math.floor(Math.random() * 50) + 1;
+    b = Math.floor(Math.random() * 50) + 1;
+    ans = a + b;
+  } else if (op === '-') {
+    a = Math.floor(Math.random() * 50) + 10;
+    b = Math.floor(Math.random() * a) + 1;
+    ans = a - b;
+  } else {
+    a = Math.floor(Math.random() * 10) + 1;
+    b = Math.floor(Math.random() * 10) + 1;
+    ans = a * b;
+  }
+  const q = `${a} ${op} ${b} = ?`;
+  const options = [ans, ans + Math.floor(Math.random() * 10) + 1, ans - Math.floor(Math.random() * 10) + 1, ans + Math.floor(Math.random() * 20) - 10].filter((val, idx, arr) => arr.indexOf(val) === idx); // unique
+  while (options.length < 4) {
+    const extra = ans + Math.floor(Math.random() * 20) - 10;
+    if (!options.includes(extra)) options.push(extra);
+  }
+  options.sort(() => Math.random() - 0.5);
+  return { q, options, ans: ans.toString() };
+}
 
 router.get('/questions', (req,res) => {
+  const questions = [];
+  for (let i = 0; i < 10; i++) {
+    questions.push({ id: i + 1, ...generateMathQuestion() });
+  }
   res.json({ questions });
 });
 
