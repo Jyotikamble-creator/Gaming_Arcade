@@ -16,6 +16,7 @@ import mathRoute from './routes/math.js'
 import emojiRoute from './routes/emoji.js'
 import scoresRoute from './routes/scores.js'
 import authRoute from './routes/auth.js'
+import progressRoute from './routes/progress.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -44,6 +45,7 @@ app.use('/api/games/memory', memoryRoute)
 app.use('/api/games/math', mathRoute)
 app.use('/api/games/emoji', emojiRoute)
 app.use('/api/scores', scoresRoute)
+app.use('/api/progress', progressRoute)
 
 // Some convenience endpoints preserved from previous implementation where
 // route modules return static/sample data.

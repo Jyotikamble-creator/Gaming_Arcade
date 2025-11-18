@@ -1,27 +1,26 @@
 import React, { useEffect, useState } from 'react'
-import { fetchScores } from '../api/scoreApi'
+import { fetchMyScores, fetchProgress } from '../api/scoreApi'
 
 export default function Dashboard() {
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null }
   })
-  const [scores, setScores] = useState({})
+  const [progress, setProgress] = useState(null)
+  const [myScores, setMyScores] = useState([])
 
   useEffect(() => {
     async function load() {
       if (!user) return
-      // fetch top scores per game for display; using existing API which returns top scores for a game
-      const games = ['word-guess','memory-card','math-quiz','typing-test','2048']
-      const obj = {}
-      for (const g of games) {
-        try {
-          const res = await fetchScores(g, 5)
-          obj[g] = res
-        } catch (e) {
-          obj[g] = []
-        }
+      try {
+        const [prog, scores] = await Promise.all([
+          fetchProgress(),
+          fetchMyScores()
+        ])
+        setProgress(prog)
+        setMyScores(scores)
+      } catch (e) {
+        console.error('Failed to load dashboard data', e)
       }
-      setScores(obj)
     }
     load()
   }, [user])
@@ -36,17 +35,38 @@ export default function Dashboard() {
   return (
     <div style={{ padding: 20 }}>
       <h2>{user.displayName || user.username}'s Dashboard</h2>
-      <p>Recent top scores (global) by game:</p>
-      <div>
-        {Object.keys(scores).map(g => (
-          <div key={g} style={{ marginTop: 12 }}>
-            <h4>{g}</h4>
-            <ol>
-              {(scores[g] || []).map((s, i) => <li key={i}>{s.player} — {s.score}</li>)}
-            </ol>
-          </div>
+      {progress ? (
+        <div>
+          <h3>Progress Summary</h3>
+          <p>Total Games Played: {progress.totalGames}</p>
+          <p>Games Played:</p>
+          <ul>
+            {Object.entries(progress.gamesPlayed).map(([game, count]) => (
+              <li key={game}>{game}: {count} times</li>
+            ))}
+          </ul>
+          <p>Best Scores:</p>
+          <ul>
+            {Object.entries(progress.bestScores).map(([game, score]) => (
+              <li key={game}>{game}: {score}</li>
+            ))}
+          </ul>
+          <h3>Recent Scores</h3>
+          <ul>
+            {progress.recentScores.map((s, i) => (
+              <li key={i}>{s.game}: {s.score} on {new Date(s.createdAt).toLocaleDateString()}</li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <p>Loading progress...</p>
+      )}
+      <h3>All My Scores</h3>
+      <ul>
+        {myScores.map((s, i) => (
+          <li key={i}>{s.game}: {s.score} on {new Date(s.createdAt).toLocaleDateString()}</li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

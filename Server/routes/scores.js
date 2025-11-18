@@ -1,11 +1,15 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
+import rateLimit from 'express-rate-limit'
 import Score from '../models/Score.js'
 import User from '../models/User.js'
 
 const router = express.Router()
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key'
+
+// Rate limiter for score submissions: 10 per minute per IP
+const scoreLimiter = rateLimit({ windowMs: 60 * 1000, max: 10, message: 'Too many score submissions, please try again later.' })
 
 // Helper: try to decode token, return userId or null
 async function decodeUserIdFromHeader(req) {
@@ -22,10 +26,15 @@ async function decodeUserIdFromHeader(req) {
 
 // POST /api/scores
 // Body: { game, score, meta?, playerName? }
-router.post('/', async (req, res) => {
+router.post('/', scoreLimiter, async (req, res) => {
   try {
     const { game, score, meta, playerName } = req.body
-    if (!game || typeof score !== 'number') return res.status(400).json({ error: 'game and numeric score required' })
+    if (!game || typeof game !== 'string' || typeof score !== 'number' || score < 0) {
+      return res.status(400).json({ error: 'game (string) and score (non-negative number) required' })
+    }
+    if (meta && typeof meta !== 'object') {
+      return res.status(400).json({ error: 'meta must be an object if provided' })
+    }
     const userId = await decodeUserIdFromHeader(req)
     const doc = await Score.create({
       game,
