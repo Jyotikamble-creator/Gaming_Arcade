@@ -8,9 +8,10 @@ body {
 }
 
 /* Tailwind custom theme colors */
-:root {
-  --primary-blue: #3b82f6;
-  --light-text: #f8fafc;
-  --subtle-text: #94a3b8;
-  --card-bg: #1e293b;
+@theme {
+  --color-primary-blue: #3b82f6;
+  --color-light-text: #f8fafc;
+  --color-subtle-text: #94a3b8;
+  --color-card-bg: #1e293b;
+  --color-dark-bg: #0d1117;
 }
