@@ -1,11 +1,11 @@
 import API from './Api'
 
-export async function signup({ username, email, password, displayName }) {
+export async function signup({ email, password }) {
   const res = await API.post('/api/auth/signup', { email, password })
   return res.data
 }
 
-export async function login({ usernameOrEmail, password }) {
+export async function login({ email, password }) {
   const res = await API.post('/api/auth/login', { email, password })
   return res.data
 }
