@@ -3,8 +3,10 @@ import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Login from './components/auth/Login'
 import Signup from './components/auth/Signup'
+import { logger, LogTags } from './lib/logger'
 
 function NotFound() {
+  logger.warn('404 Page not found accessed', { path: window.location.pathname }, LogTags.SESSIONS)
   return (
     <div style={{ padding: 20 }}>
       <h2>404 — Page not found</h2>

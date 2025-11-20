@@ -166,6 +166,7 @@ import LettersRow from '../components/LettersRow'
 import { fetchWords } from '../api/wordApi'
 import { saveScore } from '../api/scoreApi'
 import Leaderboard from '../components/Leaderboard'
+import { logger, LogTags } from '../lib/logger'
 
 export default function WordGuess() {
   const [wordData, setWordData] = useState({ word: '', description: '' })
@@ -183,6 +184,7 @@ export default function WordGuess() {
 
   async function load() {
     try {
+      logger.info('Loading word for WordGuess game', {}, LogTags.WORD_GUESS)
       const rows = await fetchWords('word-guess')
       const pick = rows && rows.length ? rows[Math.floor(Math.random() * rows.length)] : { word: 'APPLE', description: 'A fruit' }
       setWordData({ id: pick.id, word: String(pick.word || '').toUpperCase(), description: pick.description || '' })
@@ -192,8 +194,9 @@ export default function WordGuess() {
       setMsg('')
       setDisplayWord(false)
       setScore(0)
+      logger.info('Word loaded successfully', { word: pick.word }, LogTags.WORD_GUESS)
     } catch (e) {
-      console.error('load word failed', e)
+      logger.error('Failed to load word', e, {}, LogTags.WORD_GUESS)
       // fallback
       setWordData({ word: 'APPLE', description: 'A fruit' })
     }
@@ -235,12 +238,14 @@ export default function WordGuess() {
       setMsg('You Win!')
       try {
         await saveScore({ game: 'word-guess', playerName: 'guest', score: score + 50 })
+        logger.info('WordGuess game won', { score: score + 50 }, LogTags.SAVE_SCORE)
       } catch (e) {
-        console.error('save score failed', e)
+        logger.error('Failed to save score on win', e, { score: score + 50 }, LogTags.SAVE_SCORE)
       }
     } else {
       setMsg('Wrong guess')
       setDisplayWord(true)
+      logger.warn('WordGuess wrong guess', { word: wordData.word, chosen }, LogTags.WORD_GUESS)
     }
   }
 

@@ -1,5 +1,6 @@
 import React,{useEffect, useState} from 'react';
 import { fetchMathQuestions, submitScore } from '../api/Api';
+import { logger, LogTags } from '../lib/logger';
 
 export default function MathQuiz(){
   const [questions, setQuestions] = useState([]);
@@ -9,19 +10,24 @@ export default function MathQuiz(){
   useEffect(()=> load(), []);
   async function load(){
     try {
+      logger.info('Loading math questions', {}, LogTags.MATH_QUIZ);
       const res = await fetchMathQuestions();
       setQuestions(res.data.questions || []);
+      logger.info('Math questions loaded', { count: res.data.questions?.length }, LogTags.MATH_QUIZ);
     } catch (error) {
-      console.error('Failed to load questions:', error);
+      logger.error('Failed to load math questions', error, {}, LogTags.MATH_QUIZ);
       setQuestions([]);
     }
   }
 
   function answer(opt){
-    if(questions[index].ans === opt){ setScore(s=>s+10); }
+    const correct = questions[index].ans === opt;
+    if(correct){ setScore(s=>s+10); }
+    logger.debug('Math quiz answer', { questionIndex: index, correct, score: correct ? score + 10 : score }, LogTags.MATH_QUIZ);
     const nextIndex = index + 1;
     if(nextIndex >= questions.length){
       submitScore({ game:'math-quiz', score, player:'guest' });
+      logger.info('Math quiz completed', { finalScore: score }, LogTags.SAVE_SCORE);
       alert('Quiz finished. Score: '+score);
       return;
     }

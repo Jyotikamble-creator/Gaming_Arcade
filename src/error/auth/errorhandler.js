@@ -52,6 +52,7 @@ export function categorizeAxiosError(err) {
   
   if (e.isAxiosError) {
     if (e.code === "ECONNABORTED") {
+      console.error('[ERROR] Timeout error:', e.message);
       return new TimeoutError(e.message || "Request timed out");
     }
     
@@ -62,17 +63,21 @@ export function categorizeAxiosError(err) {
       
       if (typeof status === "number") {
         if (status >= 400 && status < 500) {
+          console.error('[ERROR] Client request error:', { status, statusText, message: e.message });
           return new ClientRequestError(e.message || "Client error", status, statusText, resp);
         }
         if (status >= 500) {
+          console.error('[ERROR] Server response error:', { status, statusText, message: e.message });
           return new ServerResponseError(e.message || "Server error", status, statusText, resp);
         }
       }
     } else if (e.request) {
+      console.error('[ERROR] Connection error:', e.message);
       return new ConnectionError(e.message || "No response received");
     }
   }
   
   // fallback
+  console.error('[ERROR] Unknown error:', err);
   return new Error(String(err));
 }

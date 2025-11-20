@@ -29,10 +29,13 @@ async function decodeUserIdFromHeader(req) {
 router.post('/', scoreLimiter, async (req, res) => {
   try {
     const { game, score, meta, playerName } = req.body
+    console.log('[SCORES] Score submission attempt:', { game, score, playerName })
     if (!game || typeof game !== 'string' || typeof score !== 'number' || score < 0) {
+      console.warn('[SCORES] Invalid score submission:', { game, score })
       return res.status(400).json({ error: 'game (string) and score (non-negative number) required' })
     }
     if (meta && typeof meta !== 'object') {
+      console.warn('[SCORES] Invalid meta in score submission')
       return res.status(400).json({ error: 'meta must be an object if provided' })
     }
     const userId = await decodeUserIdFromHeader(req)
@@ -43,9 +46,10 @@ router.post('/', scoreLimiter, async (req, res) => {
       playerName: userId ? undefined : (playerName || 'guest'),
       user: userId || null
     })
+    console.log('[SCORES] Score submitted successfully:', { id: doc._id, game, score })
     res.status(201).json({ ok: true, score: doc })
   } catch (err) {
-    console.error('scores POST err', err)
+    console.error('[SCORES] Score submission error:', err)
     res.status(500).json({ error: 'server error' })
   }
 })
@@ -54,12 +58,14 @@ router.post('/', scoreLimiter, async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const { game, limit = 10 } = req.query
+    console.log('[SCORES] Fetching scores:', { game, limit })
     const q = {}
     if (game) q.game = game
     const docs = await Score.find(q).sort({ score: -1, createdAt: 1 }).limit(Number(limit)).populate('user', 'username displayName')
+    console.log('[SCORES] Scores fetched:', { count: docs.length, game })
     res.json(docs)
   } catch (err) {
-    console.error('scores GET err', err)
+    console.error('[SCORES] Fetch scores error:', err)
     res.status(500).json({ error: 'server error' })
   }
 })
@@ -68,14 +74,19 @@ router.get('/', async (req, res) => {
 router.get('/me', async (req, res) => {
   try {
     const userId = await decodeUserIdFromHeader(req)
-    if (!userId) return res.status(401).json({ error: 'unauthorized' })
+    if (!userId) {
+      console.warn('[SCORES] Unauthorized access to /me')
+      return res.status(401).json({ error: 'unauthorized' })
+    }
     const { game } = req.query
+    console.log('[SCORES] Fetching user scores:', { userId, game })
     const q = { user: userId }
     if (game) q.game = game
     const docs = await Score.find(q).sort({ createdAt: -1 }).limit(100)
+    console.log('[SCORES] User scores fetched:', { userId, count: docs.length })
     res.json(docs)
   } catch (err) {
-    console.error('scores me err', err)
+    console.error('[SCORES] Fetch user scores error:', err)
     res.status(500).json({ error: 'server error' })
   }
 })

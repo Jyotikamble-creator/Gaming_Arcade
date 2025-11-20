@@ -47,6 +47,13 @@ app.use('/api/games/emoji', emojiRoute)
 app.use('/api/scores', scoresRoute)
 app.use('/api/progress', progressRoute)
 
+// POST /api/logs - for client-side logging in development
+app.post('/api/logs', (req, res) => {
+  const { level, tag, message, context } = req.body;
+  console.log(`[CLIENT-${level.toUpperCase()}] [${tag}] ${message}`, context ? JSON.stringify(context) : '');
+  res.status(200).json({ ok: true });
+});
+
 // Some convenience endpoints preserved from previous implementation where
 // route modules return static/sample data.
 
