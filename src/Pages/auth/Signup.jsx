@@ -17,8 +17,8 @@ export default function Signup() {
       const data = await signup({ username, email, password, displayName })
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      // go to profile to complete
-      nav('/profile')
+      // go to login after signup
+      nav('/login')
     } catch (err) {
       setError(err?.response?.data?.error || err.message || 'Signup failed')
     }

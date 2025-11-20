@@ -1,72 +1,70 @@
-import React, { useEffect, useState } from 'react'
-import { fetchMyScores, fetchProgress } from '../api/scoreApi'
+import React from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+
+const games = [
+  { name: 'Word Guess', path: '/word-guess' },
+  { name: 'Memory Card', path: '/memory-card' },
+  { name: 'Math Quiz', path: '/math-quiz' },
+  { name: 'Typing Test', path: '/typing-test' },
+  { name: '2048', path: '/2048' },
+  { name: 'Word Scramble', path: '/word-scramble' },
+  { name: 'Quiz', path: '/quiz' },
+  { name: 'Emoji Guess', path: '/emoji-guess' },
+  { name: 'Whack Mole', path: '/whack-a-mole' },
+  { name: 'Simon Says', path: '/simon-says' },
+  { name: 'Tic Tac Toe', path: '/tic-tac-toe' },
+]
 
 export default function Dashboard() {
-  const [user, setUser] = useState(() => {
+  const nav = useNavigate()
+  const user = (() => {
     try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null }
-  })
-  const [progress, setProgress] = useState(null)
-  const [myScores, setMyScores] = useState([])
+  })()
 
-  useEffect(() => {
-    async function load() {
-      if (!user) return
-      try {
-        const [prog, scores] = await Promise.all([
-          fetchProgress(),
-          fetchMyScores()
-        ])
-        setProgress(prog)
-        setMyScores(scores)
-      } catch (e) {
-        console.error('Failed to load dashboard data', e)
-      }
-    }
-    load()
-  }, [user])
+  if (!user) {
+    nav('/login')
+    return null
+  }
 
-  if (!user) return (
-    <div style={{ padding: 20 }}>
-      <h2>Dashboard</h2>
-      <p>Please <a href="/login">login</a> to see your dashboard.</p>
-    </div>
-  )
+  function logout() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    nav('/')
+  }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>{user.displayName || user.username}'s Dashboard</h2>
-      {progress ? (
-        <div>
-          <h3>Progress Summary</h3>
-          <p>Total Games Played: {progress.totalGames}</p>
-          <p>Games Played:</p>
-          <ul>
-            {Object.entries(progress.gamesPlayed).map(([game, count]) => (
-              <li key={game}>{game}: {count} times</li>
-            ))}
-          </ul>
-          <p>Best Scores:</p>
-          <ul>
-            {Object.entries(progress.bestScores).map(([game, score]) => (
-              <li key={game}>{game}: {score}</li>
-            ))}
-          </ul>
-          <h3>Recent Scores</h3>
-          <ul>
-            {progress.recentScores.map((s, i) => (
-              <li key={i}>{s.game}: {s.score} on {new Date(s.createdAt).toLocaleDateString()}</li>
-            ))}
-          </ul>
+    <div className="flex h-screen bg-dark-bg text-light-text">
+      {/* Sidebar */}
+      <div className="w-64 bg-gray-800 p-4">
+        <h2 className="text-xl font-bold mb-4">Gamehub</h2>
+        <ul>
+          {games.map((game, i) => (
+            <li key={i} className="mb-2">
+              <Link to={game.path} className="hover:text-primary-blue">{game.name}</Link>
+            </li>
+          ))}
+        </ul>
+        <button onClick={logout} className="mt-4 bg-red-500 text-white px-3 py-1 rounded">Logout</button>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-8">
+        <h1 className="text-3xl font-bold mb-8">Welcome to Gamehub, {user.displayName || user.username}!</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Link to="/scores" className="bg-gray-700 p-6 rounded-lg hover:bg-gray-600 transition">
+            <h3 className="text-xl font-semibold mb-2">Scores</h3>
+            <p>View all your game scores.</p>
+          </Link>
+          <Link to="/leaderboard" className="bg-gray-700 p-6 rounded-lg hover:bg-gray-600 transition">
+            <h3 className="text-xl font-semibold mb-2">Leaderboard</h3>
+            <p>See top scores across games.</p>
+          </Link>
+          <Link to="/progress" className="bg-gray-700 p-6 rounded-lg hover:bg-gray-600 transition">
+            <h3 className="text-xl font-semibold mb-2">Progress</h3>
+            <p>Track your gaming progress.</p>
+          </Link>
         </div>
-      ) : (
-        <p>Loading progress...</p>
-      )}
-      <h3>All My Scores</h3>
-      <ul>
-        {myScores.map((s, i) => (
-          <li key={i}>{s.game}: {s.score} on {new Date(s.createdAt).toLocaleDateString()}</li>
-        ))}
-      </ul>
+      </div>
     </div>
   )
 }
