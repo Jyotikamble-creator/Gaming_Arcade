@@ -1,171 +1,12 @@
-// // src/Pages/WordGuess.jsx
-// import React, { useEffect, useState } from 'react'
-// import LettersRow from '../components/LettersRow' // create this file (I provide below)
-
-// // Sample words list — you can later load from JSON or server
-// const WORDS = [
-//   { word: 'APPLE', description: 'A fruit' },
-//   { word: 'MANGO', description: 'Tropical fruit' },
-//   { word: 'HOUSE', description: 'Place to live' },
-// ]
-
-// async function saveScore(payload) {
-//   // Attempts to POST to /api/scores; catches errors and logs them.
-//   try {
-//     await fetch('/api/scores', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify(payload),
-//     })
-//   } catch (e) {
-//     console.error('Failed saving score:', e)
-//   }
-// }
-
-// export default function WordGuess() {
-//   const [wordData, setWordData] = useState(WORDS[0])
-//   const [chosenLetters, setChosenLetters] = useState([])
-//   const [hints, setHints] = useState(2)
-//   const [displayWord, setDisplayWord] = useState(false)
-//   const [score, setScore] = useState(0)
-//   const [wrongGuesses, setWrongGuesses] = useState(0)
-//   const [msg, setMsg] = useState('')
-
-//   useEffect(() => {
-//     loadWord()
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [])
-
-//   function loadWord() {
-//     const next = WORDS[Math.floor(Math.random() * WORDS.length)]
-//     setWordData(next)
-//     setChosenLetters([])
-//     setDisplayWord(false)
-//     setMsg('')
-//     setWrongGuesses(0)
-//   }
-
-//   function selectLetter(letter) {
-//     if (chosenLetters.includes(letter)) return
-//     setChosenLetters(prev => [...prev, letter])
-//   }
-
-//   function removeLast() {
-//     setChosenLetters(prev => prev.slice(0, -1))
-//   }
-
-//   function hint() {
-//     if (hints <= 0) return
-//     // reveal a random unrevealed letter
-//     const unrevealed = Array.from(new Set(wordData.word.split(''))).filter(
-//       c => !chosenLetters.includes(c)
-//     )
-//     if (!unrevealed.length) return
-//     const pick = unrevealed[Math.floor(Math.random() * unrevealed.length)]
-//     setChosenLetters(prev => [...prev, pick])
-//     setHints(h => h - 1)
-//   }
-
-//   function checkWin() {
-//     return wordData.word.split('').every(l => chosenLetters.includes(l))
-//   }
-
-//   async function guess() {
-//     if (checkWin()) {
-//       setMsg('You Won!')
-//       setScore(s => s + 50)
-//       try {
-//         await saveScore({ game: 'word-guess', player: 'guest', score: score + 50 })
-//       } catch (e) {
-//         console.error(e)
-//       }
-//     } else {
-//       setMsg('Wrong guess, reveal word!')
-//       setDisplayWord(true)
-//       setWrongGuesses(w => w + 1)
-//       setScore(s => Math.max(0, s - 5))
-//     }
-//   }
-
-//   return (
-//     <div style={{ padding: 20 }}>
-//       <h2>Word Guess</h2>
-
-//       <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-//         {Array.from(wordData.word).map((ch, idx) => (
-//           <div
-//             key={idx}
-//             style={{
-//               width: 48,
-//               height: 48,
-//               display: 'flex',
-//               alignItems: 'center',
-//               justifyContent: 'center',
-//               background: '#333',
-//               color: '#fff',
-//               borderRadius: 6,
-//               fontSize: 18,
-//             }}
-//             aria-hidden={!chosenLetters.includes(ch)}
-//             role="text"
-//           >
-//             {chosenLetters.includes(ch) ? ch : ''}
-//           </div>
-//         ))}
-//       </div>
-
-//       <p className="word-description" style={{ marginTop: 12 }}>
-//         {wordData.description}
-//       </p>
-
-//       <div style={{ marginTop: 16 }}>
-//         <LettersRow chosenLetters={chosenLetters} onSelect={selectLetter} />
-//       </div>
-
-//       <div style={{ marginTop: 16 }}>
-//         <button onClick={removeLast} disabled={!chosenLetters.length}>
-//           Remove
-//         </button>
-//         <button onClick={hint} disabled={hints <= 0} style={{ marginLeft: 8 }}>
-//           Hint ({hints})
-//         </button>
-//         <button onClick={guess} disabled={!chosenLetters.length} style={{ marginLeft: 8 }}>
-//           Guess
-//         </button>
-//         <button onClick={loadWord} style={{ marginLeft: 8 }}>
-//           Restart
-//         </button>
-//       </div>
-
-//       <div style={{ marginTop: 16 }}>
-//         <div>Score: {score}</div>
-//         <div>Wrong: {wrongGuesses}</div>
-//       </div>
-
-//       {msg && (
-//         <div style={{ marginTop: 16 }}>
-//           <strong>{msg}</strong>
-//           {displayWord && <div>Word: {wordData.word}</div>}
-//         </div>
-//       )}
-//     </div>
-//   )
-// }
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from 'react'
-import LettersRow from '../components/LettersRow'
 import { fetchWords } from '../api/wordApi'
 import { saveScore } from '../api/scoreApi'
 import Leaderboard from '../components/Leaderboard'
+import WordDisplay from '../components/wordguess/WordDisplay'
+import LetterSelector from '../components/wordguess/LetterSelector'
+import GameControls from '../components/wordguess/GameControls'
+import GameStats from '../components/wordguess/GameStats'
+import GameMessage from '../components/wordguess/GameMessage'
 import { logger, LogTags } from '../lib/logger'
 
 export default function WordGuess() {
@@ -176,6 +17,7 @@ export default function WordGuess() {
   const [msg, setMsg] = useState('')
   const [displayWord, setDisplayWord] = useState(false)
   const [score, setScore] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     load()
@@ -184,6 +26,7 @@ export default function WordGuess() {
 
   async function load() {
     try {
+      setIsLoading(true)
       logger.info('Loading word for WordGuess game', {}, LogTags.WORD_GUESS)
       const rows = await fetchWords('word-guess')
       const pick = rows && rows.length ? rows[Math.floor(Math.random() * rows.length)] : { word: 'APPLE', description: 'A fruit' }
@@ -199,6 +42,8 @@ export default function WordGuess() {
       logger.error('Failed to load word', e, {}, LogTags.WORD_GUESS)
       // fallback
       setWordData({ word: 'APPLE', description: 'A fruit' })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -232,6 +77,10 @@ export default function WordGuess() {
     setScore(s => Math.max(0, s - 5))
   }
 
+  function removeLast() {
+    setChosen(prev => prev.slice(0, -1))
+  }
+
   async function checkWin() {
     const ok = wordData.word.split('').every(c => chosen.includes(c))
     if (ok) {
@@ -249,54 +98,75 @@ export default function WordGuess() {
     }
   }
 
-  return (
-    <div style={{ padding: 20 }}>
-      <h2>Word Guess</h2>
-
-      <div style={{ display: 'flex', gap: 8 }}>
-        {Array.from(wordData.word).map((c, i) => (
-          <div key={i} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#222', color: '#fff', borderRadius: 6 }}>
-            {chosen.includes(c) ? c : '_'}
-          </div>
-        ))}
-      </div>
-
-      <p>{wordData.description}</p>
-
-      <div style={{ marginTop: 12 }}>
-        {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l => (
-          <button key={l} onClick={() => select(l)} disabled={chosen.includes(l) || !!msg} style={{ margin: 3 }}>
-            {l}
-          </button>
-        ))}
-      </div>
-
-      <div style={{ marginTop: 12 }}>
-        <button onClick={() => setChosen(prev => prev.slice(0, -1))} disabled={!chosen.length}>
-          Remove
-        </button>
-        <button onClick={useHint} disabled={hints <= 0} style={{ marginLeft: 8 }}>
-          Hint({hints})
-        </button>
-        <button onClick={checkWin} disabled={!chosen.length || !!msg} style={{ marginLeft: 8 }}>
-          Guess
-        </button>
-        <button onClick={load} style={{ marginLeft: 8 }}>
-          Restart
-        </button>
-      </div>
-
-      <div style={{ marginTop: 12 }}>Wrong: {wrong}/3 — Score: {score}</div>
-
-      {msg && (
-        <div style={{ marginTop: 10 }}>
-          {msg}
-          {displayWord && <div>Word: {wordData.word}</div>}
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark-bg flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-light-text">Loading word...</p>
         </div>
-      )}
+      </div>
+    )
+  }
 
-      <div style={{ marginTop: 20 }}>
-        <Leaderboard game="word-guess" />
+  return (
+    <div className="min-h-screen bg-dark-bg text-light-text">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">Word Guess</h1>
+          <p className="text-subtle-text">Guess the word by selecting letters. You have 3 wrong guesses allowed!</p>
+        </div>
+
+        {/* Word Description */}
+        <div className="bg-gray-800/50 rounded-lg p-6 mb-6 border border-gray-700">
+          <div className="text-center">
+            <div className="mb-3">
+              <span className="inline-block bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                {wordData.category || 'General'}
+              </span>
+            </div>
+            <h3 className="text-lg font-semibold text-blue-400 mb-2">Word Hint</h3>
+            <p className="text-gray-300 leading-relaxed text-sm md:text-base max-w-2xl mx-auto">
+              {wordData.description}
+            </p>
+          </div>
+        </div>
+
+        {/* Word Display */}
+        <WordDisplay word={wordData.word} chosenLetters={chosen} />
+
+        {/* Game Stats */}
+        <GameStats score={score} wrongGuesses={wrong} />
+
+        {/* Game Message */}
+        <GameMessage message={msg} word={wordData.word} showWord={displayWord} />
+
+        {/* Letter Selector */}
+        <div className="text-center mb-4">
+          <h3 className="text-lg font-semibold text-white mb-3">Select Letters</h3>
+          <LetterSelector
+            chosenLetters={chosen}
+            onSelectLetter={select}
+            disabled={!!msg}
+          />
+        </div>
+
+        {/* Game Controls */}
+        <GameControls
+          onRemoveLast={removeLast}
+          onUseHint={useHint}
+          onGuess={checkWin}
+          onRestart={load}
+          chosenLetters={chosen}
+          hints={hints}
+          disabled={!!msg}
+        />
+
+        {/* Leaderboard */}
+        <div className="mt-12">
+          <Leaderboard game="word-guess" />
+        </div>
       </div>
     </div>
   )
