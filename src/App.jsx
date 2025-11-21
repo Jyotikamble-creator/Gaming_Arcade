@@ -1,8 +1,7 @@
 import React from "react";
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
-import Login from './components/auth/Login'
-import Signup from './components/auth/Signup'
+import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
 import WordGuess from './pages/WordGuess'
 import MemoryCard from './pages/MemoryCard'
@@ -33,8 +32,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Auth />} />
+      <Route path="/signup" element={<Auth />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/word-guess" element={<WordGuess />} />
       <Route path="/memory-card" element={<MemoryCard />} />
