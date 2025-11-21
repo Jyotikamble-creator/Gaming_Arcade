@@ -10,6 +10,7 @@ import StreakCounter from '../components/emojiguess/StreakCounter';
 import AnimatedBackground from '../components/AnimatedBackground';
 import AchievementBadge from '../components/emojiguess/AchievementBadge';
 import ProgressRing from '../components/emojiguess/ProgressRing';
+import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/Leaderboard';
 
 export default function EmojiGuess() {
@@ -272,6 +273,11 @@ export default function EmojiGuess() {
             onKeyPress={handleKeyPress}
             disabled={attempts >= 3 && message.includes('Wrong')}
           />
+        </div>
+
+        {/* Instructions */}
+        <div className="max-w-md mx-auto mb-6">
+          <Instructions gameType="emoji-guess" />
         </div>
 
         {/* Message Display */}

@@ -7,6 +7,7 @@ import LetterSelector from '../components/wordguess/LetterSelector'
 import GameControls from '../components/wordguess/GameControls'
 import GameStats from '../components/wordguess/GameStats'
 import GameMessage from '../components/wordguess/GameMessage'
+import Instructions from '../components/shared/Instructions'
 import { logger, LogTags } from '../lib/logger'
 
 export default function WordGuess() {
@@ -141,6 +142,11 @@ export default function WordGuess() {
 
         {/* Game Message */}
         <GameMessage message={msg} word={wordData.word} showWord={displayWord} />
+
+        {/* Instructions */}
+        <div className="max-w-md mx-auto mb-6">
+          <Instructions gameType="word-guess" />
+        </div>
 
         {/* Letter Selector */}
         <div className="text-center mb-4">

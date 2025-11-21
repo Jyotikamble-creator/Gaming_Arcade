@@ -5,7 +5,7 @@ import GameBoard from '../components/game2048/GameBoard';
 import ScoreDisplay from '../components/game2048/ScoreDisplay';
 import GameControls from '../components/game2048/GameControls';
 import GameStatus from '../components/game2048/GameStatus';
-import Instructions from '../components/game2048/Instructions';
+import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/Leaderboard';
 
 export default function Game2048() {
@@ -227,7 +227,7 @@ export default function Game2048() {
 
         {/* Instructions */}
         <div className="max-w-md mx-auto mb-8">
-          <Instructions />
+          <Instructions gameType="2048" />
         </div>
 
         {/* Game Status Overlay */}
