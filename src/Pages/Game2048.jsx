@@ -1,155 +1,247 @@
-import React, { useState, useEffect } from 'react'
-import { submitScore } from '../api/Api'
+import React, { useState, useEffect, useCallback } from 'react';
+import { submitScore } from '../api/Api';
+import { logger, LogTags } from '../lib/logger';
+import GameBoard from '../components/game2048/GameBoard';
+import ScoreDisplay from '../components/game2048/ScoreDisplay';
+import GameControls from '../components/game2048/GameControls';
+import GameStatus from '../components/game2048/GameStatus';
+import Instructions from '../components/game2048/Instructions';
+import Leaderboard from '../components/Leaderboard';
 
-export default function Game2048(){
-  const [board, setBoard] = useState(() => initBoard())
-  const [score, setScore] = useState(0)
-  const [gameOver, setGameOver] = useState(false)
+export default function Game2048() {
+  const [board, setBoard] = useState(() => initBoard());
+  const [score, setScore] = useState(0);
+  const [bestScore, setBestScore] = useState(() => {
+    const saved = localStorage.getItem('game2048-best-score');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [gameOver, setGameOver] = useState(false);
+  const [gameWon, setGameWon] = useState(false);
+  const [newTiles, setNewTiles] = useState([]);
+  const [mergedTiles, setMergedTiles] = useState([]);
 
   function initBoard() {
-    const board = Array(4).fill().map(() => Array(4).fill(0))
-    addRandomTile(board)
-    addRandomTile(board)
-    return board
+    const board = Array(4).fill().map(() => Array(4).fill(0));
+    addRandomTile(board);
+    addRandomTile(board);
+    return board;
   }
 
   function addRandomTile(board) {
-    const empty = []
-    for(let i = 0; i < 4; i++) {
-      for(let j = 0; j < 4; j++) {
-        if(board[i][j] === 0) empty.push([i, j])
+    const empty = [];
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        if (board[i][j] === 0) empty.push([i, j]);
       }
     }
-    if(empty.length > 0) {
-      const [row, col] = empty[Math.floor(Math.random() * empty.length)]
-      board[row][col] = Math.random() < 0.9 ? 2 : 4
+    if (empty.length > 0) {
+      const [row, col] = empty[Math.floor(Math.random() * empty.length)];
+      board[row][col] = Math.random() < 0.9 ? 2 : 4;
+      return [row, col];
     }
+    return null;
   }
 
   function moveLeft(board) {
-    let moved = false
-    let newScore = 0
-    for(let i = 0; i < 4; i++) {
-      const row = board[i].filter(val => val !== 0)
-      for(let j = 0; j < row.length - 1; j++) {
-        if(row[j] === row[j + 1]) {
-          row[j] *= 2
-          newScore += row[j]
-          row.splice(j + 1, 1)
+    let moved = false;
+    let newScore = 0;
+    const merged = [];
+
+    for (let i = 0; i < 4; i++) {
+      const row = board[i].filter(val => val !== 0);
+      for (let j = 0; j < row.length - 1; j++) {
+        if (row[j] === row[j + 1]) {
+          row[j] *= 2;
+          newScore += row[j];
+          merged.push([i, j]);
+          row.splice(j + 1, 1);
         }
       }
-      while(row.length < 4) row.push(0)
-      for(let j = 0; j < 4; j++) {
-        if(board[i][j] !== row[j]) moved = true
-        board[i][j] = row[j]
+      while (row.length < 4) row.push(0);
+      for (let j = 0; j < 4; j++) {
+        if (board[i][j] !== row[j]) moved = true;
+        board[i][j] = row[j];
       }
     }
-    return { moved, score: newScore }
+    return { moved, score: newScore, merged };
   }
 
-  function handleMove(direction) {
-    if(gameOver) return
-    
-    const newBoard = board.map(row => [...row])
-    let result = { moved: false, score: 0 }
-    
-    if(direction === 'left') {
-      result = moveLeft(newBoard)
-    } else if(direction === 'right') {
-      newBoard.forEach(row => row.reverse())
-      result = moveLeft(newBoard)
-      newBoard.forEach(row => row.reverse())
-    } else if(direction === 'up') {
-      const rotated = newBoard[0].map((_, i) => newBoard.map(row => row[i]))
-      result = moveLeft(rotated)
-      rotated.forEach((row, i) => row.forEach((val, j) => newBoard[j][i] = val))
-    } else if(direction === 'down') {
-      const rotated = newBoard[0].map((_, i) => newBoard.map(row => row[i]).reverse())
-      result = moveLeft(rotated)
-      rotated.reverse()
-      rotated.forEach((row, i) => row.forEach((val, j) => newBoard[j][i] = val))
+  const handleMove = useCallback((direction) => {
+    if (gameOver || gameWon) return;
+
+    const newBoard = board.map(row => [...row]);
+    let result = { moved: false, score: 0, merged: [] };
+
+    if (direction === 'left') {
+      result = moveLeft(newBoard);
+    } else if (direction === 'right') {
+      newBoard.forEach(row => row.reverse());
+      result = moveLeft(newBoard);
+      newBoard.forEach(row => row.reverse());
+      result.merged = result.merged.map(([r, c]) => [r, 3 - c]);
+    } else if (direction === 'up') {
+      const rotated = newBoard[0].map((_, i) => newBoard.map(row => row[i]));
+      result = moveLeft(rotated);
+      rotated.forEach((row, i) => row.forEach((val, j) => newBoard[j][i] = val));
+      result.merged = result.merged.map(([r, c]) => [c, r]);
+    } else if (direction === 'down') {
+      const rotated = newBoard[0].map((_, i) => newBoard.map(row => row[i]).reverse());
+      result = moveLeft(rotated);
+      rotated.reverse();
+      rotated.forEach((row, i) => row.forEach((val, j) => newBoard[j][i] = val));
+      result.merged = result.merged.map(([r, c]) => [3 - c, r]);
     }
 
-    if(result.moved) {
-      addRandomTile(newBoard)
-      setBoard(newBoard)
-      setScore(prev => prev + result.score)
-      
+    if (result.moved) {
+      const newTilePos = addRandomTile(newBoard);
+      setBoard(newBoard);
+      setScore(prev => prev + result.score);
+      setNewTiles(newTilePos ? [newTilePos] : []);
+      setMergedTiles(result.merged);
+
+      // Clear animations after a short delay
+      setTimeout(() => {
+        setNewTiles([]);
+        setMergedTiles([]);
+      }, 300);
+
       // Check for 2048
-      if(newBoard.some(row => row.some(cell => cell === 2048))) {
-        alert('You reached 2048! You win!')
-        submitScore({ game: '2048', playerName: 'guest', score: score + result.score })
-        setGameOver(true)
+      if (newBoard.some(row => row.some(cell => cell === 2048))) {
+        setGameWon(true);
+        logger.info('2048 game won', { score: score + result.score }, LogTags.GAME_2048);
+      }
+
+      // Check for game over
+      if (!canMove(newBoard)) {
+        setGameOver(true);
+        logger.info('2048 game over', { score: score + result.score }, LogTags.GAME_2048);
       }
     }
+  }, [board, gameOver, gameWon, score]);
+
+  function canMove(board) {
+    // Check for empty cells
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        if (board[i][j] === 0) return true;
+      }
+    }
+
+    // Check for possible merges
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (board[i][j] === board[i][j + 1]) return true;
+      }
+    }
+    for (let j = 0; j < 4; j++) {
+      for (let i = 0; i < 3; i++) {
+        if (board[i][j] === board[i + 1][j]) return true;
+      }
+    }
+
+    return false;
   }
 
   useEffect(() => {
     const handleKeyPress = (e) => {
-      switch(e.key) {
-        case 'ArrowLeft': handleMove('left'); break
-        case 'ArrowRight': handleMove('right'); break
-        case 'ArrowUp': handleMove('up'); break
-        case 'ArrowDown': handleMove('down'); break
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+        e.preventDefault();
+        switch (e.key) {
+          case 'ArrowLeft': handleMove('left'); break;
+          case 'ArrowRight': handleMove('right'); break;
+          case 'ArrowUp': handleMove('up'); break;
+          case 'ArrowDown': handleMove('down'); break;
+        }
       }
+    };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [handleMove]);
+
+  useEffect(() => {
+    if (score > bestScore) {
+      setBestScore(score);
+      localStorage.setItem('game2048-best-score', score.toString());
     }
-    window.addEventListener('keydown', handleKeyPress)
-    return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [board, gameOver])
+  }, [score, bestScore]);
 
   function restart() {
-    setBoard(initBoard())
-    setScore(0)
-    setGameOver(false)
+    setBoard(initBoard());
+    setScore(0);
+    setGameOver(false);
+    setGameWon(false);
+    setNewTiles([]);
+    setMergedTiles([]);
+    logger.info('2048 game restarted', {}, LogTags.GAME_2048);
   }
 
+  function continuePlaying() {
+    setGameWon(false);
+  }
+
+  async function submitFinalScore() {
+    try {
+      await submitScore({
+        game: '2048',
+        score: score,
+        meta: {
+          reached2048: gameWon,
+          bestScore: bestScore
+        }
+      });
+      logger.info('2048 score submitted', { score, gameWon }, LogTags.SAVE_SCORE);
+    } catch (error) {
+      logger.error('Failed to submit 2048 score', error, { score }, LogTags.SAVE_SCORE);
+    }
+  }
+
+  useEffect(() => {
+    if (gameOver || gameWon) {
+      submitFinalScore();
+    }
+  }, [gameOver, gameWon]);
+
   return (
-    <div style={{padding:20}}>
-      <h2>2048</h2>
-      <div style={{marginBottom: 20}}>
-        <div>Score: {score}</div>
-        <button onClick={restart} style={{marginTop: 10}}>Restart</button>
-      </div>
-      
-      <div style={{
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(4, 80px)', 
-        gap: 8,
-        marginBottom: 20,
-        background: '#bbada0',
-        padding: 8,
-        borderRadius: 6
-      }}>
-        {board.flat().map((value, index) => (
-          <div key={index} style={{
-            width: 80,
-            height: 80,
-            background: value ? '#eee4da' : '#cdc1b4',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: value > 100 ? 20 : 24,
-            fontWeight: 'bold',
-            borderRadius: 3,
-            color: value > 4 ? '#f9f6f2' : '#776e65'
-          }}>
-            {value || ''}
-          </div>
-        ))}
-      </div>
-      
-      <div style={{marginBottom: 20}}>
-        <button onClick={() => handleMove('up')} style={{display: 'block', margin: '0 auto 10px'}}>↑</button>
-        <div style={{textAlign: 'center'}}>
-          <button onClick={() => handleMove('left')} style={{marginRight: 20}}>←</button>
-          <button onClick={() => handleMove('right')}>→</button>
+    <div className="min-h-screen text-light-text relative">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-2">
+            🎮 2048
+          </h1>
+          <p className="text-subtle-text text-lg">Combine tiles to reach 2048!</p>
         </div>
-        <button onClick={() => handleMove('down')} style={{display: 'block', margin: '10px auto 0'}}>↓</button>
+
+        {/* Score Display */}
+        <ScoreDisplay score={score} bestScore={bestScore} />
+
+        {/* Game Board */}
+        <div className="flex justify-center mb-8">
+          <GameBoard board={board} newTiles={newTiles} mergedTiles={mergedTiles} />
+        </div>
+
+        {/* Game Controls */}
+        <div className="flex justify-center mb-8">
+          <GameControls onMove={handleMove} onRestart={restart} gameOver={gameOver} />
+        </div>
+
+        {/* Instructions */}
+        <div className="max-w-md mx-auto mb-8">
+          <Instructions />
+        </div>
+
+        {/* Game Status Overlay */}
+        <GameStatus
+          gameWon={gameWon}
+          gameOver={gameOver}
+          onContinue={continuePlaying}
+        />
+
+        {/* Leaderboard */}
+        <div className="mt-12">
+          <Leaderboard game="2048" />
+        </div>
       </div>
-      
-      <p style={{fontSize: 14, color: '#666'}}>
-        Use arrow keys or buttons to move tiles. Combine tiles with the same number to reach 2048!
-      </p>
     </div>
-  )
+  );
 }
