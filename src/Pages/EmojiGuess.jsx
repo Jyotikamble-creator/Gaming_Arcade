@@ -7,7 +7,7 @@ import GameStats from '../components/emojiguess/GameStats';
 import HintSystem from '../components/emojiguess/HintSystem';
 import Confetti from '../components/emojiguess/Confetti';
 import StreakCounter from '../components/emojiguess/StreakCounter';
-import AnimatedBackground from '../components/emojiguess/AnimatedBackground';
+import AnimatedBackground from '../components/AnimatedBackground';
 import AchievementBadge from '../components/emojiguess/AchievementBadge';
 import ProgressRing from '../components/emojiguess/ProgressRing';
 import Leaderboard from '../components/Leaderboard';
