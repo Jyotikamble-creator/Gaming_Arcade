@@ -100,7 +100,7 @@ export default function WordGuess() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-dark-bg flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-light-text">Loading word...</p>
@@ -110,7 +110,7 @@ export default function WordGuess() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg text-light-text">
+    <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">

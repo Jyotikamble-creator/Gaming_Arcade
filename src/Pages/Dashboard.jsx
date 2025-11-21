@@ -14,7 +14,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-dark-bg text-light-text">
+    <div className="flex h-screen text-light-text">
       {/* Sidebar */}
       <Sidebar />
 

@@ -30,26 +30,28 @@ function NotFound() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Auth />} />
-      <Route path="/signup" element={<Auth />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/word-guess" element={<WordGuess />} />
-      <Route path="/memory-card" element={<MemoryCard />} />
-      <Route path="/math-quiz" element={<MathQuiz />} />
-      <Route path="/typing-test" element={<TypingTest />} />
-      <Route path="/2048" element={<Game2048 />} />
-      <Route path="/word-scramble" element={<WordScramble />} />
-      <Route path="/quiz" element={<Quiz />} />
-      <Route path="/emoji-guess" element={<EmojiGuess />} />
-      <Route path="/whack-a-mole" element={<WhackMole />} />
-      <Route path="/simon-says" element={<SimonSays />} />
-      <Route path="/tic-tac-toe" element={<TicTacToe />} />
-      <Route path="/leaderboard" element={<LeaderboardPage />} />
-      <Route path="/scores" element={<ScoresPage />} />
-      <Route path="/progress" element={<ProgressPage />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Auth />} />
+        <Route path="/signup" element={<Auth />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/word-guess" element={<WordGuess />} />
+        <Route path="/memory-card" element={<MemoryCard />} />
+        <Route path="/math-quiz" element={<MathQuiz />} />
+        <Route path="/typing-test" element={<TypingTest />} />
+        <Route path="/2048" element={<Game2048 />} />
+        <Route path="/word-scramble" element={<WordScramble />} />
+        <Route path="/quiz" element={<Quiz />} />
+        <Route path="/emoji-guess" element={<EmojiGuess />} />
+        <Route path="/whack-a-mole" element={<WhackMole />} />
+        <Route path="/simon-says" element={<SimonSays />} />
+        <Route path="/tic-tac-toe" element={<TicTacToe />} />
+        <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="/scores" element={<ScoresPage />} />
+        <Route path="/progress" element={<ProgressPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
   )
 }
