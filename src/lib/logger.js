@@ -90,14 +90,14 @@ export class Logger {
   }
 
   info(message, context) {
-    if (this.isDevelopment) {
-      console.log(this.formatMessage('info', message, context));
+    if (this.#isDevelopment) {
+      console.log(this.#formatMessage('info', message, context));
     }
   }
 
   warn(message, context) {
-    if (this.isDevelopment) {
-      console.warn(this.formatMessage('warn', message, context));
+    if (this.#isDevelopment) {
+      console.warn(this.#formatMessage('warn', message, context));
     }
   }
 
@@ -106,7 +106,7 @@ export class Logger {
       ? { ...context, error: error.message, stack: error.stack }
       : { ...context, error };
 
-    console.error(this.formatMessage('error', message, errorContext));
+    console.error(this.#formatMessage('error', message, errorContext));
 
     // In production, you might want to send errors to a monitoring service
     if (process.env.NODE_ENV === 'production') {
@@ -115,8 +115,8 @@ export class Logger {
   }
 
   debug(message, context) {
-    if (this.isDevelopment) {
-      console.debug(this.formatMessage('debug', message, context));
+    if (this.#isDevelopment) {
+      console.debug(this.#formatMessage('debug', message, context));
     }
   }
 
