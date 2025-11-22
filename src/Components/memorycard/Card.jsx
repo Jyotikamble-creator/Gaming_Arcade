@@ -1,33 +1,28 @@
 import React from 'react';
 
 const MemoryCard = ({ isFlipped, isMatched, imageContent }) => {
-  
-  // Class toggles for flip animation (simplified for static UI)
-  const isRevealed = isFlipped || isMatched;
-  
   return (
-    <div className="w-24 h-28 relative perspective-1000">
+    <div className={`w-24 h-28 relative preserve-3d cursor-pointer group transition-transform duration-500 ${isFlipped || isMatched ? 'rotate-y-180' : 'rotate-y-0'}`}>
       {/* Card Back (Face Down) */}
-      <div 
-        className={`absolute inset-0 backface-hidden rounded-lg shadow-xl border border-blue-500 flex items-center justify-center 
-          bg-gray-700 transition-transform duration-500 
-          ${isRevealed ? 'transform rotate-y-90' : 'transform rotate-y-0'}`}
+      <div
+        className="absolute inset-0 w-full h-full backface-hidden rounded-lg shadow-xl border border-blue-500 flex items-center justify-center bg-gradient-to-br from-red-700 to-red-800"
       >
-        <svg className="w-10 h-10 text-blue-500" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 12h20L12 2zM12 22l10-10H2l10 10z"></path></svg>
+        <div className="w-8 h-8 text-blue-400">
+          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L2 12h20L12 2zM12 22l10-10H2l10 10z"/>
+          </svg>
+        </div>
       </div>
 
       {/* Card Face (Revealed) */}
-      <div 
-        className={`absolute inset-0 backface-hidden rounded-lg shadow-xl border border-gray-600 flex items-center justify-center 
-          bg-white transition-transform duration-500 
-          ${isRevealed ? 'transform rotate-y-0' : 'transform rotate-y-90'}`}
+      <div
+        className={`absolute inset-0 w-full h-full backface-hidden rounded-lg shadow-xl border flex items-center justify-center rotate-y-180
+          ${isMatched ? 'bg-gradient-to-br from-green-400 to-blue-500 border-green-300 animate-pulse ring-2 ring-yellow-400' : 'bg-gradient-to-br from-blue-400 to-purple-500 border-blue-300'}`}
       >
-        {/* Content Placeholder: Use a div to simulate the image */}
-        <div className="w-full h-full p-2">
-            <div className={`w-full h-full flex items-center justify-center rounded ${isMatched ? 'bg-green-100' : 'bg-gray-100'}`}>
-                {/*  */}
-                <span className="text-xl text-gray-800">{imageContent}</span>
-            </div>
+        <div className="w-full h-full p-2 flex items-center justify-center">
+          <span className="text-2xl font-bold text-white">
+            {imageContent}
+          </span>
         </div>
       </div>
     </div>
