@@ -2,6 +2,10 @@ import React, {useEffect, useState} from 'react';
 import { fetchScramble, submitScore } from '../api/Api';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
+import WordScrambleStats from '../components/wordscramble/WordScrambleStats';
+import WordScrambleDisplay from '../components/wordscramble/WordScrambleDisplay';
+import WordScrambleInput from '../components/wordscramble/WordScrambleInput';
+import WordScrambleAnswer from '../components/wordscramble/WordScrambleAnswer';
 
 export default function WordScramble(){
   const [data, setData] = useState({ word: 'REACT', scrambled: 'TCAER' });
@@ -74,76 +78,28 @@ export default function WordScramble(){
         </div>
 
         {/* Stats */}
-        <div className="flex justify-center gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">ATTEMPTS</span>
-            <div className="text-2xl font-bold text-white">{attempts}</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">STATUS</span>
-            <div className="text-lg font-bold text-white">
-              {correct ? 'Correct!' : showAnswer ? 'Revealed' : 'Guessing...'}
-            </div>
-          </div>
-        </div>
+        <WordScrambleStats
+          attempts={attempts}
+          correct={correct}
+          showAnswer={showAnswer}
+        />
 
         {/* Scrambled Word */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 mb-6 text-center shadow-2xl">
-          <h2 className="text-2xl font-bold text-white mb-4">Scrambled Word:</h2>
-          <div className="text-4xl font-mono font-bold text-yellow-400 mb-6 tracking-wider">
-            {data.scrambled.split('').map((letter, i) => (
-              <span key={i} className="inline-block mx-1 p-2 bg-gray-700 rounded-lg">
-                {letter}
-              </span>
-            ))}
-          </div>
-        </div>
+        <WordScrambleDisplay scrambled={data.scrambled} />
 
         {/* Input and Controls */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-2xl">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-            <input
-              value={guess}
-              onChange={e=>setGuess(e.target.value)}
-              disabled={correct || showAnswer}
-              className="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white text-lg font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              placeholder="Enter your guess..."
-              onKeyPress={(e) => e.key === 'Enter' && !correct && !showAnswer && check()}
-            />
-            <div className="flex gap-3">
-              <button
-                onClick={check}
-                disabled={correct || showAnswer || !guess.trim()}
-                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:transform-none shadow-lg"
-              >
-                Check
-              </button>
-              <button
-                onClick={revealAnswer}
-                disabled={correct || showAnswer}
-                className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:transform-none shadow-lg"
-              >
-                Reveal
-              </button>
-              <button
-                onClick={load}
-                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                New Word
-              </button>
-            </div>
-          </div>
-        </div>
+        <WordScrambleInput
+          guess={guess}
+          onChange={(e) => setGuess(e.target.value)}
+          onCheck={check}
+          onReveal={revealAnswer}
+          onNewWord={load}
+          correct={correct}
+          showAnswer={showAnswer}
+        />
 
         {/* Answer Reveal */}
-        {(correct || showAnswer) && (
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 text-center shadow-2xl">
-            <h3 className="text-xl font-bold text-white mb-2">The Word Was:</h3>
-            <div className="text-3xl font-mono font-bold text-green-400">
-              {data.word}
-            </div>
-          </div>
-        )}
+        <WordScrambleAnswer word={data.word} show={correct || showAnswer} />
 
         {/* Instructions */}
         <div className="max-w-md mx-auto mb-6">

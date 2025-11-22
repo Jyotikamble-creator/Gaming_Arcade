@@ -3,6 +3,10 @@ import { saveScore } from '../api/scoreApi';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/Leaderboard';
+import TicTacToeStats from '../components/tictactoe/TicTacToeStats';
+import TicTacToeBoard from '../components/tictactoe/TicTacToeBoard';
+import TicTacToeControls from '../components/tictactoe/TicTacToeControls';
+import TicTacToeGameStatus from '../components/tictactoe/TicTacToeGameStatus';
 
 export default function TicTacToe() {
   const [board, setBoard] = useState(Array(9).fill(null));
@@ -62,18 +66,6 @@ export default function TicTacToe() {
     logger.info('Tic-tac-toe scores reset', {}, LogTags.TIC_TAC_TOE);
   };
 
-  const renderSquare = (i) => (
-    <button
-      className={`w-24 h-24 border-2 border-gray-600 text-4xl font-bold flex items-center justify-center transition-all duration-200 transform hover:scale-105 ${
-        board[i] === 'X' ? 'text-blue-400' : board[i] === 'O' ? 'text-red-400' : 'bg-gray-700 hover:bg-gray-600'
-      }`}
-      onClick={() => handleClick(i)}
-      disabled={!!board[i] || !!winner}
-    >
-      {board[i]}
-    </button>
-  );
-
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -84,58 +76,20 @@ export default function TicTacToe() {
         </div>
 
         {/* Game Stats */}
-        <div className="flex justify-center gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">NEXT PLAYER</span>
-            <div className={`text-2xl font-bold ${isXNext ? 'text-blue-400' : 'text-red-400'}`}>
-              {isXNext ? 'X' : 'O'}
-            </div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">SCORE X</span>
-            <div className="text-2xl font-bold text-blue-400">{scores.X}</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">SCORE O</span>
-            <div className="text-2xl font-bold text-red-400">{scores.O}</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">GAMES</span>
-            <div className="text-2xl font-bold text-white">{gamesPlayed}</div>
-          </div>
-        </div>
+        <TicTacToeStats
+          isXNext={isXNext}
+          scores={scores}
+          gamesPlayed={gamesPlayed}
+        />
 
         {/* Game Status */}
-        {winner && (
-          <div className="text-center mb-6">
-            <div className={`text-2xl font-bold ${winner === 'Draw' ? 'text-yellow-400' : winner === 'X' ? 'text-blue-400' : 'text-red-400'}`}>
-              {winner === 'Draw' ? "It's a Draw!" : `${winner} Wins!`}
-            </div>
-          </div>
-        )}
+        <TicTacToeGameStatus winner={winner} />
 
         {/* Game Board */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 mb-6 shadow-2xl">
-          <div className="grid grid-cols-3 gap-2 max-w-sm mx-auto">
-            {Array(9).fill(null).map((_, i) => renderSquare(i))}
-          </div>
-        </div>
+        <TicTacToeBoard board={board} onClick={handleClick} />
 
         {/* Controls */}
-        <div className="flex justify-center gap-4 mb-6">
-          <button
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
-            onClick={resetGame}
-          >
-            New Game
-          </button>
-          <button
-            className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
-            onClick={resetScores}
-          >
-            Reset Scores
-          </button>
-        </div>
+        <TicTacToeControls onNewGame={resetGame} onResetScores={resetScores} />
 
         {/* Instructions */}
         <div className="max-w-md mx-auto mb-6">
