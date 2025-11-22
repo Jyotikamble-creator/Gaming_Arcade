@@ -6,12 +6,16 @@ import GuessInput from '../components/emojiguess/GuessInput';
 import GameStats from '../components/emojiguess/GameStats';
 import HintSystem from '../components/emojiguess/HintSystem';
 import Confetti from '../components/emojiguess/Confetti';
-import StreakCounter from '../components/emojiguess/StreakCounter';
 import AnimatedBackground from '../components/AnimatedBackground';
-import AchievementBadge from '../components/emojiguess/AchievementBadge';
 import ProgressRing from '../components/emojiguess/ProgressRing';
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/Leaderboard';
+import EmojiGuessHeader from '../components/emojiguess/EmojiGuessHeader';
+import EmojiGuessAchievements from '../components/emojiguess/EmojiGuessAchievements';
+import EmojiGuessMessage from '../components/emojiguess/EmojiGuessMessage';
+import EmojiGuessControls from '../components/emojiguess/EmojiGuessControls';
+import EmojiGuessLoading from '../components/emojiguess/EmojiGuessLoading';
+import EmojiGuessError from '../components/emojiguess/EmojiGuessError';
 
 export default function EmojiGuess() {
   const [puzzle, setPuzzle] = useState(null);
@@ -24,15 +28,14 @@ export default function EmojiGuess() {
   const [showHint, setShowHint] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [gameStarted, setGameStarted] = useState(false);
-  const [streak, setStreak] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [streak, setStreak] = useState(0);
   const [achievements, setAchievements] = useState({
     firstWin: false,
     streak5: false,
     streak10: false,
-    perfectGame: false
+    perfectGame: false,
   });
-  const [totalGames, setTotalGames] = useState(0);
 
   useEffect(() => {
     loadPuzzle();
@@ -90,7 +93,6 @@ export default function EmojiGuess() {
 
       setScore(prevScore => prevScore + points);
       setStreak(prevStreak => prevStreak + 1);
-      setTotalGames(prev => prev + 1);
       setShowConfetti(true);
 
       // Check achievements
@@ -157,44 +159,19 @@ export default function EmojiGuess() {
     }
   }
 
+  function handleTryAgain() {
+    setAttempts(0);
+    setMessage('');
+    setGuess('');
+    setStreak(0);
+  }
+
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-        <AnimatedBackground />
-        <div className="text-center relative z-10">
-          <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-light-text text-xl font-semibold">Loading emoji puzzle...</p>
-          <div className="mt-4 flex justify-center space-x-2">
-            <div className="w-3 h-3 bg-yellow-400 rounded-full animate-bounce"></div>
-            <div className="w-3 h-3 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-            <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <EmojiGuessLoading />;
   }
 
   if (!puzzle) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-        <AnimatedBackground />
-        <div className="bg-card-bg/90 backdrop-blur-sm rounded-xl p-8 border border-gray-700 max-w-md w-full text-center relative z-10 shadow-2xl">
-          <div className="text-red-400 mb-4">
-            <svg className="w-16 h-16 mx-auto mb-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-light-text mb-2">Failed to Load Puzzle</h2>
-          <p className="text-subtle-text mb-6">{message}</p>
-          <button
-            onClick={loadPuzzle}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
+    return <EmojiGuessError message={message} onRetry={loadPuzzle} />;
   }
 
   return (
@@ -204,25 +181,10 @@ export default function EmojiGuess() {
 
       <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-2 animate-pulse">
-            🎭 Emoji Guess
-          </h1>
-          <p className="text-subtle-text text-lg">Decode the emoji combination and guess what it represents!</p>
-          {streak > 0 && (
-            <div className="mt-4 flex justify-center">
-              <StreakCounter streak={streak} />
-            </div>
-          )}
-        </div>
+        <EmojiGuessHeader streak={streak} />
 
         {/* Achievement Badges */}
-        <div className="mb-6 flex flex-wrap justify-center gap-4">
-          {achievements.firstWin && <AchievementBadge type="first-win" unlocked={achievements.firstWin} />}
-          {achievements.streak5 && <AchievementBadge type="streak-5" unlocked={achievements.streak5} />}
-          {achievements.streak10 && <AchievementBadge type="streak-10" unlocked={achievements.streak10} />}
-          {achievements.perfectGame && <AchievementBadge type="perfect-game" unlocked={achievements.perfectGame} />}
-        </div>
+        <EmojiGuessAchievements achievements={achievements} />
 
         {/* Game Stats */}
         <div className="mb-8">
@@ -281,48 +243,16 @@ export default function EmojiGuess() {
         </div>
 
         {/* Message Display */}
-        {message && (
-          <div className={`mt-6 p-6 rounded-xl border text-center max-w-md mx-auto shadow-2xl transform transition-all duration-300 ${
-            messageType === 'success'
-              ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-400 text-green-300 animate-bounce'
-              : messageType === 'error'
-              ? 'bg-gradient-to-r from-red-500/20 to-pink-500/20 border-red-400 text-red-300'
-              : 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-blue-400 text-blue-300'
-          }`}>
-            <p className="font-bold text-lg">{message}</p>
-          </div>
-        )}
+        <EmojiGuessMessage message={message} messageType={messageType} />
 
         {/* Game Controls */}
-        <div className="mt-8 flex justify-center gap-4">
-          <button
-            onClick={loadPuzzle}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
-            disabled={isLoading}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            New Puzzle
-          </button>
-
-          {attempts >= 3 && message.includes('Wrong') && (
-            <button
-              onClick={() => {
-                setAttempts(0);
-                setMessage('');
-                setGuess('');
-                setStreak(0);
-              }}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Try Again
-            </button>
-          )}
-        </div>
+        <EmojiGuessControls
+          onNewPuzzle={loadPuzzle}
+          onTryAgain={handleTryAgain}
+          isLoading={isLoading}
+          attempts={attempts}
+          message={message}
+        />
 
         {/* Leaderboard */}
         <div className="mt-12">
