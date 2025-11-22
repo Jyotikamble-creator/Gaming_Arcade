@@ -2,17 +2,18 @@ import React, {useEffect, useState} from 'react';
 import { fetchScramble, submitScore } from '../api/Api';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
-import Leaderboard from '../components/Leaderboard';
 
 export default function WordScramble(){
-  const [data, setData] = useState(null);
+  const [data, setData] = useState({ word: 'REACT', scrambled: 'TCAER' });
   const [guess, setGuess] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [correct, setCorrect] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
 
-  useEffect(()=> load(), []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function load(){
     try {
@@ -27,7 +28,7 @@ export default function WordScramble(){
       logger.info('Word scramble loaded', { word: r.data?.word }, LogTags.WORD_SCRAMBLE);
     } catch (error) {
       logger.error('Failed to load scramble', error, {}, LogTags.WORD_SCRAMBLE);
-      setData(null);
+      // Keep test data if API fails
     } finally {
       setIsLoading(false);
     }
@@ -39,7 +40,7 @@ export default function WordScramble(){
 
     if(isCorrect){
       setCorrect(true);
-      const score = Math.max(100 - (attempts * 10), 10); // Decrease score with more attempts
+      const score = Math.max(100 - (attempts * 10), 10);
       await submitScore({game:'word-scramble', score, meta:{attempts: attempts + 1, word: data.word}});
       logger.info('Word scramble correct', { score, attempts: attempts + 1, word: data.word }, LogTags.SAVE_SCORE);
     } else {
@@ -58,27 +59,6 @@ export default function WordScramble(){
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-light-text">Loading scrambled word...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if(!data) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="bg-card-bg/90 backdrop-blur-sm rounded-xl p-8 border border-gray-700 max-w-md w-full text-center">
-          <div className="text-red-400 mb-4">
-            <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-bold text-light-text mb-2">Failed to Load Word</h2>
-          <button
-            onClick={load}
-            className="w-full bg-primary-blue hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200 mt-4"
-          >
-            Try Again
-          </button>
         </div>
       </div>
     );
@@ -168,11 +148,6 @@ export default function WordScramble(){
         {/* Instructions */}
         <div className="max-w-md mx-auto mb-6">
           <Instructions gameType="word-scramble" />
-        </div>
-
-        {/* Leaderboard */}
-        <div className="mt-12">
-          <Leaderboard game="word-scramble" />
         </div>
       </div>
     </div>

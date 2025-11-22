@@ -24,6 +24,7 @@ function NotFound() {
   return (
     <div style={{ padding: 20 }}>
       <h2>404 — Page not found</h2>
+      <p>Path: {window.location.pathname}</p>
     </div>
   )
 }
