@@ -1,8 +1,11 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import { fetchTypingPassage, submitScore } from '../api/Api';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/Leaderboard';
+import MetricCard from '../components/typetesting/MetricCard';
+import TypingArea from '../components/typetesting/TypingArea';
+import CompletionModal from '../components/typetesting/CompletionModal';
 
 export default function TypingTest(){
   const [text, setText] = useState('');
@@ -12,9 +15,13 @@ export default function TypingTest(){
   const [isLoading, setIsLoading] = useState(true);
   const [wpm, setWpm] = useState(0);
   const [accuracy, setAccuracy] = useState(100);
-  const textareaRef = useRef(null);
 
-  useEffect(()=> load(), []);
+  useEffect(() => {
+    const fetchData = async () => {
+      await load();
+    };
+    fetchData();
+  }, []);
 
   async function load(){
     try {
@@ -83,50 +90,27 @@ export default function TypingTest(){
 
         {/* Stats */}
         <div className="flex justify-center gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">WPM</span>
-            <div className="text-2xl font-bold text-white">{done ? wpm : '--'}</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">ACCURACY</span>
-            <div className="text-2xl font-bold text-white">{accuracy}%</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">STATUS</span>
-            <div className="text-lg font-bold text-white">{done ? 'Completed' : 'Typing...'}</div>
-          </div>
+          <MetricCard label="WPM" value={done ? wpm : '--'} />
+          <MetricCard label="ACCURACY" value={`${accuracy}%`} />
+          <MetricCard label="STATUS" value={done ? 'Completed' : 'Typing...'} />
         </div>
 
-        {/* Passage Display */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-2xl">
-          <div className="text-lg leading-relaxed text-gray-200 mb-4 font-mono">
-            {text.split('').map((char, i) => {
-              let className = '';
-              if (i < input.length) {
-                className = input[i] === char ? 'text-green-400' : 'text-red-400 bg-red-900/30';
-              } else if (i === input.length) {
-                className = 'bg-blue-500/30';
-              }
-              return (
-                <span key={i} className={className}>
-                  {char}
-                </span>
-              );
-            })}
-          </div>
-        </div>
+        {/* Typing Area */}
+        <TypingArea 
+          sourceText={text} 
+          typedInput={input} 
+          onChange={onChange} 
+          disabled={done} 
+        />
 
-        {/* Input Area */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-2xl">
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={onChange}
-            rows={6}
-            disabled={done}
-            className="w-full bg-transparent border border-gray-600 rounded-lg p-4 text-white font-mono text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            placeholder="Start typing here..."
-          />
+        {/* New Passage Button */}
+        <div className="flex justify-center mt-6 mb-6">
+          <button
+            onClick={load}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition duration-200"
+          >
+            Load New Passage
+          </button>
         </div>
 
         {/* Instructions */}
@@ -136,23 +120,7 @@ export default function TypingTest(){
 
         {/* Completion Modal */}
         {done && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">
-              <div className="text-6xl mb-4">🎉</div>
-              <h2 className="text-3xl font-bold text-green-600 mb-4">Test Completed!</h2>
-              <div className="space-y-2 mb-6">
-                <p className="text-gray-600">Words per minute:</p>
-                <p className="text-4xl font-bold text-blue-600">{wpm} WPM</p>
-                <p className="text-gray-600">Accuracy: {accuracy}%</p>
-              </div>
-              <button
-                onClick={load}
-                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                Take Test Again
-              </button>
-            </div>
-          </div>
+          <CompletionModal wpm={wpm} accuracy={accuracy} onRestart={load} />
         )}
 
         {/* Leaderboard */}

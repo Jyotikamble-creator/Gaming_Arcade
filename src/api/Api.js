@@ -71,7 +71,7 @@ export const fetchMathQuestions = () => {
 export const fetchTypingPassage = () => {
 	try {
 		logger.debug('Fetching typing passage', {}, LogTags.TYPING_TEST)
-		return API.get('/api/typing/passage')
+		return API.get('/api/games/typing/passage')
 	} catch (error) {
 		logger.error('Failed to fetch typing passage', error, {}, LogTags.TYPING_TEST)
 		throw error
