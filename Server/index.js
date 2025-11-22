@@ -56,8 +56,13 @@ app.post('/api/logs', (req, res) => {
   res.status(200).json({ ok: true });
 });
 
-// Some convenience endpoints preserved from previous implementation where
-// route modules return static/sample data.
+// Serve static files from the React app build directory
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// Catch all handler: send back React's index.html file for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
 
 const PORT = process.env.PORT || 4000
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
