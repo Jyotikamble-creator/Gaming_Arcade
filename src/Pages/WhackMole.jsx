@@ -3,8 +3,11 @@ import { startWhack, submitScore } from '../api/Api';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/Leaderboard';
+import WhackMoleStats from '../components/whackmole/WhackMoleStats';
+import WhackMoleGrid from '../components/whackmole/WhackMoleGrid';
+import WhackMoleGameOverModal from '../components/whackmole/WhackMoleGameOverModal';
 
-export default function WhackAMole(){
+export default function WhackMole(){
   const [grid, setGrid] = useState([]);
   const [active, setActive] = useState(null);
   const [score, setScore] = useState(0);
@@ -15,12 +18,46 @@ export default function WhackAMole(){
   const timerRef = useRef(null);
   const gameTimerRef = useRef(null);
 
-  useEffect(()=> init(), []);
+  useEffect(() => {
+    const initializeGame = async () => {
+      try {
+        setIsLoading(true);
+        logger.info('Starting whack-a-mole game', {}, LogTags.WHACK_MOLE);
+        const r = await startWhack();
+        const gridSize = r.data.gridSize || 9;
+        setGrid(Array.from({length: gridSize}, (_,i)=>i));
+        setScore(0);
+        setTimeLeft(r.data.duration || 30);
+        setGameStarted(false);
+        setGameEnded(false);
+        setActive(null);
+        logger.info('Whack-a-mole initialized', { gridSize, duration: r.data.duration || 30 }, LogTags.WHACK_MOLE);
+      } catch (error) {
+        logger.error('Failed to start whack-a-mole', error, {}, LogTags.WHACK_MOLE);
+        setGrid(Array.from({length: 9}, (_,i)=>i));
+        setTimeLeft(30);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  async function init(){
+    initializeGame();
+
+    // Cleanup function to clear any timers when component unmounts
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      if (gameTimerRef.current) {
+        clearInterval(gameTimerRef.current);
+      }
+    };
+  }, []);
+
+  const restartGame = async () => {
     try {
       setIsLoading(true);
-      logger.info('Starting whack-a-mole game', {}, LogTags.WHACK_MOLE);
+      logger.info('Restarting whack-a-mole game', {}, LogTags.WHACK_MOLE);
       const r = await startWhack();
       const gridSize = r.data.gridSize || 9;
       setGrid(Array.from({length: gridSize}, (_,i)=>i));
@@ -29,15 +66,15 @@ export default function WhackAMole(){
       setGameStarted(false);
       setGameEnded(false);
       setActive(null);
-      logger.info('Whack-a-mole initialized', { gridSize, duration: r.data.duration || 30 }, LogTags.WHACK_MOLE);
+      logger.info('Whack-a-mole restarted', { gridSize, duration: r.data.duration || 30 }, LogTags.WHACK_MOLE);
     } catch (error) {
-      logger.error('Failed to start whack-a-mole', error, {}, LogTags.WHACK_MOLE);
+      logger.error('Failed to restart whack-a-mole', error, {}, LogTags.WHACK_MOLE);
       setGrid(Array.from({length: 9}, (_,i)=>i));
       setTimeLeft(30);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   function startGame(){
     setGameStarted(true);
@@ -99,43 +136,20 @@ export default function WhackAMole(){
         </div>
 
         {/* Game Stats */}
-        <div className="flex justify-center gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">SCORE</span>
-            <div className="text-2xl font-bold text-white">{score}</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">TIME LEFT</span>
-            <div className="text-2xl font-bold text-white">{timeLeft}s</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">STATUS</span>
-            <div className="text-lg font-bold text-white">
-              {gameEnded ? 'Game Over' : gameStarted ? 'Playing' : 'Ready'}
-            </div>
-          </div>
-        </div>
+        <WhackMoleStats
+          score={score}
+          timeLeft={timeLeft}
+          gameStatus={gameEnded ? 'Game Over' : gameStarted ? 'Playing' : 'Ready'}
+        />
 
         {/* Game Grid */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 mb-6 shadow-2xl">
-          <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
-            {grid.map(i => (
-              <div
-                key={i}
-                onClick={() => whack(i)}
-                className={`aspect-square rounded-xl border-4 border-gray-600 flex items-center justify-center cursor-pointer transition-all duration-200 transform hover:scale-105 ${
-                  i === active && gameStarted && !gameEnded
-                    ? 'bg-orange-500 border-orange-400 shadow-lg shadow-orange-500/50'
-                    : 'bg-gray-700 hover:bg-gray-600'
-                }`}
-              >
-                {i === active && gameStarted && !gameEnded && (
-                  <div className="text-4xl animate-bounce">🐭</div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        <WhackMoleGrid
+          grid={grid}
+          active={active}
+          gameStarted={gameStarted}
+          gameEnded={gameEnded}
+          onWhack={whack}
+        />
 
         {/* Start Button */}
         {!gameStarted && !gameEnded && (
@@ -156,20 +170,10 @@ export default function WhackAMole(){
 
         {/* Game Over Modal */}
         {gameEnded && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">
-              <div className="text-6xl mb-4">🎉</div>
-              <h2 className="text-3xl font-bold text-green-600 mb-4">Game Over!</h2>
-              <p className="text-gray-600 mb-2">Your final score:</p>
-              <p className="text-4xl font-bold text-blue-600 mb-6">{score} points</p>
-              <button
-                onClick={init}
-                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                Play Again
-              </button>
-            </div>
-          </div>
+          <WhackMoleGameOverModal
+            score={score}
+            onRestart={restartGame}
+          />
         )}
 
         {/* Leaderboard */}
