@@ -3,6 +3,9 @@ import { startSimon, submitScore } from '../api/Api';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/Leaderboard';
+import SimonSaysStats from '../components/simonsays/SimonSaysStats';
+import SimonSaysGrid from '../components/simonsays/SimonSaysGrid';
+import SimonSaysGameOverModal from '../components/simonsays/SimonSaysGameOverModal';
 
 export default function SimonSays(){
   const [colors, setColors] = useState([]);
@@ -15,12 +18,37 @@ export default function SimonSays(){
   const [gameWon, setGameWon] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(()=> init(), []);
+  useEffect(() => {
+    const initializeGame = async () => {
+      try {
+        setIsLoading(true);
+        logger.info('Starting Simon Says game', {}, LogTags.SIMON_SAYS);
+        const r = await startSimon();
+        setColors(r.data.colors || ['red', 'blue', 'green', 'yellow']);
+        setSeq([]);
+        setPlayerSeq([]);
+        setRound(0);
+        setGameOver(false);
+        setGameWon(false);
+        setActiveColor(null);
+        nextRound([]);
+        logger.info('Simon Says initialized', { colors: r.data.colors?.length || 4 }, LogTags.SIMON_SAYS);
+      } catch (error) {
+        logger.error('Failed to start Simon Says', error, {}, LogTags.SIMON_SAYS);
+        setColors(['red', 'blue', 'green', 'yellow']);
+        nextRound([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  async function init(){
+    initializeGame();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const restartGame = async () => {
     try {
       setIsLoading(true);
-      logger.info('Starting Simon Says game', {}, LogTags.SIMON_SAYS);
+      logger.info('Restarting Simon Says game', {}, LogTags.SIMON_SAYS);
       const r = await startSimon();
       setColors(r.data.colors || ['red', 'blue', 'green', 'yellow']);
       setSeq([]);
@@ -30,15 +58,15 @@ export default function SimonSays(){
       setGameWon(false);
       setActiveColor(null);
       nextRound([]);
-      logger.info('Simon Says initialized', { colors: r.data.colors?.length || 4 }, LogTags.SIMON_SAYS);
+      logger.info('Simon Says restarted', { colors: r.data.colors?.length || 4 }, LogTags.SIMON_SAYS);
     } catch (error) {
-      logger.error('Failed to start Simon Says', error, {}, LogTags.SIMON_SAYS);
+      logger.error('Failed to restart Simon Says', error, {}, LogTags.SIMON_SAYS);
       setColors(['red', 'blue', 'green', 'yellow']);
       nextRound([]);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   const nextRound = useCallback((prev) => {
     const next = [...prev, colors[Math.floor(Math.random()*colors.length)]];
@@ -95,28 +123,6 @@ export default function SimonSays(){
     }
   }
 
-  const getColorClasses = (color) => {
-    const baseClasses = 'w-24 h-24 rounded-full font-bold text-white text-xl transition-all duration-200 transform hover:scale-105 shadow-lg';
-    const colorMap = {
-      red: 'bg-red-500 hover:bg-red-600',
-      blue: 'bg-blue-500 hover:bg-blue-600',
-      green: 'bg-green-500 hover:bg-green-600',
-      yellow: 'bg-yellow-500 hover:bg-yellow-600'
-    };
-
-    let classes = `${baseClasses} ${colorMap[color] || 'bg-gray-500'}`;
-
-    if(activeColor === color){
-      classes += ' ring-4 ring-white scale-110 brightness-125';
-    }
-
-    if(isShowingSequence || gameOver || gameWon){
-      classes += ' cursor-not-allowed opacity-75';
-    }
-
-    return classes;
-  };
-
   if(isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -138,38 +144,21 @@ export default function SimonSays(){
         </div>
 
         {/* Game Stats */}
-        <div className="flex justify-center gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">ROUND</span>
-            <div className="text-2xl font-bold text-white">{round}</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">SEQUENCE LENGTH</span>
-            <div className="text-2xl font-bold text-white">{seq.length}</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <span className="text-sm font-medium text-gray-300">STATUS</span>
-            <div className="text-lg font-bold text-white">
-              {gameWon ? 'Won!' : gameOver ? 'Game Over' : isShowingSequence ? 'Watch...' : 'Your Turn'}
-            </div>
-          </div>
-        </div>
+        <SimonSaysStats
+          round={round}
+          sequenceLength={seq.length}
+          gameStatus={gameWon ? 'Won!' : gameOver ? 'Game Over' : isShowingSequence ? 'Watch...' : 'Your Turn'}
+        />
 
         {/* Color Buttons */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 mb-6 shadow-2xl">
-          <div className="grid grid-cols-2 gap-6 max-w-sm mx-auto">
-            {colors.map(c => (
-              <button
-                key={c}
-                onClick={() => press(c)}
-                disabled={isShowingSequence || gameOver || gameWon}
-                className={getColorClasses(c)}
-              >
-                {c.charAt(0).toUpperCase() + c.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
+        <SimonSaysGrid
+          colors={colors}
+          activeColor={activeColor}
+          isShowingSequence={isShowingSequence}
+          gameOver={gameOver}
+          gameWon={gameWon}
+          onPress={press}
+        />
 
         {/* Instructions */}
         <div className="max-w-md mx-auto mb-6">
@@ -178,26 +167,11 @@ export default function SimonSays(){
 
         {/* Game Over Modal */}
         {(gameOver || gameWon) && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">
-              <div className="text-6xl mb-4">{gameWon ? '🎉' : '😞'}</div>
-              <h2 className="text-3xl font-bold mb-4">
-                {gameWon ? 'Congratulations!' : 'Game Over'}
-              </h2>
-              <p className="text-gray-600 mb-2">
-                {gameWon ? 'You completed all 10 rounds!' : `You reached round ${round}`}
-              </p>
-              <p className="text-4xl font-bold text-blue-600 mb-6">
-                {gameWon ? '100 points' : `${round - 1} points`}
-              </p>
-              <button
-                onClick={init}
-                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                Play Again
-              </button>
-            </div>
-          </div>
+          <SimonSaysGameOverModal
+            gameWon={gameWon}
+            round={round}
+            onRestart={restartGame}
+          />
         )}
 
         {/* Leaderboard */}
