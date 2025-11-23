@@ -2,7 +2,7 @@ import React, {useEffect, useState, useCallback} from 'react';
 import { startSimon, submitScore } from '../api/Api';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
-import Leaderboard from '../components/Leaderboard';
+import Leaderboard from '../components/leaderboard/Leaderboard';
 import SimonSaysStats from '../components/simonsays/SimonSaysStats';
 import SimonSaysGrid from '../components/simonsays/SimonSaysGrid';
 import SimonSaysGameOverModal from '../components/simonsays/SimonSaysGameOverModal';

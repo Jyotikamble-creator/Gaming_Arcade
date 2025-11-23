@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { fetchQuiz, submitScore } from '../api/Api';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
-import Leaderboard from '../components/Leaderboard';
+import Leaderboard from '../components/leaderboard/Leaderboard';
 import QuizStats from '../components/quiz/QuizStats';
 import QuestionCard from '../components/quiz/QuestionCard';
 import QuizCompletedModal from '../components/quiz/QuizCompletedModal';

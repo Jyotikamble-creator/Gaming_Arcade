@@ -9,7 +9,7 @@ import Confetti from '../components/emojiguess/Confetti';
 import AnimatedBackground from '../components/AnimatedBackground';
 import ProgressRing from '../components/emojiguess/ProgressRing';
 import Instructions from '../components/shared/Instructions';
-import Leaderboard from '../components/Leaderboard';
+import Leaderboard from '../components/leaderboard/Leaderboard';
 import EmojiGuessHeader from '../components/emojiguess/EmojiGuessHeader';
 import EmojiGuessAchievements from '../components/emojiguess/EmojiGuessAchievements';
 import EmojiGuessMessage from '../components/emojiguess/EmojiGuessMessage';

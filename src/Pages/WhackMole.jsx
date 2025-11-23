@@ -2,7 +2,7 @@ import React, {useEffect, useState, useRef} from 'react';
 import { startWhack, submitScore } from '../api/Api';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
-import Leaderboard from '../components/Leaderboard';
+import Leaderboard from '../components/leaderboard/Leaderboard';
 import WhackMoleStats from '../components/whackmole/WhackMoleStats';
 import WhackMoleGrid from '../components/whackmole/WhackMoleGrid';
 import WhackMoleGameOverModal from '../components/whackmole/WhackMoleGameOverModal';

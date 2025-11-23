@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { fetchWords } from '../api/wordApi'
 import { saveScore } from '../api/scoreApi'
-import Leaderboard from '../components/Leaderboard'
+import Leaderboard from '../components/leaderboard/Leaderboard'
 import WordDisplay from '../components/wordguess/WordDisplay'
 import LetterSelector from '../components/wordguess/LetterSelector'
 import GameControls from '../components/wordguess/GameControls'

@@ -6,7 +6,7 @@ import ScoreDisplay from '../components/game2048/ScoreDisplay';
 import GameControls from '../components/game2048/GameControls';
 import GameStatus from '../components/game2048/GameStatus';
 import Instructions from '../components/shared/Instructions';
-import Leaderboard from '../components/Leaderboard';
+import Leaderboard from '../components/leaderboard/Leaderboard';
 
 export default function Game2048() {
   const [board, setBoard] = useState(() => initBoard());

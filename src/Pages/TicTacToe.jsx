@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { saveScore } from '../api/scoreApi';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
-import Leaderboard from '../components/Leaderboard';
+import Leaderboard from '../components/leaderboard/Leaderboard';
 import TicTacToeStats from '../components/tictactoe/TicTacToeStats';
 import TicTacToeBoard from '../components/tictactoe/TicTacToeBoard';
 import TicTacToeControls from '../components/tictactoe/TicTacToeControls';

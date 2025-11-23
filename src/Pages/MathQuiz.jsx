@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchMathQuestions, submitScore } from '../api/Api';
 import { logger, LogTags } from '../lib/logger';
 import Instructions from '../components/shared/Instructions';
-import Leaderboard from '../components/Leaderboard';
+import Leaderboard from '../components/leaderboard/Leaderboard';
 import ProgressBar from '../components/mathsquiz/ProgressBar';
 import TimerDisplay from '../components/mathsquiz/TimerDisplay';
 import ActionButton from '../components/mathsquiz/ActionButton';
