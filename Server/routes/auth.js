@@ -16,7 +16,15 @@ const authenticate = async (req, res, next) => {
     }
     const token = auth.split(' ')[1]
     const decoded = jwt.verify(token, JWT_SECRET)
-    req.user = decoded
+    
+    // Fetch the full user object from database
+    const user = await User.findById(decoded.id).select('-passwordHash')
+    if (!user) {
+      console.log('[AUTH] User not found for token')
+      return res.status(401).json({ error: 'user not found' })
+    }
+    
+    req.user = user
     console.log('[AUTH] Token verified for user:', decoded.email)
     next()
   } catch (err) {
@@ -107,8 +115,59 @@ router.get('/me', async (req, res) => {
 router.put('/profile', authenticate, async (req, res) => {
   try {
     console.log('[AUTH] Profile update for user:', req.user.email)
-    // No fields to update currently
-    res.json({ user: { id: req.user.id, email: req.user.email } })
+    const { displayName, bio, avatar, favoriteGame, username } = req.body
+
+    // Validate input
+    if (displayName && (typeof displayName !== 'string' || displayName.length > 50)) {
+      return res.status(400).json({ error: 'Display name must be a string under 50 characters' })
+    }
+    if (bio && (typeof bio !== 'string' || bio.length > 500)) {
+      return res.status(400).json({ error: 'Bio must be a string under 500 characters' })
+    }
+    if (username && (typeof username !== 'string' || username.length < 3 || username.length > 20)) {
+      return res.status(400).json({ error: 'Username must be 3-20 characters' })
+    }
+
+    // Check if username is already taken
+    if (username && username !== req.user.username) {
+      const existingUser = await User.findOne({ username, _id: { $ne: req.user._id } })
+      if (existingUser) {
+        return res.status(400).json({ error: 'Username is already taken' })
+      }
+    }
+
+    // Update user profile
+    const updateData = {}
+    if (displayName !== undefined) updateData.displayName = displayName
+    if (bio !== undefined) updateData.bio = bio
+    if (avatar !== undefined) updateData.avatar = avatar
+    if (favoriteGame !== undefined) updateData.favoriteGame = favoriteGame
+    if (username !== undefined) updateData.username = username
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      updateData,
+      { new: true, runValidators: true }
+    )
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    console.log('[AUTH] Profile updated successfully for user:', req.user.email)
+    res.json({
+      user: {
+        id: updatedUser._id,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        displayName: updatedUser.displayName,
+        bio: updatedUser.bio,
+        avatar: updatedUser.avatar,
+        favoriteGame: updatedUser.favoriteGame,
+        profileCompleted: updatedUser.profileCompleted,
+        createdAt: updatedUser.createdAt
+      }
+    })
   } catch (err) {
     console.error('[AUTH] Profile update error:', err)
     res.status(500).json({ error: 'server error' })

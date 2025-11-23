@@ -36,3 +36,15 @@ export async function me() {
     throw error
   }
 }
+
+export async function updateProfile(profileData) {
+  try {
+    logger.info('Updating user profile', { userId: profileData.id }, LogTags.SESSIONS)
+    const res = await API.put('/api/auth/profile', profileData)
+    logger.info('User profile updated successfully', { userId: res.data.user?.id }, LogTags.SESSIONS)
+    return res.data
+  } catch (error) {
+    logger.error('Failed to update user profile', error, profileData, LogTags.SESSIONS)
+    throw error
+  }
+}

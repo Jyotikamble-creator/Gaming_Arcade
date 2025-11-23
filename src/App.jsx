@@ -17,6 +17,7 @@ import TicTacToe from './pages/TicTacToe'
 import LeaderboardPage from './pages/LeaderboardPage'
 import ScoresPage from './pages/ScoresPage'
 import ProgressPage from './pages/ProgressPage'
+import ProfilePage from './pages/ProfilePage'
 import { logger, LogTags } from './lib/logger'
 
 function NotFound() {
@@ -51,6 +52,7 @@ export default function App() {
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/scores" element={<ScoresPage />} />
         <Route path="/progress" element={<ProgressPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

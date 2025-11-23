@@ -41,7 +41,13 @@ const Sidebar = () => {
           ))}
         </ul>
       </nav>
-      <div className="mt-8 pt-4 border-t border-gray-700">
+      <div className="mt-8 pt-4 border-t border-gray-700 space-y-3">
+        <Link
+          to="/profile"
+          className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 text-center"
+        >
+          👤 My Profile
+        </Link>
         <button
           onClick={logout}
           className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
