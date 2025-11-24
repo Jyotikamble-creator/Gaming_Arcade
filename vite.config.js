@@ -20,43 +20,43 @@ export default defineConfig({
           ui: ['lucide-react'],
           http: ['axios'],
           
-          // Game pages - split by category
+          // Game pages - split by category  
           wordGames: [
-            './src/pages/WordGuess.jsx',
-            './src/pages/WordScramble.jsx'
+            '/src/pages/WordGuess',
+            '/src/pages/WordScramble'
           ],
           puzzleGames: [
-            './src/pages/EmojiGuess.jsx',
-            './src/pages/MemoryCard.jsx',
-            './src/pages/Game2048.jsx'
+            '/src/pages/EmojiGuess',
+            '/src/pages/MemoryCard',
+            '/src/pages/Game2048'
           ],
           skillGames: [
-            './src/pages/MathQuiz.jsx',
-            './src/pages/TypingTest.jsx',
-            './src/pages/Quiz.jsx'
+            '/src/pages/MathQuiz',
+            '/src/pages/TypingTest',
+            '/src/pages/Quiz'
           ],
           actionGames: [
-            './src/pages/WhackMole.jsx',
-            './src/pages/SimonSays.jsx',
-            './src/pages/TicTacToe.jsx'
+            '/src/pages/WhackMole',
+            '/src/pages/SimonSays',
+            '/src/pages/TicTacToe'
           ],
           
           // Core app components
           auth: [
-            './src/pages/Auth.jsx',
-            './src/components/auth/Login.jsx',
-            './src/components/auth/Signup.jsx'
+            '/src/pages/Auth',
+            '/src/components/auth/Login',
+            '/src/components/auth/Signup'
           ],
           dashboard: [
-            './src/pages/Dashboard.jsx',
-            './src/pages/Home.jsx',
-            './src/components/gamehub/Sidebar.jsx'
+            '/src/pages/Dashboard', 
+            '/src/pages/Home',
+            '/src/components/gamehub/Sidebar'
           ],
           utilities: [
-            './src/pages/LeaderboardPage.jsx',
-            './src/pages/ScoresPage.jsx',
-            './src/pages/ProgressPage.jsx',
-            './src/pages/ProfilePage.jsx'
+            '/src/pages/LeaderboardPage',
+            '/src/pages/ScoresPage', 
+            '/src/pages/ProgressPage',
+            '/src/pages/ProfilePage'
           ]
         }
       }
