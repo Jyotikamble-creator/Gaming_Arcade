@@ -8,6 +8,7 @@ import Auth from './pages/Auth.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 
 // Lazy load game pages for better performance
+// import all game pages using React.lazy
 const WordGuess = lazy(() => import('./pages/WordGuess.jsx'))
 const MemoryCard = lazy(() => import('./pages/MemoryCard.jsx'))
 const MathQuiz = lazy(() => import('./pages/MathQuiz.jsx'))
