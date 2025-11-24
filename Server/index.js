@@ -4,6 +4,8 @@ import cors from 'cors'
 import rateLimit from 'express-rate-limit'
 import { fileURLToPath } from 'url'
 import path from 'path'
+import dotenv from 'dotenv'
+
 import connectDB from './config/db.js'
 import commonRoutes from './routes/common.js'
 import wordRoute from './routes/word.js'
@@ -19,11 +21,19 @@ import authRoute from './routes/auth.js'
 import progressRoute from './routes/progress.js'
 import quizRoute from './routes/quiz.js'
 
+// Load environment variables from root .env file
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+dotenv.config({ path: path.join(__dirname, '../.env') })
 
 const app = express()
-app.use(cors({ origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5174', 'http://127.0.0.1:5174', 'http://localhost:5175', 'http://127.0.0.1:5175'] }))
+
+// CORS configuration using environment variables
+const corsOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['http://localhost:5173', 'http://127.0.0.1:5173']
+
+app.use(cors({ origin: corsOrigins }))
 app.use(bodyParser.json({ limit: '50kb' }))
 
 // Basic rate limiter for api endpoints
@@ -31,7 +41,7 @@ const apiLimiter = rateLimit({ windowMs: 60 * 1000, max: 120 })
 app.use('/api/', apiLimiter)
 
 // Connect to MongoDB
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/gaming_arcade'
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/gaming_arcade'
 connectDB(MONGO_URI).then(() => console.log('MongoDB connected')).catch(err => console.error('Mongo connect error', err))
 
 // Mount routes
