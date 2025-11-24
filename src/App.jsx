@@ -3,27 +3,26 @@ import { Routes, Route } from 'react-router-dom'
 import { logger, LogTags } from './lib/logger'
 
 // Core pages (loaded immediately)
-import Home from './pages/Home.jsx'
-import Auth from './pages/Auth.jsx'
-import Dashboard from './pages/Dashboard.jsx'
+import Home from './pages/Home'
+import Auth from './pages/Auth'
+import Dashboard from './pages/Dashboard'
 
 // Lazy load game pages for better performance
-// import all game pages using React.lazy
-const WordGuess = lazy(() => import('./pages/WordGuess.jsx'))
-const MemoryCard = lazy(() => import('./pages/MemoryCard.jsx'))
-const MathQuiz = lazy(() => import('./pages/MathQuiz.jsx'))
-const TypingTest = lazy(() => import('./pages/TypingTest.jsx'))
-const Game2048 = lazy(() => import('./pages/Game2048.jsx'))
-const WordScramble = lazy(() => import('./pages/WordScramble.jsx'))
-const Quiz = lazy(() => import('./pages/Quiz.jsx'))
-const EmojiGuess = lazy(() => import('./pages/EmojiGuess.jsx'))
-const WhackMole = lazy(() => import('./pages/WhackMole.jsx'))
-const SimonSays = lazy(() => import('./pages/SimonSays.jsx'))
-const TicTacToe = lazy(() => import('./pages/TicTacToe.jsx'))
-const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage.jsx'))
-const ScoresPage = lazy(() => import('./pages/ScoresPage.jsx'))
-const ProgressPage = lazy(() => import('./pages/ProgressPage.jsx'))
-const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx'))
+const WordGuess = lazy(() => import('./pages/WordGuess'))
+const MemoryCard = lazy(() => import('./pages/MemoryCard'))
+const MathQuiz = lazy(() => import('./pages/MathQuiz'))
+const TypingTest = lazy(() => import('./pages/TypingTest'))
+const Game2048 = lazy(() => import('./pages/Game2048'))
+const WordScramble = lazy(() => import('./pages/WordScramble'))
+const Quiz = lazy(() => import('./pages/Quiz'))
+const EmojiGuess = lazy(() => import('./pages/EmojiGuess'))
+const WhackMole = lazy(() => import('./pages/WhackMole'))
+const SimonSays = lazy(() => import('./pages/SimonSays'))
+const TicTacToe = lazy(() => import('./pages/TicTacToe'))
+const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
+const ScoresPage = lazy(() => import('./pages/ScoresPage'))
+const ProgressPage = lazy(() => import('./pages/ProgressPage'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 
 // Loading component for lazy-loaded pages
 function PageLoader() {

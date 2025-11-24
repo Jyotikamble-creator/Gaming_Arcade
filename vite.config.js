@@ -6,6 +6,9 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   base: process.env.NODE_ENV === 'production' ? '/' : '/',
+  resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,
