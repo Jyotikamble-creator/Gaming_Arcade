@@ -181,11 +181,9 @@ wordgame/
 
 <img width="1920" height="900" alt="emojiguess" src="https://github.com/user-attachments/assets/94d887e2-2685-4e6b-89fe-b3535eefa3fe" />
 
-<img width="1920" height="900" alt="memorycard" src="https://github.com/user-attachments/assets/3047dbd4-eb5e-4c0a-bd51-15e7b70798b1" />
-
 <img width="1920" height="900" alt="game2048" src="https://github.com/user-attachments/assets/2e94a10f-4766-4cf0-a7f9-4899844cd5bd" />
 
-<img width="1920" height="90" alt="typingtest" src="https://github.com/user-attachments/assets/858d3de2-8ec4-4fcb-aec0-64da5febf626" />
+<img width="1920" height="900" alt="typingtest" src="https://github.com/user-attachments/assets/858d3de2-8ec4-4fcb-aec0-64da5febf626" />
 
 <img width="1920" height="900" alt="quiz" src="https://github.com/user-attachments/assets/34255038-bee4-415a-b163-19193943b859" />
 
