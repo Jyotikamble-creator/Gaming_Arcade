@@ -168,6 +168,35 @@ wordgame/
 └── dist/                  # Built frontend (generated)
 ```
 
+
+<img width="1920" height="900" alt="landing" src="https://github.com/user-attachments/assets/14fe20e9-c50e-4891-a9af-8f1a48b44a00" />
+
+<img width="1920"  height="900" alt="auth" src="https://github.com/user-attachments/assets/ae1cd6a6-4c79-4710-8a21-f2cbbf6f2ad8" />
+
+<img width="1920" height="900" alt="gamehub" src="https://github.com/user-attachments/assets/da4dfb6e-9119-41d7-9957-c47baf2b50b4" />
+
+<img width="1920" height="900" alt="wordgame" src="https://github.com/user-attachments/assets/f6e457cb-8904-48f9-9193-0c62c8fe3b98" />
+
+<img width="1920" height="900" alt="wordscramble" src="https://github.com/user-attachments/assets/7af9e073-0078-4150-9abe-823d69e93ef5" />
+
+<img width="1920" height="900" alt="emojiguess" src="https://github.com/user-attachments/assets/94d887e2-2685-4e6b-89fe-b3535eefa3fe" />
+
+<img width="1920" height="900" alt="memorycard" src="https://github.com/user-attachments/assets/3047dbd4-eb5e-4c0a-bd51-15e7b70798b1" />
+
+<img width="1920" height="900" alt="game2048" src="https://github.com/user-attachments/assets/2e94a10f-4766-4cf0-a7f9-4899844cd5bd" />
+
+<img width="1920" height="90" alt="typingtest" src="https://github.com/user-attachments/assets/858d3de2-8ec4-4fcb-aec0-64da5febf626" />
+
+<img width="1920" height="900" alt="quiz" src="https://github.com/user-attachments/assets/34255038-bee4-415a-b163-19193943b859" />
+
+<img width="1920" height="900" alt="tiktak" src="https://github.com/user-attachments/assets/b0b62373-5957-4eba-9650-44cecd88853f" />
+
+<img width="1920" height="900" alt="whackmole" src="https://github.com/user-attachments/assets/4fbb40f6-54c6-416b-948b-e92371260f54" />
+
+<img width="1920" height="900" alt="simonsay" src="https://github.com/user-attachments/assets/1944b6fc-a6c8-4f00-8c2d-fdc7d0f236e0" />
+
+
+
 ## Contributing
 
 1. Fork the repository
