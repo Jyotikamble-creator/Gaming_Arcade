@@ -167,7 +167,13 @@ wordgame/
 │   └── config/            # Server configuration
 └── dist/                  # Built frontend (generated)
 ```
+------
+## 🔗 Live Website 
 
+🌐 Website: https://gaming-arcade-one.vercel.app/
+
+------
+## Project Overview
 
 <img width="1920" height="900" alt="landing" src="https://github.com/user-attachments/assets/14fe20e9-c50e-4891-a9af-8f1a48b44a00" />
 
