@@ -14,6 +14,7 @@ const games = [
   { name: 'Simon Says', path: '/simon-says' },
   { name: 'Tic Tac Toe', path: '/tic-tac-toe' },
   { name: 'Sudoku', path: '/sudoku' },
+  { name: 'Word Builder', path: '/word-builder' },
 ];
 
 const Sidebar = () => {

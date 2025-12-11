@@ -20,6 +20,7 @@ const WhackMole = lazy(() => import('./pages/WhackMole'))
 const SimonSays = lazy(() => import('./pages/SimonSays'))
 const TicTacToe = lazy(() => import('./pages/TicTacToe'))
 const Sudoku = lazy(() => import('./pages/Sudoku'))
+const WordBuilder = lazy(() => import('./pages/WordBuilder'))
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
 const ScoresPage = lazy(() => import('./pages/ScoresPage'))
 const ProgressPage = lazy(() => import('./pages/ProgressPage'))
@@ -76,6 +77,7 @@ export default function App() {
           <Route path="/simon-says" element={<SimonSays />} />
           <Route path="/tic-tac-toe" element={<TicTacToe />} />
           <Route path="/sudoku" element={<Sudoku />} />
+          <Route path="/word-builder" element={<WordBuilder />} />
           
           {/* Utility pages - lazy loaded */}
           <Route path="/leaderboard" element={<LeaderboardPage />} />

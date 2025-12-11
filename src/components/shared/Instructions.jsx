@@ -139,6 +139,19 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: Start by looking for cells with only one possible number. Use the process of elimination!'
         };
+      case 'word-builder':
+        return {
+          title: 'How to Play Word Builder',
+          rules: [
+            '• Click letters to form valid words',
+            '• Words must be at least 3 letters long',
+            '• Click letters in your word to remove them',
+            '• Use Shuffle to rearrange available letters',
+            '• Find the minimum required words to complete',
+            '• Longer words give bonus points!'
+          ],
+          tip: '💡 Tip: Start with smaller words, then try to find longer ones. Use all the letters if possible!'
+        };
       default:
         return {
           title: 'How to Play',
