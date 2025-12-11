@@ -245,6 +245,20 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: Plan ahead! Think about which tiles need to move where before making your next move.'
         };
+      case 'number-maze':
+        return {
+          title: 'How to Play Number Maze',
+          rules: [
+            '• Navigate through the grid to reach the target number',
+            '• Each cell you visit adds/subtracts its value to your sum',
+            '• Use arrow keys or WASD to move to adjacent cells',
+            '• Cannot revisit cells once visited',
+            '• Reach exactly the target number to win',
+            '• Fewer moves and faster times give higher scores',
+            '• Watch the difference counter to guide your path'
+          ],
+          tip: '💡 Tip: Plan your route carefully! Positive numbers help, negative numbers hurt your progress.'
+        };
       default:
         return {
           title: 'How to Play',

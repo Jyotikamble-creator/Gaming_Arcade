@@ -29,6 +29,7 @@ import reactionTimeRoute from './routes/reaction-time.js'
 import brainTeaserRoute from './routes/brain-teaser.js'
 import towerStackerRoute from './routes/tower-stacker.js'
 import slidingPuzzleRoute from './routes/sliding-puzzle.js'
+import numberMazeRoute from './routes/number-maze.js'
 
 // Load environment variables from root .env file
 const __filename = fileURLToPath(import.meta.url)
@@ -76,6 +77,7 @@ app.use('/api/games/reaction-time', reactionTimeRoute)
 app.use('/api/games/brain-teaser', brainTeaserRoute)
 app.use('/api/games/tower-stacker', towerStackerRoute)
 app.use('/api/games/sliding-puzzle', slidingPuzzleRoute)
+app.use('/api/games/number-maze', numberMazeRoute)
 
 // POST /api/logs - for client-side logging in development
 app.post('/api/logs', (req, res) => {

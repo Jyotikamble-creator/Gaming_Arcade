@@ -23,6 +23,7 @@ const games = [
   { name: 'Brain Teaser', path: '/brain-teaser', icon: '🧠', color: 'purple' },
   { name: 'Tower Stacker', path: '/tower-stacker', icon: '🏗️', color: 'cyan' },
   { name: 'Sliding Puzzle', path: '/sliding-puzzle', icon: '🧩', color: 'violet' },
+  { name: 'Number Maze', path: '/number-maze', icon: '🔢', color: 'emerald' },
 ];
 
 export default function Dashboard() {
