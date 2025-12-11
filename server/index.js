@@ -23,6 +23,7 @@ import quizRoute from './routes/quiz.js'
 import sudokuRoute from './routes/sudoku.js'
 import wordBuilderRoute from './routes/word-builder.js'
 import speedMathRoute from './routes/speed-math.js'
+import hangmanRoute from './routes/hangman.js'
 
 // Load environment variables from root .env file
 const __filename = fileURLToPath(import.meta.url)
@@ -64,6 +65,7 @@ app.use('/api/games/quiz', quizRoute)
 app.use('/api/games/sudoku', sudokuRoute)
 app.use('/api/games/word-builder', wordBuilderRoute)
 app.use('/api/games/speed-math', speedMathRoute)
+app.use('/api/games/hangman', hangmanRoute)
 
 // POST /api/logs - for client-side logging in development
 app.post('/api/logs', (req, res) => {

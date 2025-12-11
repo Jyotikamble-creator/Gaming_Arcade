@@ -165,6 +165,19 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: Speed and accuracy both matter! Build streaks for bonus points - every 3 correct answers in a row adds extra points!'
         };
+      case 'hangman':
+        return {
+          title: 'How to Play Hangman',
+          rules: [
+            '• Choose a category to start playing',
+            '• Click letters to guess the hidden word',
+            '• You have 6 wrong guesses before game over',
+            '• Use hints if you get stuck (costs 10 points)',
+            '• Longer words give bonus points',
+            '• Complete words to increase your score!'
+          ],
+          tip: '💡 Tip: Start with common vowels (A, E, I, O, U) and frequent consonants (R, S, T, N). Pay attention to word length!'
+        };
       default:
         return {
           title: 'How to Play',

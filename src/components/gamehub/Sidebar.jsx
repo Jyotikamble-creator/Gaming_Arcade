@@ -16,6 +16,7 @@ const games = [
   { name: 'Sudoku', path: '/sudoku' },
   { name: 'Word Builder', path: '/word-builder' },
   { name: 'Speed Math', path: '/speed-math' },
+  { name: 'Hangman', path: '/hangman' },
 ];
 
 const Sidebar = () => {
