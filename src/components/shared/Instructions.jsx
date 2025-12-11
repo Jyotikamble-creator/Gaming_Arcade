@@ -217,6 +217,20 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: Focus on one property at a time - shape, color, or pattern. Don\'t rush, accuracy builds your streak!'
         };
+      case 'tower-stacker':
+        return {
+          title: 'How to Play Tower Stacker',
+          rules: [
+            '• Click or press SPACE to drop the moving block',
+            '• Align blocks perfectly to maintain width',
+            '• Misaligned drops reduce the block size',
+            '• Perfect drops (±5px) earn 20 bonus points',
+            '• Build combo streaks for extra points',
+            '• Reach level 20 to win the game!',
+            '• Game ends if block misses completely'
+          ],
+          tip: '💡 Tip: Time your drops carefully! Perfect alignment keeps your tower stable and maximizes your score.'
+        };
       default:
         return {
           title: 'How to Play',
