@@ -99,7 +99,7 @@ export default function MathQuiz(){
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white">Loading math questions...</p>
@@ -110,7 +110,7 @@ export default function MathQuiz(){
 
   if (!questions.length) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 max-w-md w-full text-center">
           <h2 className="text-xl font-bold text-white mb-4">Failed to Load Questions</h2>
           <button
@@ -127,7 +127,7 @@ export default function MathQuiz(){
   const q = questions[index];
 
   return (
-    <div className="min-h-screen text-white bg-gray-900">
+    <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">

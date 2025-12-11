@@ -204,7 +204,7 @@ export default function Hangman() {
   }, [guessedLetters, wrongGuesses, word, isPlaying, gameWon, gameLost, score, wordsCompleted, category]);
 
   return (
-    <div className="min-h-screen text-white bg-gradient-to-br from-gray-900 via-indigo-900 to-gray-900">
+    <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Header */}
         <div className="text-center mb-8">
