@@ -22,6 +22,7 @@ const games = [
   { name: 'Reaction Time', path: '/reaction-time', icon: '⏱️', color: 'indigo' },
   { name: 'Brain Teaser', path: '/brain-teaser', icon: '🧠', color: 'purple' },
   { name: 'Tower Stacker', path: '/tower-stacker', icon: '🏗️', color: 'cyan' },
+  { name: 'Sliding Puzzle', path: '/sliding-puzzle', icon: '🧩', color: 'violet' },
 ];
 
 export default function Dashboard() {

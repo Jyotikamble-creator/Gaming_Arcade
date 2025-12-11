@@ -27,6 +27,7 @@ const CodingPuzzle = lazy(() => import('./pages/CodingPuzzle'))
 const ReactionTime = lazy(() => import('./pages/ReactionTime'))
 const BrainTeaser = lazy(() => import('./pages/BrainTeaser'))
 const TowerStacker = lazy(() => import('./pages/TowerStacker'))
+const SlidingPuzzle = lazy(() => import('./pages/SlidingPuzzle'))
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
 const ScoresPage = lazy(() => import('./pages/ScoresPage'))
 const ProgressPage = lazy(() => import('./pages/ProgressPage'))
@@ -90,6 +91,7 @@ export default function App() {
           <Route path="/reaction-time" element={<ReactionTime />} />
           <Route path="/brain-teaser" element={<BrainTeaser />} />
           <Route path="/tower-stacker" element={<TowerStacker />} />
+          <Route path="/sliding-puzzle" element={<SlidingPuzzle />} />
           
           {/* Utility pages - lazy loaded */}
           <Route path="/leaderboard" element={<LeaderboardPage />} />

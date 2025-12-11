@@ -231,6 +231,20 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: Time your drops carefully! Perfect alignment keeps your tower stable and maximizes your score.'
         };
+      case 'sliding-puzzle':
+        return {
+          title: 'How to Play Sliding Puzzle',
+          rules: [
+            '• Slide tiles to arrange numbers 1-15 in order',
+            '• Click adjacent tiles to move them into the empty space',
+            '• Only tiles next to the empty space can move',
+            '• Goal is to reach the solved state with empty space at bottom-right',
+            '• Fewer moves and faster times earn higher scores',
+            '• Efficiency rating based on moves vs optimal solution',
+            '• Try to achieve "Master" rating for maximum points!'
+          ],
+          tip: '💡 Tip: Plan ahead! Think about which tiles need to move where before making your next move.'
+        };
       default:
         return {
           title: 'How to Play',
