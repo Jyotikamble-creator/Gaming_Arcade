@@ -178,6 +178,19 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: Start with common vowels (A, E, I, O, U) and frequent consonants (R, S, T, N). Pay attention to word length!'
         };
+      case 'coding-puzzle':
+        return {
+          title: 'How to Play Coding Puzzle',
+          rules: [
+            '• Choose a puzzle category (Patterns, Code Output, Logic, or Bitwise)',
+            '• Read the puzzle question carefully',
+            '• Type your answer in the input field',
+            '• Use hints if needed (reduces bonus points)',
+            '• Solve 10 puzzles to complete the game',
+            '• Build streaks for bonus points!'
+          ],
+          tip: '💡 Tip: For number patterns, look for common sequences (Fibonacci, powers, arithmetic). For code output, trace through the logic step by step!'
+        };
       default:
         return {
           title: 'How to Play',

@@ -17,6 +17,7 @@ const games = [
   { name: 'Word Builder', path: '/word-builder' },
   { name: 'Speed Math', path: '/speed-math' },
   { name: 'Hangman', path: '/hangman' },
+  { name: 'Coding Puzzle', path: '/coding-puzzle' },
 ];
 
 const Sidebar = () => {
