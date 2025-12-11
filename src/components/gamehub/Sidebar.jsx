@@ -15,6 +15,7 @@ const games = [
   { name: 'Tic Tac Toe', path: '/tic-tac-toe' },
   { name: 'Sudoku', path: '/sudoku' },
   { name: 'Word Builder', path: '/word-builder' },
+  { name: 'Speed Math', path: '/speed-math' },
 ];
 
 const Sidebar = () => {
