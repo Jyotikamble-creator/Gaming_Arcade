@@ -13,6 +13,7 @@ const games = [
   { name: 'Whack Mole', path: '/whack-a-mole' },
   { name: 'Simon Says', path: '/simon-says' },
   { name: 'Tic Tac Toe', path: '/tic-tac-toe' },
+  { name: 'Sudoku', path: '/sudoku' },
 ];
 
 const Sidebar = () => {

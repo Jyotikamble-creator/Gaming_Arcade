@@ -126,6 +126,19 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: Read all options carefully before selecting your answer!'
         };
+      case 'sudoku':
+        return {
+          title: 'How to Play Sudoku',
+          rules: [
+            '• Fill the 9×9 grid with numbers 1-9',
+            '• Each row must contain all digits 1-9',
+            '• Each column must contain all digits 1-9',
+            '• Each 3×3 box must contain all digits 1-9',
+            '• Use notes mode to mark possible numbers',
+            '• Get hints when stuck, but they reduce your score!'
+          ],
+          tip: '💡 Tip: Start by looking for cells with only one possible number. Use the process of elimination!'
+        };
       default:
         return {
           title: 'How to Play',
