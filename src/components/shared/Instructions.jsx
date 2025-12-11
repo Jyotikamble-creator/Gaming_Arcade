@@ -204,6 +204,19 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: Stay relaxed and focused. Don\'t anticipate - react! Average human reaction time is 200-300ms.'
         };
+      case 'brain-teaser':
+        return {
+          title: 'How to Play Brain Teasers',
+          rules: [
+            '• You have 60 seconds to solve as many puzzles as possible',
+            '• Three types: Match Shape, Find Odd One, Pattern Test',
+            '• Click the correct answer for each puzzle',
+            '• Build streaks for bonus points (3+ in a row)',
+            '• Harder puzzles give more points',
+            '• Speed and accuracy both matter!'
+          ],
+          tip: '💡 Tip: Focus on one property at a time - shape, color, or pattern. Don\'t rush, accuracy builds your streak!'
+        };
       default:
         return {
           title: 'How to Play',
