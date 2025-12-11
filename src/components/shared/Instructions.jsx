@@ -191,6 +191,19 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: For number patterns, look for common sequences (Fibonacci, powers, arithmetic). For code output, trace through the logic step by step!'
         };
+      case 'reaction-time':
+        return {
+          title: 'How to Play Reaction Time Tester',
+          rules: [
+            '• Click Start Test to begin',
+            '• Wait for the screen to turn green',
+            '• Click as fast as you can when it changes!',
+            '• Complete 5 rounds to finish',
+            '• Clicking too early resets the round',
+            '• Lower average time = better score!'
+          ],
+          tip: '💡 Tip: Stay relaxed and focused. Don\'t anticipate - react! Average human reaction time is 200-300ms.'
+        };
       default:
         return {
           title: 'How to Play',

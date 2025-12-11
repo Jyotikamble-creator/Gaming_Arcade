@@ -25,6 +25,7 @@ import wordBuilderRoute from './routes/word-builder.js'
 import speedMathRoute from './routes/speed-math.js'
 import hangmanRoute from './routes/hangman.js'
 import codingPuzzleRoute from './routes/coding-puzzle.js'
+import reactionTimeRoute from './routes/reaction-time.js'
 
 // Load environment variables from root .env file
 const __filename = fileURLToPath(import.meta.url)
@@ -68,6 +69,7 @@ app.use('/api/games/word-builder', wordBuilderRoute)
 app.use('/api/games/speed-math', speedMathRoute)
 app.use('/api/games/hangman', hangmanRoute)
 app.use('/api/games/coding-puzzle', codingPuzzleRoute)
+app.use('/api/games/reaction-time', reactionTimeRoute)
 
 // POST /api/logs - for client-side logging in development
 app.post('/api/logs', (req, res) => {

@@ -24,6 +24,7 @@ const WordBuilder = lazy(() => import('./pages/WordBuilder'))
 const SpeedMath = lazy(() => import('./pages/SpeedMath'))
 const Hangman = lazy(() => import('./pages/Hangman'))
 const CodingPuzzle = lazy(() => import('./pages/CodingPuzzle'))
+const ReactionTime = lazy(() => import('./pages/ReactionTime'))
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
 const ScoresPage = lazy(() => import('./pages/ScoresPage'))
 const ProgressPage = lazy(() => import('./pages/ProgressPage'))
@@ -84,6 +85,7 @@ export default function App() {
           <Route path="/speed-math" element={<SpeedMath />} />
           <Route path="/hangman" element={<Hangman />} />
           <Route path="/coding-puzzle" element={<CodingPuzzle />} />
+          <Route path="/reaction-time" element={<ReactionTime />} />
           
           {/* Utility pages - lazy loaded */}
           <Route path="/leaderboard" element={<LeaderboardPage />} />

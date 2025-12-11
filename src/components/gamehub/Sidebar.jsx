@@ -18,6 +18,7 @@ const games = [
   { name: 'Speed Math', path: '/speed-math' },
   { name: 'Hangman', path: '/hangman' },
   { name: 'Coding Puzzle', path: '/coding-puzzle' },
+  { name: 'Reaction Time', path: '/reaction-time' },
 ];
 
 const Sidebar = () => {
