@@ -1,12 +1,22 @@
-import express from 'express';
+// wordgame/server/routes/memory.js
+// Memory card game
+import express from "express";
 
+// Create router
 const router = express.Router();
 
-function shuffle(a){ return a.sort(()=> Math.random()-0.5) }
+// Shuffle helper
+function shuffle(a) {
+  return a.sort(() => Math.random() - 0.5);
+}
 
-router.get('/start', (req,res) => {
-  const pairs = ['🍎','🍌','🍇','🍊'];
-  let cards = pairs.concat(pairs).map((c,i)=>({ id:i, value:c, matched:false }));
+// Start game
+router.get("/start", (req, res) => {
+  // Create shuffled cards
+  const pairs = ["🍎", "🍌", "🍇", "🍊"];
+  let cards = pairs
+    .concat(pairs)
+    .map((c, i) => ({ id: i, value: c, matched: false }));
   cards = shuffle(cards);
   res.json({ cards });
 });

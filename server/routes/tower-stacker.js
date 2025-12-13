@@ -1,23 +1,26 @@
-import express from 'express';
+// Routes for Tower Stacker game
+import express from "express";
+
+// Create router
 const router = express.Router();
 
 // Get difficulty benchmarks
-router.get('/benchmarks', (req, res) => {
+router.get("/benchmarks", (req, res) => {
   res.json({
     beginner: { minLevel: 1, maxLevel: 5 },
     intermediate: { minLevel: 6, maxLevel: 10 },
     advanced: { minLevel: 11, maxLevel: 15 },
     expert: { minLevel: 16, maxLevel: 19 },
-    master: { minLevel: 20, maxLevel: 20 }
+    master: { minLevel: 20, maxLevel: 20 },
   });
 });
 
 // Calculate score based on performance
-router.post('/calculate-score', (req, res) => {
+router.post("/calculate-score", (req, res) => {
   const { level, perfectDrops } = req.body;
 
   if (!level) {
-    return res.status(400).json({ error: 'Level is required' });
+    return res.status(400).json({ error: "Level is required" });
   }
 
   // Base score calculation
@@ -36,35 +39,38 @@ router.post('/calculate-score', (req, res) => {
   if (level >= 10) score += 100;
   if (level >= 15) score += 150;
 
-  res.json({ 
+  res.json({
     score,
     rating: getRating(level),
-    message: getMessage(level, perfectDrops)
+    message: getMessage(level, perfectDrops),
   });
 });
 
+// Helper functions
+// Generate rating based on level achieved
 function getRating(level) {
-  if (level >= 20) return 'Tower Master';
-  if (level >= 15) return 'Excellent';
-  if (level >= 10) return 'Great';
-  if (level >= 5) return 'Good';
-  return 'Beginner';
+  if (level >= 20) return "Tower Master";
+  if (level >= 15) return "Excellent";
+  if (level >= 10) return "Great";
+  if (level >= 5) return "Good";
+  return "Beginner";
 }
 
+// Generate message based on performance
 function getMessage(level, perfectDrops) {
   if (level >= 20) {
-    return 'Perfect! You built a complete tower!';
+    return "Perfect! You built a complete tower!";
   }
   if (perfectDrops >= 10) {
-    return 'Amazing accuracy! Keep it up!';
+    return "Amazing accuracy! Keep it up!";
   }
   if (level >= 15) {
-    return 'So close to perfection!';
+    return "So close to perfection!";
   }
   if (level >= 10) {
-    return 'Great balance and timing!';
+    return "Great balance and timing!";
   }
-  return 'Keep practicing your timing!';
+  return "Keep practicing your timing!";
 }
 
 export default router;
