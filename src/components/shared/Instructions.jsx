@@ -139,6 +139,18 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: Start by looking for cells with only one possible number. Use the process of elimination!'
         };
+      case 'music-tiles':
+        return {
+          title: 'How to Play Music Tiles',
+          rules: [
+            '• Watch the sequence of tiles that light up',
+            '• Click the tiles in the same order they appeared',
+            '• Sequences get longer and faster each level',
+            '• Wrong clicks end your turn',
+            '• Reach higher levels for better scores!'
+          ],
+          tip: '💡 Tip: Focus on memorizing the pattern! Start with the first few tiles and build from there.'
+        };
       case 'word-builder':
         return {
           title: 'How to Play Word Builder',

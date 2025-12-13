@@ -25,6 +25,7 @@ const games = [
   { name: 'Sliding Puzzle', path: '/sliding-puzzle', icon: '🧩', color: 'violet' },
   { name: 'Number Maze', path: '/number-maze', icon: '🔢', color: 'emerald' },
   { name: 'Pixel Art Creator', path: '/pixel-art-creator', icon: '🎨', color: 'pink' },
+  { name: 'Music Tiles', path: '/music-tiles', icon: '🎵', color: 'purple' },
 ];
 
 export default function Dashboard() {
