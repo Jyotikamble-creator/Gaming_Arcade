@@ -29,6 +29,7 @@ const BrainTeaser = lazy(() => import('./pages/BrainTeaser'))
 const TowerStacker = lazy(() => import('./pages/TowerStacker'))
 const SlidingPuzzle = lazy(() => import('./pages/SlidingPuzzle'))
 const NumberMaze = lazy(() => import('./pages/NumberMaze'))
+const PixelArtCreator = lazy(() => import('./pages/PixelArtCreator'))
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
 const ScoresPage = lazy(() => import('./pages/ScoresPage'))
 const ProgressPage = lazy(() => import('./pages/ProgressPage'))
@@ -94,6 +95,7 @@ export default function App() {
           <Route path="/tower-stacker" element={<TowerStacker />} />
           <Route path="/sliding-puzzle" element={<SlidingPuzzle />} />
           <Route path="/number-maze" element={<NumberMaze />} />
+          <Route path="/pixel-art-creator" element={<PixelArtCreator />} />
           
           {/* Utility pages - lazy loaded */}
           <Route path="/leaderboard" element={<LeaderboardPage />} />

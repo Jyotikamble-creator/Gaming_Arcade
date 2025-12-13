@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Get difficulty benchmarks
@@ -81,4 +81,4 @@ function getMessage(moves, timeElapsed) {
   return 'Nice try! Keep practicing to improve your efficiency!';
 }
 
-module.exports = router;
+export default router;

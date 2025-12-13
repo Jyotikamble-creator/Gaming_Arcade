@@ -24,6 +24,7 @@ const games = [
   { name: 'Tower Stacker', path: '/tower-stacker', icon: '🏗️', color: 'cyan' },
   { name: 'Sliding Puzzle', path: '/sliding-puzzle', icon: '🧩', color: 'violet' },
   { name: 'Number Maze', path: '/number-maze', icon: '🔢', color: 'emerald' },
+  { name: 'Pixel Art Creator', path: '/pixel-art-creator', icon: '🎨', color: 'pink' },
 ];
 
 export default function Dashboard() {
