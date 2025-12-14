@@ -1,5 +1,4 @@
-import React from 'react';
-
+// Component to display various brain teaser puzzles with shape rendering
 // Shape components
 const ShapeRenderer = ({ shape, color, size = 'large' }) => {
   const sizeClass = size === 'large' ? 'w-24 h-24' : size === 'medium' ? 'w-16 h-16' : 'w-12 h-12';
@@ -14,27 +13,29 @@ const ShapeRenderer = ({ shape, color, size = 'large' }) => {
     cyan: '#06b6d4'
   };
 
+  // Determine shape color
   const shapeColor = colorMap[color] || '#fff';
 
+  // Render different shapes
   const renderShape = () => {
     switch (shape) {
       case 'circle':
         return (
-          <div 
+          <div
             className={`${sizeClass} rounded-full`}
             style={{ backgroundColor: shapeColor }}
           />
         );
       case 'square':
         return (
-          <div 
+          <div
             className={`${sizeClass} rounded-lg`}
             style={{ backgroundColor: shapeColor }}
           />
         );
       case 'triangle':
         return (
-          <div 
+          <div
             className={sizeClass}
             style={{
               width: 0,
@@ -47,7 +48,7 @@ const ShapeRenderer = ({ shape, color, size = 'large' }) => {
         );
       case 'diamond':
         return (
-          <div 
+          <div
             className={`${sizeClass} rotate-45 rounded-md`}
             style={{ backgroundColor: shapeColor }}
           />
@@ -76,9 +77,11 @@ const ShapeRenderer = ({ shape, color, size = 'large' }) => {
   return <div className="flex items-center justify-center">{renderShape()}</div>;
 };
 
+// Main component
 export default function BrainTeaserDisplay({ puzzle, onAnswer, feedback }) {
   if (!puzzle) return null;
 
+  // Render different puzzle types
   const renderMatchShapePuzzle = () => (
     <div>
       <div className="text-center mb-8">
@@ -103,10 +106,11 @@ export default function BrainTeaserDisplay({ puzzle, onAnswer, feedback }) {
     </div>
   );
 
+  // Render Find Odd One Out puzzle
   const renderFindOddPuzzle = () => (
     <div>
       <h3 className="text-2xl font-bold text-white mb-6 text-center">{puzzle.question}</h3>
-      
+
       <div className="grid grid-cols-5 gap-4">
         {puzzle.options.map((option, index) => (
           <button
@@ -122,10 +126,11 @@ export default function BrainTeaserDisplay({ puzzle, onAnswer, feedback }) {
     </div>
   );
 
+  // Render Pattern Puzzle
   const renderPatternPuzzle = () => (
     <div>
       <h3 className="text-2xl font-bold text-white mb-6 text-center">{puzzle.question}</h3>
-      
+
       {/* Pattern Display */}
       <div className="bg-purple-600/20 border-2 border-purple-500/50 rounded-2xl p-6 mb-8">
         <div className="flex items-center justify-center gap-6">
@@ -154,14 +159,15 @@ export default function BrainTeaserDisplay({ puzzle, onAnswer, feedback }) {
     </div>
   );
 
+  // Render the puzzle
   return (
     <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 mb-6 border border-purple-500/30 shadow-2xl">
       {/* Puzzle Type Badge */}
       <div className="flex justify-center mb-6">
         <span className="bg-purple-600/30 text-purple-300 px-4 py-2 rounded-full text-sm font-bold border border-purple-500/50">
-          {puzzle.type === 'match-shape' ? '🎯 Match Shape' : 
-           puzzle.type === 'find-odd' ? '🔍 Find Odd One' : 
-           '🧩 Pattern Test'}
+          {puzzle.type === 'match-shape' ? '🎯 Match Shape' :
+            puzzle.type === 'find-odd' ? '🔍 Find Odd One' :
+              '🧩 Pattern Test'}
         </span>
       </div>
 
@@ -172,11 +178,10 @@ export default function BrainTeaserDisplay({ puzzle, onAnswer, feedback }) {
 
       {/* Feedback */}
       {feedback && (
-        <div className={`mt-6 px-6 py-3 rounded-xl font-semibold text-center text-lg ${
-          feedback.type === 'success' 
-            ? 'bg-green-600/30 text-green-300 border-2 border-green-500/50' 
+        <div className={`mt-6 px-6 py-3 rounded-xl font-semibold text-center text-lg ${feedback.type === 'success'
+            ? 'bg-green-600/30 text-green-300 border-2 border-green-500/50'
             : 'bg-red-600/30 text-red-300 border-2 border-red-500/50'
-        }`}>
+          }`}>
           {feedback.message}
         </div>
       )}

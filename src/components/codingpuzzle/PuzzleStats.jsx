@@ -1,4 +1,4 @@
-import React from 'react';
+// Component to display statistics for the coding puzzle session
 
 export default function PuzzleStats({ score, puzzlesSolved, totalPuzzles, streak, bestStreak }) {
   return (

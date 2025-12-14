@@ -1,5 +1,4 @@
-import React from 'react';
-
+// Component to display the coding puzzle question and its difficulty
 export default function PuzzleDisplay({ puzzle, puzzleNumber, totalPuzzles }) {
   return (
     <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 mb-6 border border-purple-500/30 shadow-2xl">

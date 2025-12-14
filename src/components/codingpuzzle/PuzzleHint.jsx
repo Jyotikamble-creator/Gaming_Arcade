@@ -1,4 +1,4 @@
-import React from 'react';
+// Component to display a hint for the coding puzzle
 
 export default function PuzzleHint({ hint }) {
   return (

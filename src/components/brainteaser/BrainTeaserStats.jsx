@@ -1,5 +1,4 @@
-import React from 'react';
-
+// Component to display Brain Teaser game statistics
 export default function BrainTeaserStats({ score, puzzlesSolved, streak, bestStreak }) {
   return (
     <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 mb-6 border border-purple-500/30 shadow-2xl">
