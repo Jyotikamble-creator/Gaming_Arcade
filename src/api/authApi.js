@@ -1,50 +1,94 @@
-import API from './Api'
-import { logger, LogTags } from '../lib/logger'
+// API module for user authentication
+import API from "./Api";
+// Logger module for logging
+import { logger, LogTags } from "../lib/logger";
 
+// User signup function
 export async function signup({ email, password }) {
   try {
-    logger.info('Attempting user signup', { email }, LogTags.REGISTER)
-    const res = await API.post('/api/auth/signup', { email, password })
-    logger.info('User signup successful', { email, userId: res.data.user?.id }, LogTags.REGISTER)
-    return res.data
+    logger.info("Attempting user signup", { email }, LogTags.REGISTER);
+    // Call the signup endpoint
+    const res = await API.post("/api/auth/signup", { email, password });
+    // Log successful signup
+    logger.info(
+      "User signup successful",
+      { email, userId: res.data.user?.id },
+      LogTags.REGISTER
+    );
+    return res.data;
   } catch (error) {
-    logger.error('User signup failed', error, { email }, LogTags.REGISTER)
-    throw error
+    logger.error("User signup failed", error, { email }, LogTags.REGISTER);
+    throw error;
   }
 }
 
+// User login function
 export async function login({ email, password }) {
   try {
-    logger.info('Attempting user login', { email }, LogTags.LOGIN)
-    const res = await API.post('/api/auth/login', { email, password })
-    logger.info('User login successful', { email, userId: res.data.user?.id }, LogTags.LOGIN)
-    return res.data
+    logger.info("Attempting user login", { email }, LogTags.LOGIN);
+    // Call the login endpoint
+    const res = await API.post("/api/auth/login", { email, password });
+    // Log successful login
+    logger.info(
+      "User login successful",
+      { email, userId: res.data.user?.id },
+      LogTags.LOGIN
+    );
+    return res.data;
   } catch (error) {
-    logger.error('User login failed', error, { email }, LogTags.LOGIN)
-    throw error
+    logger.error("User login failed", error, { email }, LogTags.LOGIN);
+    throw error;
   }
 }
 
+// Get current user info
 export async function me() {
   try {
-    logger.debug('Fetching current user info', {}, LogTags.SESSIONS)
-    const res = await API.get('/api/auth/me')
-    logger.debug('Current user info fetched', { userId: res.data.user?.id }, LogTags.SESSIONS)
-    return res.data
+    logger.debug("Fetching current user info", {}, LogTags.SESSIONS);
+    // Call the me endpoint
+    const res = await API.get("/api/auth/me");
+    // Log successful fetch
+    logger.debug(
+      "Current user info fetched",
+      { userId: res.data.user?.id },
+      LogTags.SESSIONS
+    );
+    return res.data;
   } catch (error) {
-    logger.error('Failed to fetch current user info', error, {}, LogTags.SESSIONS)
-    throw error
+    logger.error(
+      "Failed to fetch current user info",
+      error,
+      {},
+      LogTags.SESSIONS
+    );
+    throw error;
   }
 }
 
+// Update user profile
 export async function updateProfile(profileData) {
   try {
-    logger.info('Updating user profile', { userId: profileData.id }, LogTags.SESSIONS)
-    const res = await API.put('/api/auth/profile', profileData)
-    logger.info('User profile updated successfully', { userId: res.data.user?.id }, LogTags.SESSIONS)
-    return res.data
+    logger.info(
+      "Updating user profile",
+      { userId: profileData.id },
+      LogTags.SESSIONS
+    );
+    // Call the update profile endpoint
+    const res = await API.put("/api/auth/profile", profileData);
+    // Log successful update
+    logger.info(
+      "User profile updated successfully",
+      { userId: res.data.user?.id },
+      LogTags.SESSIONS
+    );
+    return res.data;
   } catch (error) {
-    logger.error('Failed to update user profile', error, profileData, LogTags.SESSIONS)
-    throw error
+    logger.error(
+      "Failed to update user profile",
+      error,
+      profileData,
+      LogTags.SESSIONS
+    );
+    throw error;
   }
 }

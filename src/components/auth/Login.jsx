@@ -1,9 +1,16 @@
+// Login component for user authentication
+// Handles user input, form submission, and error display
 import React, { useState } from 'react';
+// Icon imports
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+// API module for user authentication
 import { login } from '../../api/authApi';
+// Router module
 import { useNavigate } from 'react-router-dom';
 
+// Login component
 export default function Login() {
+  // State variables
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -11,12 +18,16 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const nav = useNavigate();
 
+  // Handle form submission
   async function doLogin(e) {
+    // Prevent default form submission
     e.preventDefault();
     setError(null);
     setIsLoading(true);
     try {
+      // Attempt user login
       const data = await login({ email, password });
+      // Store token and user info in localStorage
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       nav('/dashboard');
@@ -35,18 +46,18 @@ export default function Login() {
 
       // Check if this is a network error (backend not running)
       if (error?.message?.includes('Network Error') ||
-          error?.message?.includes('ECONNREFUSED') ||
-          error?.message?.includes('fetch') ||
-          error?.name === 'ConnectionError' ||
-          error?.status === 404) {
-        console.error('🚨 BACKEND CONNECTION ERROR:');
+        error?.message?.includes('ECONNREFUSED') ||
+        error?.message?.includes('fetch') ||
+        error?.name === 'ConnectionError' ||
+        error?.status === 404) {
+        console.error('BACKEND CONNECTION ERROR:');
         console.error('- Backend server is not running on port 5000');
         console.error('- Check if server is started in server directory');
         console.error('- Verify API endpoints are correct');
 
-        setError('🚨 Backend Server Not Running - Please start the backend server first.');
+        setError(' Backend Server Not Running - Please start the backend server first.');
       } else {
-        console.error('🚨 LOGIN ERROR:', error?.message || 'Unknown error');
+        console.error(' LOGIN ERROR:', error?.message || 'Unknown error');
         setError('Invalid email or password. Please try again.');
       }
     } finally {
@@ -54,17 +65,19 @@ export default function Login() {
     }
   }
 
+  // Render the login form
   return (
     <div className="bg-card-bg backdrop-blur-sm rounded-lg p-8 border border-gray-700 w-full max-w-md">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-white mb-2">
-          Sign in to your account
+          Login to your account
         </h2>
         <p className="text-gray-400">
-          Welcome back! Please enter your details.
+          Welcome back 👋🏻! Please enter your details.
         </p>
       </div>
 
+      {/* login form */}
       <form onSubmit={doLogin} className="space-y-6">
         {/* Email Field */}
         <div>
@@ -146,18 +159,18 @@ export default function Login() {
         </button>
       </form>
 
-        {/* Signup Link */}
-        <div className="text-center">
-          <span className="text-gray-400 text-sm">
-            Don&apos;t have an account?{' '}
-          </span>
-          <a
-            href="/signup"
-            className="text-sm text-primary-blue hover:text-blue-400 transition-colors"
-          >
-            Sign Up
-          </a>
-        </div>
+      {/* Signup Link */}
+      <div className="text-center">
+        <span className="text-gray-400 text-sm">
+          Don&apos;t have an account?{' '}
+        </span>
+        <a
+          href="/signup"
+          className="text-sm text-primary-blue hover:text-blue-400 transition-colors"
+        >
+          Sign Up
+        </a>
+      </div>
     </div>
   );
 }

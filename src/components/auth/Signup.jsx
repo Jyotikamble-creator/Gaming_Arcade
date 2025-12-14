@@ -1,9 +1,16 @@
+// Signup component for user registration
+// Includes enhanced error handling with detailed logging 
 import React, { useState } from 'react';
+// Icon imports
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+// API module for user authentication
 import { signup } from '../../api/authApi';
+// Router module
 import { useNavigate } from 'react-router-dom';
 
+// Signup component
 export default function Signup() {
+  // State variables
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -11,12 +18,15 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const nav = useNavigate();
 
+  // Handle form submission
   async function doSignup(e) {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
     try {
+      // Attempt user signup
       const data = await signup({ email, password });
+      // Store token and user info in localStorage
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       nav('/login');
@@ -54,27 +64,33 @@ export default function Signup() {
         }
       } else {
         // No response - likely a network error
-        console.error('🚨 BACKEND CONNECTION ERROR:');
+        console.error(' BACKEND CONNECTION ERROR:');
         console.error('- Backend server is not running on port 4000');
         console.error('- Check if server is started in server directory');
         console.error('- Verify API endpoints are correct');
         console.error('Error details:', err?.message, err?.code, err?.name);
 
-        setError('🚨 Backend Server Not Running - Please start the backend server first.');
+        setError(' Backend Server Not Running - Please start the backend server first.');
       }
     } finally {
       setIsLoading(false);
     }
   }
 
+  // Render the signup form
   return (
     <div className="bg-card-bg backdrop-blur-sm rounded-lg p-8 border border-gray-700 w-full max-w-md">
-      <h2 className="text-2xl font-bold text-light-text mb-6 text-center">Sign Up</h2>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-white mb-2">
+          Sign Up To Game Arcade
+        </h2>
+        <p className="text-gray-400">
+          Welcome to Game Arcade 👋🏻! Please enter your details.
+        </p>
+      </div>
 
+      {/* Signup Form */}
       <form onSubmit={doSignup} className="space-y-6">
-        {/* Username Field */}
-       
-
         {/* Email Field */}
         <div>
           <label className="block text-sm font-medium text-subtle-text mb-2">
@@ -117,8 +133,6 @@ export default function Signup() {
             </button>
           </div>
         </div>
-
-    
 
         {/* Error Display */}
         {error && (

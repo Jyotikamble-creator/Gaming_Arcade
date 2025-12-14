@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import { me, updateProfile } from '../../api/authApi'
-import AnimatedBackground from '../AnimatedBackground'
+// User profile page
+import React, { useEffect, useState } from 'react';
+// API module for user authentication
+import { me, updateProfile } from '../../api/authApi';
+// Animated background component
+import AnimatedBackground from '../AnimatedBackground';
+// Router module
 import { logger, LogTags } from '../../lib/logger'
 
+// User profile component
 export default function MyProfile() {
+  // State variables
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -32,6 +38,7 @@ export default function MyProfile() {
     { id: 'quiz', name: 'Quiz', icon: '📝' }
   ]
 
+  // Load user profile on component mount
   useEffect(() => {
     // Check if user is authenticated
     const token = localStorage.getItem('token')
@@ -46,6 +53,7 @@ export default function MyProfile() {
     loadUserProfile()
   }, [])
 
+  // Function to load user profile
   const loadUserProfile = async () => {
     try {
       setLoading(true)
@@ -88,6 +96,7 @@ export default function MyProfile() {
     }
   }
 
+  // Handle form input changes
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
@@ -95,9 +104,11 @@ export default function MyProfile() {
     }))
   }
 
+  // Handle form submission
   const handleSave = async () => {
     const performSave = async (retryCount = 0) => {
       try {
+        // Validate form data
         setSaving(true)
         setError(null)
 
@@ -149,6 +160,7 @@ export default function MyProfile() {
     await performSave()
   }
 
+  // Handle cancel button
   const handleCancel = () => {
     // Reset form data to current user data
     setFormData({
@@ -162,6 +174,7 @@ export default function MyProfile() {
     setError(null)
   }
 
+  // Calculate profile completion percentage
   const getProfileCompletion = () => {
     if (!user) return 0
 
@@ -186,12 +199,13 @@ export default function MyProfile() {
 
     return Math.round((completed / total) * 100)
   }
-
+  // Get user initials
   const getInitials = (name) => {
     if (!name) return 'U'
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
   }
 
+  // Render loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -204,6 +218,7 @@ export default function MyProfile() {
     )
   }
 
+  // Render not authenticated state
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
@@ -221,11 +236,13 @@ export default function MyProfile() {
     )
   }
 
+  // Calculate actual completion percentage
   const actualCompletionPercentage = (() => {
     if (!user) return 0
     let completed = 0
     let total = 5
 
+    // Check each profile field
     if (user.displayName && user.displayName.trim()) completed++
     if (user.username && user.username.trim()) completed++
     if (user.bio && user.bio.trim()) completed++
@@ -235,13 +252,16 @@ export default function MyProfile() {
     return Math.round((completed / total) * 100)
   })()
 
+  // Calculate completion percentage
   const completionPercentage = getProfileCompletion()
   const favoriteGame = games.find(g => g.id === user.favoriteGame)
 
+  // Render profile page
   return (
     <div className="min-h-screen text-light-text relative overflow-hidden">
       <AnimatedBackground />
 
+      {/* Main content */}
       <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
@@ -266,9 +286,8 @@ export default function MyProfile() {
           </div>
           <div className="w-full bg-gray-700 rounded-full h-3 mb-2">
             <div
-              className={`h-3 rounded-full transition-all duration-500 ${
-                isEditing ? 'bg-gradient-to-r from-yellow-500 to-orange-600' : 'bg-gradient-to-r from-blue-500 to-purple-600'
-              }`}
+              className={`h-3 rounded-full transition-all duration-500 ${isEditing ? 'bg-gradient-to-r from-yellow-500 to-orange-600' : 'bg-gradient-to-r from-blue-500 to-purple-600'
+                }`}
               style={{ width: `${completionPercentage}%` }}
             ></div>
           </div>
