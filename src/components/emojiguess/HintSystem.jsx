@@ -1,5 +1,5 @@
-import React from 'react';
-
+// A React component that provides a hint system for the Emoji Guess game,
+// including displaying hints, tracking hints used, and allowing users to use hints.
 const HintSystem = ({ showHint, answer, hintsUsed, onUseHint, maxHints }) => {
   const getHintText = () => {
     if (!showHint) return null;

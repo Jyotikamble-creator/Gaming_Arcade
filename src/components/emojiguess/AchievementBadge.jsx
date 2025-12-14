@@ -1,7 +1,9 @@
-import React from 'react';
+// A React component that displays achievement badges for the Emoji Guess game.
 import { Award, Star, Zap, Target } from 'lucide-react';
 
+// Displays an achievement badge based on the type and whether it is unlocked.
 const AchievementBadge = ({ type, unlocked }) => {
+  // Returns achievement data based on the type.
   const getAchievementData = (type) => {
     switch (type) {
       case 'first-win':
@@ -42,8 +44,8 @@ const AchievementBadge = ({ type, unlocked }) => {
     }
   };
 
+  // Get the achievement data for the given type.
   const achievement = getAchievementData(type);
-
   return (
     <div className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r ${achievement.color} text-white shadow-lg transform transition-all duration-300 ${unlocked ? 'scale-100 opacity-100' : 'scale-95 opacity-70'}`}>
       <div className={`p-2 rounded-full bg-white bg-opacity-20 ${unlocked ? 'animate-pulse' : ''}`}>

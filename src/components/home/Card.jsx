@@ -1,5 +1,5 @@
-import React from 'react';
-
+// This component represents the home page of the game application.
+// It provides an overview of available games and navigation options.
 const HomePage = () => {
   return (
     <div className="container mx-auto px-4 py-16">
@@ -25,6 +25,7 @@ const HomePage = () => {
       <div className="mb-16">
         <h2 className="text-3xl font-bold text-light-text text-center mb-8">Popular Games</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Each game card */}
           <div className="bg-card-bg p-6 rounded-lg shadow-xl text-center hover:shadow-2xl transition duration-300">
             <div className="text-4xl mb-4">🎯</div>
             <h3 className="text-xl font-semibold text-light-text mb-2">Word Guess</h3>

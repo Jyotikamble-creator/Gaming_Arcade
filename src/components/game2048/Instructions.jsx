@@ -1,9 +1,14 @@
+// Component to display game instructions for 2048 game
 import React, { useState } from 'react';
+// Icons
 import { HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
+// Instructions component for 2048 game
 const Instructions = () => {
+  // State to track if instructions are expanded
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Render instructions
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 shadow-lg">
       <button

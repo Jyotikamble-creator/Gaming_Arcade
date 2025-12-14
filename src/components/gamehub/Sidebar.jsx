@@ -1,19 +1,23 @@
-import React from 'react';
+// A sidebar component for the game hub with navigation links and logout functionality.
 import { Link, useNavigate } from 'react-router-dom';
 
+// Sidebar component
 const Sidebar = () => {
+  // Navigation hook
   const nav = useNavigate();
 
+  // Logout function
   function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     nav('/');
   }
 
+  // Render the sidebar
   return (
     <div className="w-64 bg-gray-800 p-4 border-r border-gray-700">
       <h2 className="text-xl font-bold mb-6 text-white">Game Hub</h2>
-      
+      {/* Navigation links */}
       <div className="space-y-4">
         <Link
           to="/scores"

@@ -1,6 +1,7 @@
-import React from 'react';
+// Component for game controls in 2048 game
 import { RotateCcw, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 
+// Component for game controls
 const GameControls = ({ onMove, onRestart, gameOver }) => {
   const buttonClass = `
     w-14 h-14 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600
@@ -10,6 +11,7 @@ const GameControls = ({ onMove, onRestart, gameOver }) => {
     flex items-center justify-center border-2 border-white/20
   `;
 
+  // Render game controls
   return (
     <div className="flex flex-col items-center gap-6">
       {/* Directional Controls Grid */}

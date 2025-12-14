@@ -1,8 +1,10 @@
-import React from 'react';
+// Component to display score and best score for 2048 game
 import { Trophy, Target } from 'lucide-react';
 
+// ScoreDisplay component to show current score and best score
 const ScoreDisplay = ({ score, bestScore }) => {
   return (
+    // Container for scores
     <div className="flex justify-center gap-6 mb-6">
       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg">
         <div className="flex items-center justify-center gap-2 mb-2">

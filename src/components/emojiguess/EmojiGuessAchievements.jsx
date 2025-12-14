@@ -1,6 +1,7 @@
-import React from 'react';
+// A React component that displays achievement badges for the Emoji Guess game.
 import AchievementBadge from './AchievementBadge';
 
+// Displays achievement badges for the Emoji Guess game.
 export default function EmojiGuessAchievements({ achievements }) {
   return (
     <div className="mb-6 flex flex-wrap justify-center gap-4">

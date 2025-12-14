@@ -1,6 +1,7 @@
-import React from 'react';
+// A React component that displays a loading screen for the Emoji Guess game,
 import AnimatedBackground from '../AnimatedBackground';
 
+// including a spinner and a message.
 export default function EmojiGuessLoading() {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">

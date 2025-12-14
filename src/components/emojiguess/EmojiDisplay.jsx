@@ -1,5 +1,5 @@
-import React from 'react';
-
+// A React component that displays emojis along with their category and difficulty level.
+// It provides a visual representation for the Emoji Guess game.
 const EmojiDisplay = ({ emojis, category, difficulty }) => {
   const getDifficultyColor = (level) => {
     switch (level?.toLowerCase()) {
@@ -10,6 +10,7 @@ const EmojiDisplay = ({ emojis, category, difficulty }) => {
     }
   };
 
+  // Render the emoji display card with category and difficulty badges.
   return (
     <div className="bg-card-bg rounded-lg p-8 border border-gray-700 mb-6">
       <div className="text-center">

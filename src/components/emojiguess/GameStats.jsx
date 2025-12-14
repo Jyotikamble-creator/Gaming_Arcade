@@ -1,8 +1,7 @@
-import React from 'react';
-
+// A React component that displays game statistics for the Emoji Guess game,
 const GameStats = ({ score, attempts, hintsUsed, gameStarted }) => {
   if (!gameStarted) return null;
-
+// including score, attempts, and hints used.
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <div className="bg-card-bg rounded-lg p-4 border border-gray-700 text-center">

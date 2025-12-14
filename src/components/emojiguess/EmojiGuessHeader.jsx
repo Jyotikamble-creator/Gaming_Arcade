@@ -1,6 +1,7 @@
-import React from 'react';
+// A React component that serves as the header for the Emoji Guess game,
 import StreakCounter from './StreakCounter';
 
+// including the title, description, and current streak display.
 export default function EmojiGuessHeader({ streak }) {
   return (
     <div className="text-center mb-8">

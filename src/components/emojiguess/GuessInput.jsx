@@ -1,5 +1,5 @@
-import React from 'react';
-
+// A React component that renders an input field for the user to enter their guess in the Emoji Guess game.
+// The component takes in the guess, setGuess, onSubmit, onKeyPress, and disabled props.
 const GuessInput = ({ guess, setGuess, onSubmit, onKeyPress, disabled }) => {
   return (
     <div className="bg-card-bg rounded-lg p-6 border border-gray-700 mb-6">

@@ -1,11 +1,13 @@
-import React from 'react';
+// A React component that renders a circular progress ring to visually represent progress percentage.
 
 const ProgressRing = ({ progress, size = 80, strokeWidth = 8, color = '#4CAF50' }) => {
+  // Calculate stroke-dasharray and stroke-dashoffset
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const strokeDasharray = circumference;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
+  // Render the progress ring
   return (
     <div className="relative inline-flex items-center justify-center">
       <svg width={size} height={size} className="transform -rotate-90">

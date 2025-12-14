@@ -1,8 +1,11 @@
+// A React component that displays confetti animation when triggered.
 import React, { useEffect, useState } from 'react';
 
+// Confetti component that shows confetti animation when 'show' is true.
 const Confetti = ({ show }) => {
   const [particles, setParticles] = useState([]);
 
+  // Generate confetti particles when 'show' changes to true.
   useEffect(() => {
     if (show) {
       const newParticles = Array.from({ length: 50 }, (_, i) => ({
@@ -24,6 +27,7 @@ const Confetti = ({ show }) => {
 
   if (!show) return null;
 
+  // Render confetti particles.
   return (
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
       {particles.map((particle) => (

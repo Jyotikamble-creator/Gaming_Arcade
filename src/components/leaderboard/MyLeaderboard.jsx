@@ -1,9 +1,15 @@
-import React, { useEffect, useState, useMemo } from 'react'
-import { fetchScores } from '../../api/scoreApi'
-import AnimatedBackground from '../AnimatedBackground'
-import { logger, LogTags } from '../../lib/logger'
+// Displays the leaderboards for all games
+import React, { useEffect, useState, useMemo } from 'react';
+// API function to fetch scores
+import { fetchScores } from '../../api/scoreApi';
+// Animated background component
+import AnimatedBackground from '../AnimatedBackground';
+// Logger module
+import { logger, LogTags } from '../../lib/logger';
 
+// Leaderboard component
 export default function MyLeaderboard() {
+  // State
   const [leaderboards, setLeaderboards] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -22,12 +28,15 @@ export default function MyLeaderboard() {
     { id: 'quiz', name: 'Quiz', icon: '📝' }
   ], [])
 
+  // Fetch scores for all games
   useEffect(() => {
+    // Function to load leaderboards
     async function loadLeaderboards() {
+      // Reset state
       try {
         setLoading(true)
         logger.debug('Loading leaderboards for all games', {}, LogTags.LEADERBOARD)
-
+        // Get more scores for better stats
         const promises = games.map(async (game) => {
           try {
             const data = await fetchScores(game.id, 50) // Get more scores for better stats
@@ -37,13 +46,14 @@ export default function MyLeaderboard() {
             return { game: game.id, data: [] }
           }
         })
-
+        // Get all scores
         const results = await Promise.all(promises)
         const leaderboardsObj = {}
         results.forEach(({ game, data }) => {
           leaderboardsObj[game] = data
         })
 
+        // Set leaderboards
         setLeaderboards(leaderboardsObj)
         logger.info('Leaderboards loaded successfully', { gamesCount: Object.keys(leaderboardsObj).length }, LogTags.LEADERBOARD)
       } catch (e) {
@@ -79,6 +89,7 @@ export default function MyLeaderboard() {
 
   const filteredGames = getFilteredGames()
 
+  // Render
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -91,6 +102,7 @@ export default function MyLeaderboard() {
     )
   }
 
+  // Render error state
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
@@ -114,10 +126,12 @@ export default function MyLeaderboard() {
     )
   }
 
+  // Render leaderboards
   return (
     <div className="min-h-screen text-light-text relative overflow-hidden">
       <AnimatedBackground />
 
+      {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
@@ -265,9 +279,8 @@ export default function MyLeaderboard() {
                                       {index + 1}
                                     </span>
                                   )}
-                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${
-                                    isTopThree ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-blue-500'
-                                  }`}>
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${isTopThree ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-blue-500'
+                                    }`}>
                                     {(score.playerName || (score.user && (score.user.displayName || score.user.username)) || 'A')[0].toUpperCase()}
                                   </div>
                                 </div>

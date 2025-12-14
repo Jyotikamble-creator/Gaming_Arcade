@@ -1,6 +1,6 @@
-import React from 'react';
-
+// ActionButtons component for Maths Quiz
 const ActionButtons = ({ onSkip, onSubmit }) => {
+  // Render action buttons
   return (
     <div className="flex justify-center space-x-4 mt-6">
       <button 

@@ -1,5 +1,5 @@
-import React from 'react';
-
+// A React component that provides control buttons for the Emoji Guess game,
+// including "New Puzzle" and "Try Again" buttons.
 export default function EmojiGuessControls({
   onNewPuzzle,
   onTryAgain,

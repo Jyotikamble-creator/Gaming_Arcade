@@ -1,17 +1,25 @@
-import React, { useEffect, useState } from 'react'
-import { fetchScores } from '../../api/scoreApi'
-import { logger, LogTags } from '../../lib/logger'
+// Leaderboard component to display top scores with time filters
+// Supports filtering by All Time, This Month, and This Week.
+import React, { useEffect, useState } from 'react';
+// API function to fetch scores
+import { fetchScores } from '../../api/scoreApi';
+// Logger module
+import { logger, LogTags } from '../../lib/logger';
 
+// Leaderboard component
 export default function Leaderboard({ game = 'word-guess', limit = 10 }) {
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [timeFilter, setTimeFilter] = useState('all')
 
+  // Fetch scores
   useEffect(() => {
     let mounted = true
     async function loadScores() {
+      // Reset state
       try {
+        // Check if component is still mounted
         setLoading(true)
         logger.debug('Loading leaderboard scores', { game, limit }, LogTags.LEADERBOARD)
         const data = await fetchScores(game, limit * 2) // Get more to filter by time
@@ -43,6 +51,7 @@ export default function Leaderboard({ game = 'word-guess', limit = 10 }) {
     return () => (mounted = false)
   }, [game, limit, timeFilter])
 
+  // Render leaderboard
   if (loading) {
     return (
       <div className="bg-card-bg/90 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-xl">
@@ -54,6 +63,7 @@ export default function Leaderboard({ game = 'word-guess', limit = 10 }) {
     )
   }
 
+  // Render error state
   if (error) {
     return (
       <div className="bg-card-bg/90 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-xl">
@@ -69,6 +79,7 @@ export default function Leaderboard({ game = 'word-guess', limit = 10 }) {
     )
   }
 
+  // Render leaderboard
   return (
     <div className="bg-card-bg/90 backdrop-blur-sm rounded-xl border border-gray-700 shadow-xl w-full">
       <div className="p-6">
@@ -77,25 +88,22 @@ export default function Leaderboard({ game = 'word-guess', limit = 10 }) {
         {/* Time Filter Tabs */}
         <div className="flex mb-4 border-b border-gray-700">
           <button
-            className={`pb-2 px-4 text-center font-semibold transition duration-200 ${
-              timeFilter === 'all' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-subtle-text hover:text-white'
-            }`}
+            className={`pb-2 px-4 text-center font-semibold transition duration-200 ${timeFilter === 'all' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-subtle-text hover:text-white'
+              }`}
             onClick={() => setTimeFilter('all')}
           >
             All Time
           </button>
           <button
-            className={`pb-2 px-4 text-center font-semibold transition duration-200 ${
-              timeFilter === 'month' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-subtle-text hover:text-white'
-            }`}
+            className={`pb-2 px-4 text-center font-semibold transition duration-200 ${timeFilter === 'month' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-subtle-text hover:text-white'
+              }`}
             onClick={() => setTimeFilter('month')}
           >
             This Month
           </button>
           <button
-            className={`pb-2 px-4 text-center font-semibold transition duration-200 ${
-              timeFilter === 'week' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-subtle-text hover:text-white'
-            }`}
+            className={`pb-2 px-4 text-center font-semibold transition duration-200 ${timeFilter === 'week' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-subtle-text hover:text-white'
+              }`}
             onClick={() => setTimeFilter('week')}
           >
             This Week
@@ -120,6 +128,7 @@ export default function Leaderboard({ game = 'word-guess', limit = 10 }) {
               const rankColors = ['text-yellow-400', 'text-gray-300', 'text-amber-600']
               const rankIcons = ['🥇', '🥈', '🥉']
 
+              // Render each score
               return (
                 <div key={score._id || idx} className="flex items-center p-3 rounded-lg hover:bg-gray-700/30 transition duration-150">
                   <div className="flex items-center">
@@ -130,9 +139,8 @@ export default function Leaderboard({ game = 'word-guess', limit = 10 }) {
                         {idx + 1}
                       </span>
                     )}
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold ${
-                      isTopThree ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-blue-500'
-                    }`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold ${isTopThree ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-blue-500'
+                      }`}>
                       {(score.playerName || (score.user && (score.user.displayName || score.user.username)) || 'A')[0].toUpperCase()}
                     </div>
                   </div>

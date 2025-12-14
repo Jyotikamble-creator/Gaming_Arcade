@@ -1,12 +1,16 @@
-import React from 'react';
+// Component to display game status (win/lose) for 2048 game
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
+// GameStatus component to show win or game over status
 const GameStatus = ({ gameWon, gameOver, onContinue }) => {
   if (!gameWon && !gameOver) return null;
 
+  // Determine if it's a win or game over
   const isWin = gameWon && !gameOver;
 
+  // Render game status
   return (
+    // Background overlay
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className={`
         bg-white rounded-2xl p-8 text-center shadow-2xl transform transition-all duration-300
@@ -30,7 +34,6 @@ const GameStatus = ({ gameWon, gameOver, onContinue }) => {
             : 'No more moves available. Try again!'
           }
         </p>
-
         {isWin && (
           <div className="mb-6">
             <button

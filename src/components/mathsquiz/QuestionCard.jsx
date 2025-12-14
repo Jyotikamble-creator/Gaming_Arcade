@@ -1,17 +1,21 @@
+// QuestionCard component for Maths Quiz
 import React, { useState } from 'react';
+// Import TimerDisplay and ProgressBar components
 import TimerDisplay from './TimerDisplay';
+// Import ProgressBar component
 import ProgressBar from './ProgressBar';
 
+// QuestionCard component
 const QuestionCard = ({ currentQ, totalQ, question, feedbackStatus }) => {
   const [answer, setAnswer] = useState('');
-  
+
   // Example feedbackStatus: 'correct', 'incorrect', or 'none'
   const feedbackText = feedbackStatus === 'correct' ? 'Correct!' : feedbackStatus === 'incorrect' ? 'Incorrect, try again.' : '';
   const feedbackClass = feedbackStatus === 'correct' ? 'text-green-500' : 'text-red-500';
-
+  // Render question card
   return (
     <div className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 w-full max-w-lg mx-auto">
-      
+
       {/* Top Bar: Question Count and Timer */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -23,8 +27,8 @@ const QuestionCard = ({ currentQ, totalQ, question, feedbackStatus }) => {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-            <span className="text-sm text-subtle-text">Time Left:</span>
-            <TimerDisplay minutes={1} seconds={25} /> {/* Hardcoded example time */}
+          <span className="text-sm text-subtle-text">Time Left:</span>
+          <TimerDisplay minutes={1} seconds={25} /> {/* Hardcoded example time */}
         </div>
       </div>
 
@@ -37,7 +41,7 @@ const QuestionCard = ({ currentQ, totalQ, question, feedbackStatus }) => {
 
       {/* Answer Input */}
       <div className="mb-4">
-        <input 
+        <input
           type="number"
           placeholder="Your Answer"
           value={answer}

@@ -1,8 +1,7 @@
-import React from 'react';
-
+// A React component that displays messages for the Emoji Guess game,
 export default function EmojiGuessMessage({ message, messageType }) {
   if (!message) return null;
-
+// including success, error, and informational messages.
   return (
     <div className={`mt-6 p-6 rounded-xl border text-center max-w-md mx-auto shadow-2xl transform transition-all duration-300 ${
       messageType === 'success'

@@ -1,6 +1,7 @@
-import React from 'react';
+// A React component that displays an error message when the Emoji Guess puzzle fails to load,
 import AnimatedBackground from '../AnimatedBackground';
 
+// including a "Try Again" button to retry loading the puzzle.
 export default function EmojiGuessError({ message, onRetry }) {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">

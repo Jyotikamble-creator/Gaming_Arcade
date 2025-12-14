@@ -1,10 +1,10 @@
-import React from 'react';
-
-const HangmanLoseModal = ({ 
-  word, 
-  score, 
+// A modal component displayed when the player loses the Hangman game, showing the correct word, final score, and an option to try again.
+// This component is used in the Hangman game.
+const HangmanLoseModal = ({
+  word,
+  score,
   wordsCompleted,
-  onTryAgain 
+  onTryAgain
 }) => {
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -28,7 +28,8 @@ const HangmanLoseModal = ({
             <div className="text-gray-400 text-xs mb-1">Final Score</div>
             <div className="text-2xl font-bold text-white">{score}</div>
           </div>
-          
+
+          {/* Words Completed */}
           <div className="bg-gray-700/50 rounded-lg p-4 text-center">
             <div className="text-gray-400 text-xs mb-1">Words Completed</div>
             <div className="text-2xl font-bold text-white">{wordsCompleted}</div>
@@ -38,7 +39,7 @@ const HangmanLoseModal = ({
         {/* Encouragement Message */}
         <div className="text-center mb-6">
           <p className="text-yellow-400 font-semibold">
-            {wordsCompleted > 0 
+            {wordsCompleted > 0
               ? `🎯 Great job! You completed ${wordsCompleted} word${wordsCompleted > 1 ? 's' : ''}!`
               : '💪 Keep practicing, you\'ll get better!'}
           </p>
