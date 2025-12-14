@@ -1,5 +1,4 @@
-import React from 'react';
-
+// Component to display quiz statistics
 const QuizStats = ({ current, total, score, progress }) => {
   return (
     <div className="flex justify-center gap-6 mb-8">

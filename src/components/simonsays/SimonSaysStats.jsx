@@ -1,5 +1,4 @@
-import React from 'react';
-
+// Displays game statistics for the Simon Says game.
 const SimonSaysStats = ({ round, sequenceLength, gameStatus }) => {
   return (
     <div className="flex justify-center gap-6 mb-8">

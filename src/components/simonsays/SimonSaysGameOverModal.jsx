@@ -1,8 +1,8 @@
-import React from 'react';
-
+// Modal displayed at the end of a Simon Says game, showing score and restart option.
 const SimonSaysGameOverModal = ({ gameWon, round, onRestart }) => {
   const score = gameWon ? 100 : (round - 1);
 
+  // Render the modal
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">

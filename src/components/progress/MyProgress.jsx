@@ -1,8 +1,13 @@
-import React, { useEffect, useState, useMemo } from 'react'
-import { fetchProgress } from '../../api/scoreApi'
-import AnimatedBackground from '../AnimatedBackground'
-import { logger, LogTags } from '../../lib/logger'
+// Component to display user's progress across games
+import React, { useEffect, useState, useMemo } from 'react';
+// API function to fetch progress
+import { fetchProgress } from '../../api/scoreApi';
+// Animated background component
+import AnimatedBackground from '../AnimatedBackground';
+// Logger module
+import { logger, LogTags } from '../../lib/logger';
 
+// MyProgress component
 export default function MyProgress() {
   const [progress, setProgress] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -81,8 +86,10 @@ export default function MyProgress() {
     return games.filter(game => game.id === selectedGame)
   }
 
+  // Get filtered games
   const filteredGames = getFilteredGames()
 
+  // Render
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -95,6 +102,7 @@ export default function MyProgress() {
     )
   }
 
+  // Render error
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
@@ -118,6 +126,7 @@ export default function MyProgress() {
     )
   }
 
+  // Render
   return (
     <div className="min-h-screen text-light-text relative overflow-hidden">
       <AnimatedBackground />
@@ -146,6 +155,7 @@ export default function MyProgress() {
               </div>
             </div>
           </div>
+
 
           <div className="bg-card-bg/90 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-xl">
             <div className="flex items-center mb-2">

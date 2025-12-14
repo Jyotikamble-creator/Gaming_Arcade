@@ -1,12 +1,11 @@
-import React from 'react';
-
+// Breadcrumbs component for Memory Card Game
 const Breadcrumbs = ({ path = [] }) => {
   return (
     <div className="text-sm text-subtle-text mb-6">
       {path.map((item, index) => (
         <React.Fragment key={index}>
-          <a 
-            href={item.link || "#"} 
+          <a
+            href={item.link || "#"}
             className={`hover:text-white ${index === path.length - 1 ? 'text-white font-medium' : ''}`}
           >
             {item.label}

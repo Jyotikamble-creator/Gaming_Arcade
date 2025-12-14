@@ -1,5 +1,4 @@
-import React from 'react';
-
+// Displays statistics for the sliding puzzle game including moves, time, status, and efficiency.
 export default function PuzzleStats({ moves, timeElapsed, gameStarted, gameCompleted }) {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -7,6 +6,7 @@ export default function PuzzleStats({ moves, timeElapsed, gameStarted, gameCompl
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Calculate efficiency based on moves and time
   const getEfficiency = () => {
     if (moves === 0) return 0;
     // Theoretical minimum moves for 15-puzzle is around 80, but varies
@@ -15,6 +15,7 @@ export default function PuzzleStats({ moves, timeElapsed, gameStarted, gameCompl
     return Math.min(100, efficiency);
   };
 
+  // Render the stats panel
   return (
     <div className="bg-gray-800/50 rounded-lg p-6 mb-6 border border-gray-700">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -28,12 +29,11 @@ export default function PuzzleStats({ moves, timeElapsed, gameStarted, gameCompl
         </div>
         <div>
           <p className="text-subtle-text text-sm mb-1">Status</p>
-          <p className={`text-lg font-semibold ${
-            gameCompleted ? 'text-green-400' :
-            gameStarted ? 'text-yellow-400' : 'text-gray-400'
-          }`}>
+          <p className={`text-lg font-semibold ${gameCompleted ? 'text-green-400' :
+              gameStarted ? 'text-yellow-400' : 'text-gray-400'
+            }`}>
             {gameCompleted ? 'Solved!' :
-             gameStarted ? 'Playing' : 'Ready'}
+              gameStarted ? 'Playing' : 'Ready'}
           </p>
         </div>
         <div>

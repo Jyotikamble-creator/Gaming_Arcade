@@ -1,9 +1,8 @@
-import React from 'react';
-
+// GameStats component for Memory Card Game
 const GameStats = ({ moves, time }) => {
   return (
     <div className="flex space-x-12 mb-8 items-center">
-      
+
       {/* Moves Counter */}
       <div>
         <h3 className="text-4xl font-extrabold text-blue-400">{moves}</h3>

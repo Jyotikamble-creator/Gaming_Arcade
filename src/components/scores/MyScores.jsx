@@ -1,16 +1,24 @@
-import React, { useEffect, useState } from 'react'
-import { fetchMyScores } from '../../api/scoreApi'
-import AnimatedBackground from '../AnimatedBackground'
-import { logger, LogTags } from '../../lib/logger'
+// Component to display the user's scores with stats and filtering options
+import React, { useEffect, useState } from 'react';
+// API function to fetch user scores
+import { fetchMyScores } from '../../api/scoreApi';
+// Animated background component
+import AnimatedBackground from '../AnimatedBackground';
+// Logger module
+import { logger, LogTags } from '../../lib/logger';
 
+// Component to display the user's scores with stats and filtering options
 export default function MyScores() {
+  // State variables
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedGame, setSelectedGame] = useState('all')
 
+  // Fetch user scores
   useEffect(() => {
     async function loadScores() {
+      // Set loading state
       try {
         setLoading(true)
         logger.debug('Loading user scores', {}, LogTags.MY_SCORES)
@@ -37,6 +45,7 @@ export default function MyScores() {
   const averageScore = totalGames > 0 ? Math.round(totalScore / totalGames) : 0
   const bestScore = scores.length > 0 ? Math.max(...scores.map(s => s.score)) : 0
 
+  // Render loading, error, or scores
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -49,6 +58,7 @@ export default function MyScores() {
     )
   }
 
+  // Render error state
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
@@ -72,6 +82,7 @@ export default function MyScores() {
     )
   }
 
+  // Render scores
   return (
     <div className="min-h-screen text-light-text relative overflow-hidden">
       <AnimatedBackground />
@@ -204,6 +215,7 @@ export default function MyScores() {
                         </p>
                       </div>
                     </div>
+                    
                     <div className="text-right">
                       <div className="text-2xl font-bold text-green-400">
                         {score.score.toLocaleString()}

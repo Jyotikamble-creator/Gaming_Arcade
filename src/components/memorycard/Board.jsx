@@ -1,6 +1,6 @@
-import React from 'react';
+// Board component for Memory Card Game
 import MemoryCard from './Card';
-
+// Render the game board with memory cards
 const Board = ({ cards, flipped, matched, onCardClick, disabled }) => {
   return (
     <div className="flex justify-center mb-8">

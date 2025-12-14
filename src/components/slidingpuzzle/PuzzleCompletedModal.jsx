@@ -1,5 +1,4 @@
-import React from 'react';
-
+// Modal displayed when the sliding puzzle is completed, showing performance stats and achievements.
 export default function PuzzleCompletedModal({ moves, timeElapsed, onPlayAgain }) {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -7,6 +6,7 @@ export default function PuzzleCompletedModal({ moves, timeElapsed, onPlayAgain }
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Calculate performance rating based on moves and time
   const getPerformanceRating = () => {
     const timeBonus = Math.max(0, 300 - timeElapsed);
     const moveEfficiency = moves <= 100 ? 100 : Math.max(0, 200 - moves);
@@ -21,10 +21,12 @@ export default function PuzzleCompletedModal({ moves, timeElapsed, onPlayAgain }
 
   const rating = getPerformanceRating();
 
+  // Render the modal
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 rounded-xl p-8 max-w-md w-full border-2 border-green-500 shadow-2xl">
         <div className="text-center">
+          {/* Performance Rating */}
           <div className="mb-6">
             <div className="text-6xl mb-4">🎉</div>
             <h2 className={`text-4xl font-bold mb-2 ${rating.color}`}>

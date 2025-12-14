@@ -1,5 +1,4 @@
-import React from 'react';
-
+// MemoryCard component for Memory Card Game
 const MemoryCard = ({ isFlipped, isMatched, imageContent }) => {
   return (
     <div className={`w-24 h-28 relative preserve-3d cursor-pointer group transition-transform duration-500 ${isFlipped || isMatched ? 'rotate-y-180' : 'rotate-y-0'}`}>
@@ -9,7 +8,7 @@ const MemoryCard = ({ isFlipped, isMatched, imageContent }) => {
       >
         <div className="w-8 h-8 text-blue-400">
           <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2L2 12h20L12 2zM12 22l10-10H2l10 10z"/>
+            <path d="M12 2L2 12h20L12 2zM12 22l10-10H2l10 10z" />
           </svg>
         </div>
       </div>

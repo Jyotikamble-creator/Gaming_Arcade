@@ -1,5 +1,4 @@
-import React from 'react';
-
+// Renders the sliding puzzle grid and handles tile interactions, shuffling, and game status display.
 export default function PuzzleGrid({
   tiles,
   gridSize,
@@ -12,6 +11,7 @@ export default function PuzzleGrid({
   const tileSize = 80;
   const gap = 4;
 
+  // Render the puzzle grid
   return (
     <div className="mb-6">
       <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">

@@ -1,15 +1,14 @@
-import React from 'react';
-
+// VictoryModal component for Memory Card Game
 const VictoryModal = ({ moves, minutes, seconds, onPlayAgain, onBackToAllGames }) => {
   const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  
+
   return (
     // Full screen overlay for the modal
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm">
-      
+
       {/* Modal Content Box */}
       <div className="bg-gray-800 p-8 rounded-xl shadow-2xl border-2 border-gray-700 w-full max-w-sm transform scale-100 transition-transform duration-300">
-        
+
         {/* Header Icon */}
         <div className="flex justify-center mb-6">
           {/* Placeholder for the "check-in-circle" icon */}
@@ -21,20 +20,20 @@ const VictoryModal = ({ moves, minutes, seconds, onPlayAgain, onBackToAllGames }
         <h2 className="text-3xl font-extrabold text-white text-center mb-3">
           Congratulations!
         </h2>
-        
+
         <p className="text-center text-subtle-text mb-8">
           You completed the game in **{moves} moves** and **{timeString} minutes**.
         </p>
 
         {/* Action Buttons */}
         <div className="space-y-4">
-          <button 
+          <button
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md"
             onClick={onPlayAgain}
           >
             Play Again
           </button>
-          <button 
+          <button
             className="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md"
             onClick={onBackToAllGames}
           >

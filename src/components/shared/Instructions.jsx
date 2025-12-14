@@ -1,9 +1,13 @@
+// Provides game-specific instructions based on the gameType prop.
 import React, { useState } from 'react';
+// Icons
 import { HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
+// Component to display game instructions
 const Instructions = ({ gameType }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Function to get instructions based on the game type
   const getInstructions = () => {
     switch (gameType) {
       case 'emoji-guess':
@@ -280,8 +284,9 @@ const Instructions = ({ gameType }) => {
     }
   };
 
+  // Get instructions based on the game type
   const instructions = getInstructions();
-
+  // Render component
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 shadow-lg">
       <button
@@ -295,6 +300,7 @@ const Instructions = ({ gameType }) => {
         {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
       </button>
 
+      {/* Render expanded instructions */}
       {isExpanded && (
         <div className="mt-4 text-gray-300 text-sm space-y-2">
           {instructions.rules.map((rule, index) => (

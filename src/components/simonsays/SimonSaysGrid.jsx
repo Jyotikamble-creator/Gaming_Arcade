@@ -1,5 +1,4 @@
-import React from 'react';
-
+// Renders a grid of colored buttons for the Simon Says game.
 const SimonSaysGrid = ({ colors, activeColor, isShowingSequence, gameOver, gameWon, onPress }) => {
   const getColorClasses = (color) => {
     const baseClasses = 'w-20 h-20 rounded-full font-bold text-white text-lg transition-all duration-200 transform hover:scale-105 shadow-lg';
@@ -16,17 +15,18 @@ const SimonSaysGrid = ({ colors, activeColor, isShowingSequence, gameOver, gameW
 
     let classes = `${baseClasses} ${colorMap[color] || 'bg-gray-500'}`;
 
-    if(activeColor === color){
+    if (activeColor === color) {
       classes += ' ring-4 ring-white scale-110 brightness-125';
     }
 
-    if(isShowingSequence || gameOver || gameWon){
+    if (isShowingSequence || gameOver || gameWon) {
       classes += ' cursor-not-allowed opacity-75';
     }
 
     return classes;
   };
 
+  // Render the grid of buttons
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 mb-6 shadow-2xl">
       <div className="grid grid-cols-4 gap-4 max-w-lg mx-auto">

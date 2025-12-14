@@ -1,13 +1,12 @@
-import React from 'react';
-
-export default function ReactionDisplay({ 
-  gameState, 
-  tooEarly, 
-  currentRound, 
-  totalRounds, 
+// Component to display reaction time game status
+export default function ReactionDisplay({
+  gameState,
+  tooEarly,
+  currentRound,
+  totalRounds,
   reactionTimes,
   onStartRound,
-  onClick 
+  onClick
 }) {
   const getBackgroundColor = () => {
     if (tooEarly) return 'from-red-600 to-red-800';
@@ -16,15 +15,16 @@ export default function ReactionDisplay({
     return 'from-gray-700 to-gray-900';
   };
 
+  // Get message
   const getMessage = () => {
     if (tooEarly) {
       return {
-        title: '❌ Too Early!',
+        title: ' Too Early!',
         subtitle: 'Wait for the green screen',
         icon: '⏸️'
       };
     }
-    
+
     if (gameState === 'waiting') {
       return {
         title: 'Wait...',
@@ -32,7 +32,7 @@ export default function ReactionDisplay({
         icon: '⏳'
       };
     }
-    
+
     if (gameState === 'ready') {
       return {
         title: 'CLICK NOW!',
@@ -40,7 +40,7 @@ export default function ReactionDisplay({
         icon: '⚡'
       };
     }
-    
+
     if (gameState === 'clicked') {
       const lastTime = reactionTimes[reactionTimes.length - 1];
       return {
@@ -49,7 +49,7 @@ export default function ReactionDisplay({
         icon: getRatingEmoji(lastTime)
       };
     }
-    
+
     // ready-to-start or idle state
     return {
       title: `Round ${currentRound + 1}/${totalRounds}`,
@@ -58,6 +58,7 @@ export default function ReactionDisplay({
     };
   };
 
+  // Helper functions for rating text and emoji
   const getRatingText = (time) => {
     if (time < 200) return 'Incredible!';
     if (time < 250) return 'Excellent!';
@@ -67,6 +68,7 @@ export default function ReactionDisplay({
     return 'Keep trying!';
   };
 
+  // Helper functions for rating text and emoji
   const getRatingEmoji = (time) => {
     if (time < 200) return '🏆';
     if (time < 250) return '⭐';
@@ -76,8 +78,10 @@ export default function ReactionDisplay({
     return '💪';
   };
 
+  // Get message
   const message = getMessage();
 
+  // Handle click
   const handleClick = () => {
     if (gameState === 'idle' || gameState === 'ready-to-start') {
       onStartRound();
@@ -86,14 +90,14 @@ export default function ReactionDisplay({
     }
   };
 
+  // Render component
   return (
     <div
       onClick={handleClick}
-      className={`max-w-4xl mx-auto bg-gradient-to-br ${getBackgroundColor()} rounded-3xl p-12 mb-6 border-4 ${
-        gameState === 'ready' ? 'border-green-300 animate-pulse' : 
-        tooEarly ? 'border-red-300' :
-        'border-gray-600'
-      } shadow-2xl cursor-pointer transition-all duration-300 hover:scale-[1.02] min-h-[400px] flex flex-col items-center justify-center`}
+      className={`max-w-4xl mx-auto bg-gradient-to-br ${getBackgroundColor()} rounded-3xl p-12 mb-6 border-4 ${gameState === 'ready' ? 'border-green-300 animate-pulse' :
+          tooEarly ? 'border-red-300' :
+            'border-gray-600'
+        } shadow-2xl cursor-pointer transition-all duration-300 hover:scale-[1.02] min-h-[400px] flex flex-col items-center justify-center`}
       style={{ userSelect: 'none' }}
     >
       <div className="text-center">
@@ -101,12 +105,12 @@ export default function ReactionDisplay({
         <div className="text-8xl mb-6 animate-bounce">
           {message.icon}
         </div>
-        
+
         {/* Title */}
         <h2 className="text-6xl font-bold text-white mb-4">
           {message.title}
         </h2>
-        
+
         {/* Subtitle */}
         <p className="text-2xl text-white/90 font-medium">
           {message.subtitle}
