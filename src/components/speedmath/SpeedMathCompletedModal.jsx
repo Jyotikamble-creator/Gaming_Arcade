@@ -1,18 +1,18 @@
-import React from 'react';
-
-const SpeedMathCompletedModal = ({ 
-  score, 
-  problemsSolved, 
-  totalProblems, 
-  bestStreak, 
-  difficulty, 
+// A modal component to display the final results of the Speed Math game mode.
+const SpeedMathCompletedModal = ({
+  score,
+  problemsSolved,
+  totalProblems,
+  bestStreak,
+  difficulty,
   onRestart,
-  onBackToMenu 
+  onBackToMenu
 }) => {
   const accuracy = totalProblems > 0 ? Math.round((problemsSolved / totalProblems) * 100) : 0;
 
+  // Function to get the difficulty badge
   const getDifficultyBadge = () => {
-    switch(difficulty) {
+    switch (difficulty) {
       case 'easy': return { emoji: '🟢', label: 'Easy', color: 'text-green-400' };
       case 'medium': return { emoji: '🟡', label: 'Medium', color: 'text-yellow-400' };
       case 'hard': return { emoji: '🔴', label: 'Hard', color: 'text-red-400' };
@@ -20,8 +20,10 @@ const SpeedMathCompletedModal = ({
     }
   };
 
+  // Get the difficulty badge
   const badge = getDifficultyBadge();
 
+  // Render the modal
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 max-w-md w-full border-2 border-purple-500/50 shadow-2xl">
@@ -44,17 +46,17 @@ const SpeedMathCompletedModal = ({
             <div className="text-gray-400 text-xs mb-1">Problems Solved</div>
             <div className="text-2xl font-bold text-white">{problemsSolved}</div>
           </div>
-          
+
           <div className="bg-gray-700/50 rounded-lg p-4 text-center">
             <div className="text-gray-400 text-xs mb-1">Total Attempts</div>
             <div className="text-2xl font-bold text-white">{totalProblems}</div>
           </div>
-          
+
           <div className="bg-gray-700/50 rounded-lg p-4 text-center">
             <div className="text-gray-400 text-xs mb-1">Accuracy</div>
             <div className="text-2xl font-bold text-white">{accuracy}%</div>
           </div>
-          
+
           <div className="bg-gray-700/50 rounded-lg p-4 text-center">
             <div className="text-gray-400 text-xs mb-1">Best Streak</div>
             <div className="text-2xl font-bold text-white flex items-center justify-center gap-1">
@@ -96,7 +98,7 @@ const SpeedMathCompletedModal = ({
           >
             Play Again 🎮
           </button>
-          
+
           <button
             onClick={onBackToMenu}
             className="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"

@@ -1,5 +1,4 @@
-import React from 'react';
-
+// Component to display the speed math timer with dynamic color and progress bar
 const SpeedMathTimer = ({ timeLeft }) => {
   const getTimerColor = () => {
     if (timeLeft > 30) return 'text-green-400';
@@ -7,6 +6,7 @@ const SpeedMathTimer = ({ timeLeft }) => {
     return 'text-red-400 animate-pulse';
   };
 
+  // Determine progress bar color based on time left
   const getProgressColor = () => {
     if (timeLeft > 30) return 'bg-green-500';
     if (timeLeft > 10) return 'bg-yellow-500';
@@ -15,6 +15,7 @@ const SpeedMathTimer = ({ timeLeft }) => {
 
   const progressPercentage = (timeLeft / 60) * 100;
 
+  // Render the timer component
   return (
     <div className="mb-6">
       <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl p-4 border border-gray-700">
@@ -24,7 +25,7 @@ const SpeedMathTimer = ({ timeLeft }) => {
             {timeLeft}s
           </span>
         </div>
-        
+
         {/* Progress Bar */}
         <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
           <div

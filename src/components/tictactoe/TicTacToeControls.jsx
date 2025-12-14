@@ -1,6 +1,6 @@
-import React from 'react';
-
+// TicTacToeControls component for game control buttons
 export default function TicTacToeControls({ onNewGame, onResetScores }) {
+  // Render the control buttons
   return (
     <div className="flex justify-center gap-4 mb-6">
       <button

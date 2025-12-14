@@ -1,8 +1,8 @@
-import React from 'react';
-
+// This component allows players to select letters for guessing in the Word Guess game mode.
 const LetterSelector = ({ chosenLetters, onSelectLetter, disabled }) => {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
+  // Render the letter selection buttons
   return (
     <div className="grid grid-cols-6 sm:grid-cols-9 gap-2 mb-6 max-w-md mx-auto">
       {alphabet.map(letter => (

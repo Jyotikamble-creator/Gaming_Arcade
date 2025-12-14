@@ -1,6 +1,6 @@
-import React from 'react';
-
+// This component displays game statistics for the Word Guess game mode, including score and wrong guesses.
 const GameStats = ({ score, wrongGuesses, maxWrong = 3 }) => {
+  // Render the game statistics
   return (
     <div className="flex justify-center gap-6 mb-6">
       <div className="text-center">

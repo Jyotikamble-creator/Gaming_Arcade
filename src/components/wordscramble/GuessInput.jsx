@@ -1,6 +1,6 @@
-import React from 'react';
-
+// This component handles user input for guessing words in the Word Scramble game mode.
 const GuessInput = ({ guess, setGuess, onCheck, onReveal, onNewWord, correct, showAnswer }) => {
+  // Render the guess input and action buttons
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-2xl">
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">

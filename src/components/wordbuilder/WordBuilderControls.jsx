@@ -1,6 +1,5 @@
-import React from 'react';
-
-export default function WordBuilderControls({ 
+// This component provides controls for the Word Builder game, including difficulty selection, action buttons, and game management.
+export default function WordBuilderControls({
   onSubmit,
   onClear,
   onShuffle,
@@ -19,6 +18,7 @@ export default function WordBuilderControls({
     { value: 'hard', label: 'Hard', color: 'red' }
   ];
 
+  // Render the component
   return (
     <div className="word-builder-controls">
       {/* Difficulty Selector */}
@@ -29,9 +29,8 @@ export default function WordBuilderControls({
             <button
               key={level.value}
               onClick={() => onDifficultyChange(level.value)}
-              className={`difficulty-btn difficulty-${level.color} ${
-                difficulty === level.value ? 'active' : ''
-              }`}
+              className={`difficulty-btn difficulty-${level.color} ${difficulty === level.value ? 'active' : ''
+                }`}
             >
               {level.label}
             </button>

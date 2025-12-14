@@ -1,6 +1,6 @@
-import React from 'react';
-
+// This component displays game statistics for the Word Scramble game mode, including attempts and status.
 const GameStats = ({ attempts, correct, showAnswer }) => {
+  // Render the game statistics display
   return (
     <div className="flex justify-center gap-6 mb-8">
       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">

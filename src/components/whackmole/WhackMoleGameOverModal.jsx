@@ -1,6 +1,6 @@
-import React from 'react';
-
+// This component displays a modal when the Whack-a-Mole game is over, showing the final score and a button to restart the game.
 const WhackMoleGameOverModal = ({ score, onRestart }) => {
+  // Render the modal
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">

@@ -1,6 +1,6 @@
-import React from 'react';
-
+// This component displays the Whack-a-Mole game statistics including score, time left, and game status
 const WhackMoleStats = ({ score, timeLeft, gameStatus }) => {
+  // Render the stats display
   return (
     <div className="flex justify-center gap-6 mb-8">
       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">

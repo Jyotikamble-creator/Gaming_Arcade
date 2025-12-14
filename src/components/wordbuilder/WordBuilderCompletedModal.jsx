@@ -1,19 +1,20 @@
+// This component displays a modal when the Word Builder challenge is completed, showing stats and performance rating.
 import React, { useEffect, useRef } from 'react';
-
-export default function WordBuilderCompletedModal({ 
-  isOpen, 
-  score, 
+export default function WordBuilderCompletedModal({
+  isOpen,
+  score,
   wordsFound,
   totalWords,
   allWords,
-  time, 
+  time,
   difficulty,
   hintsUsed,
-  onClose, 
-  onNewGame 
+  onClose,
+  onNewGame
 }) {
   const modalRef = useRef(null);
 
+  // Focus the modal when it's opened
   useEffect(() => {
     if (isOpen && modalRef.current) {
       modalRef.current.focus();
@@ -22,12 +23,14 @@ export default function WordBuilderCompletedModal({
 
   if (!isOpen) return null;
 
+  // Helper function to format time in mm:ss
   function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}m ${secs}s`;
   }
 
+  // Difficulty configuration
   const difficultyConfig = {
     easy: { color: 'green', label: 'Easy', emoji: '😊' },
     medium: { color: 'yellow', label: 'Medium', emoji: '🤔' },
@@ -51,10 +54,11 @@ export default function WordBuilderCompletedModal({
   // Separate found and missed words
   const missedWords = allWords.filter(word => !wordsFound.includes(word));
 
+  // Render the Word Builder completed modal
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div 
-        className="modal-content" 
+      <div
+        className="modal-content"
         onClick={(e) => e.stopPropagation()}
         ref={modalRef}
         tabIndex={-1}
@@ -62,8 +66,8 @@ export default function WordBuilderCompletedModal({
         {/* Confetti Animation */}
         <div className="confetti-container">
           {[...Array(30)].map((_, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className="confetti"
               style={{
                 left: `${Math.random() * 100}%`,
@@ -83,12 +87,12 @@ export default function WordBuilderCompletedModal({
 
         {/* Title */}
         <h2 className="modal-title">Challenge Complete!</h2>
-        
+
         {/* Rating Stars */}
         <div className="rating-container">
           <div className="stars">
             {[...Array(5)].map((_, i) => (
-              <svg 
+              <svg
                 key={i}
                 className={`star ${i < rating.stars ? 'filled' : ''}`}
                 fill="currentColor"

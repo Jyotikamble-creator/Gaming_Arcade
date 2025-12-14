@@ -1,5 +1,7 @@
+// Animated background component with floating particles
 import React, { useEffect, useState } from 'react';
 
+// AnimatedBackground component
 const AnimatedBackground = () => {
   const [particles, setParticles] = useState([]);
 
@@ -27,6 +29,7 @@ const AnimatedBackground = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Render the animated background with particles
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       {particles.map((particle) => (

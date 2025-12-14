@@ -1,9 +1,9 @@
-// src/components/LettersRow.jsx
-import React from 'react'
+// This component renders a row of letter buttons for selection.
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
-export default function LettersRow({ chosenLetters = [], onSelect = () => {} }) {
+// Render the letters row with selectable buttons
+export default function LettersRow({ chosenLetters = [], onSelect = () => { } }) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
       {ALPHABET.map(letter => (
@@ -12,6 +12,7 @@ export default function LettersRow({ chosenLetters = [], onSelect = () => {} }) 
           onClick={() => onSelect(letter)}
           disabled={chosenLetters.includes(letter)}
           aria-pressed={chosenLetters.includes(letter)}
+
           style={{
             padding: '8px 10px',
             borderRadius: 4,

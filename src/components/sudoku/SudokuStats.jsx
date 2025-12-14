@@ -1,19 +1,20 @@
-import React from 'react';
-
-export default function SudokuStats({ 
-  difficulty, 
-  time, 
-  mistakes, 
+// Component to display Sudoku game statistics including difficulty, time, mistakes, and hints used
+export default function SudokuStats({
+  difficulty,
+  time,
+  mistakes,
   hintsUsed,
   maxHints,
   maxMistakes = 3
 }) {
+  // Helper function to format time in mm:ss
   function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 
+  // Difficulty configuration
   const difficultyConfig = {
     easy: { color: 'green', label: 'Easy', emoji: '😊' },
     medium: { color: 'yellow', label: 'Medium', emoji: '🤔' },
@@ -22,6 +23,7 @@ export default function SudokuStats({
 
   const config = difficultyConfig[difficulty] || difficultyConfig.easy;
 
+  // Render the Sudoku statistics component
   return (
     <div className="sudoku-stats">
       {/* Difficulty Badge */}
@@ -61,8 +63,8 @@ export default function SudokuStats({
           </div>
           <div className="mistakes-dots">
             {[...Array(maxMistakes)].map((_, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className={`mistake-dot ${i < mistakes ? 'filled' : ''}`}
               />
             ))}
@@ -84,7 +86,7 @@ export default function SudokuStats({
             <span className="stat-max">/{maxHints}</span>
           </div>
           <div className="hints-progress">
-            <div 
+            <div
               className="hints-progress-bar"
               style={{ width: `${(hintsUsed / maxHints) * 100}%` }}
             />

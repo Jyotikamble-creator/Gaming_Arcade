@@ -1,14 +1,14 @@
-import React from 'react';
-
-const SpeedMathProblem = ({ 
-  problem, 
-  userAnswer, 
-  setUserAnswer, 
-  onSubmit, 
-  onSkip, 
+// Component to display a speed math problem with input and action buttons
+const SpeedMathProblem = ({
+  problem,
+  userAnswer,
+  setUserAnswer,
+  onSubmit,
+  onSkip,
   onKeyPress,
-  feedback 
+  feedback
 }) => {
+  // Render the speed math problem component
   return (
     <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 shadow-2xl">
       {/* Problem Display */}
@@ -18,13 +18,12 @@ const SpeedMathProblem = ({
         </div>
         <div className="h-6">
           {feedback && (
-            <div className={`text-lg font-semibold ${
-              feedback.includes('Correct') 
-                ? 'text-green-400' 
-                : feedback.includes('Wrong') 
-                ? 'text-red-400' 
-                : 'text-yellow-400'
-            }`}>
+            <div className={`text-lg font-semibold ${feedback.includes('Correct')
+                ? 'text-green-400'
+                : feedback.includes('Wrong')
+                  ? 'text-red-400'
+                  : 'text-yellow-400'
+              }`}>
               {feedback}
             </div>
           )}

@@ -1,66 +1,68 @@
-import React from 'react';
-
-export default function SudokuBoard({ 
-  board, 
-  initialBoard, 
-  selectedCell, 
+// Component to render the Sudoku board with cells, highlights, notes, and pause overlay
+export default function SudokuBoard({
+  board,
+  initialBoard,
+  selectedCell,
   solution,
   notes,
   onCellClick,
-  isPaused 
+  isPaused
 }) {
+  // Helper function to get cell classes
   function getCellClasses(row, col) {
     const classes = ['sudoku-cell'];
-    
+
     // Initial cells (not editable)
     if (initialBoard[row][col] !== 0) {
       classes.push('sudoku-cell-initial');
     }
-    
+
     // Selected cell
     if (selectedCell && selectedCell.row === row && selectedCell.col === col) {
       classes.push('sudoku-cell-selected');
     }
-    
+
     // Highlight same row, column, and 3x3 box
     if (selectedCell) {
       const sameRow = selectedCell.row === row;
       const sameCol = selectedCell.col === col;
-      const sameBox = 
+      const sameBox =
         Math.floor(selectedCell.row / 3) === Math.floor(row / 3) &&
         Math.floor(selectedCell.col / 3) === Math.floor(col / 3);
-      
+
       if (sameRow || sameCol || sameBox) {
         classes.push('sudoku-cell-highlighted');
       }
     }
-    
+
     // Highlight same numbers
     if (selectedCell && board[selectedCell.row][selectedCell.col] !== 0) {
       if (board[row][col] === board[selectedCell.row][selectedCell.col]) {
         classes.push('sudoku-cell-same-number');
       }
     }
-    
+
     // Wrong number (if filled and doesn't match solution)
     if (board[row][col] !== 0 && initialBoard[row][col] === 0) {
       if (board[row][col] !== solution[row][col]) {
         classes.push('sudoku-cell-wrong');
       }
     }
-    
+
     return classes.join(' ');
   }
 
+  // Helper function to render cell content
   function renderCellContent(row, col) {
     const value = board[row][col];
     const key = `${row}-${col}`;
     const cellNotes = notes[key] || [];
-    
+
     if (value !== 0) {
       return <span className="sudoku-number">{value}</span>;
     }
-    
+
+    // Render notes
     if (cellNotes.length > 0) {
       return (
         <div className="sudoku-notes">
@@ -72,10 +74,11 @@ export default function SudokuBoard({
         </div>
       );
     }
-    
+
     return null;
   }
 
+  // Render the Sudoku board
   return (
     <div className="sudoku-board-wrapper">
       {isPaused && (
@@ -89,7 +92,7 @@ export default function SudokuBoard({
           </div>
         </div>
       )}
-      
+      {/* Render the Sudoku board */}
       <div className="sudoku-board">
         {board.map((row, rowIndex) => (
           <div key={rowIndex} className="sudoku-row">
@@ -105,7 +108,8 @@ export default function SudokuBoard({
           </div>
         ))}
       </div>
-      
+      {/* Render the Sudoku board */}
+
       <style jsx>{`
         .sudoku-board-wrapper {
           position: relative;

@@ -1,6 +1,5 @@
-import React from 'react';
-
-export default function SudokuControls({ 
+// Component for Sudoku game controls including number pad, difficulty selector, and action buttons
+export default function SudokuControls({
   difficulty,
   notesMode,
   isPaused,
@@ -16,13 +15,14 @@ export default function SudokuControls({
   onResume
 }) {
   const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  
+  // Difficulty levels
   const difficultyLevels = [
     { value: 'easy', label: 'Easy', color: 'green' },
     { value: 'medium', label: 'Medium', color: 'yellow' },
     { value: 'hard', label: 'Hard', color: 'red' }
   ];
 
+  // Render the component
   return (
     <div className="sudoku-controls">
       {/* Difficulty Selector */}
@@ -33,9 +33,8 @@ export default function SudokuControls({
             <button
               key={level.value}
               onClick={() => onDifficultyChange(level.value)}
-              className={`difficulty-btn difficulty-${level.color} ${
-                difficulty === level.value ? 'active' : ''
-              }`}
+              className={`difficulty-btn difficulty-${level.color} ${difficulty === level.value ? 'active' : ''
+                }`}
             >
               {level.label}
             </button>

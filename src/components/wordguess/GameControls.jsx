@@ -1,5 +1,4 @@
-import React from 'react';
-
+// This component provides game control buttons for the Word Guess game mode, including options to remove the last letter, use a hint, make a guess, and start a new game.
 const GameControls = ({
   onRemoveLast,
   onUseHint,
@@ -9,6 +8,7 @@ const GameControls = ({
   hints,
   disabled
 }) => {
+  // Render the game control buttons
   return (
     <div className="flex flex-wrap justify-center gap-3 mb-6">
       <button

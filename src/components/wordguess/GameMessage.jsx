@@ -1,11 +1,11 @@
-import React from 'react';
-
+// This component displays game messages for the Word Guess game mode, indicating win/loss status and revealing the correct word if necessary.
 const GameMessage = ({ message, word, showWord }) => {
   if (!message) return null;
-
+// determine if it's a win or game over
   const isWin = message.toLowerCase().includes('win');
   const isGameOver = message.toLowerCase().includes('game over');
 
+  // render the message with appropriate styling
   return (
     <div className={`text-center p-4 rounded-lg mb-6 ${
       isWin

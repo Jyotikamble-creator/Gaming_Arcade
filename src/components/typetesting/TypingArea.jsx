@@ -1,9 +1,8 @@
-import React from 'react';
-
+// This component displays the source text with real-time feedback on typing accuracy
 const TypingArea = ({ sourceText, typedInput, onChange, onRefresh, disabled }) => {
   return (
     <div className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 w-full max-w-4xl mx-auto">
-      
+
       {/* Source Text Display */}
       <div className="text-lg leading-relaxed text-gray-200 mb-4 font-mono">
         {sourceText.split('').map((char, i) => {

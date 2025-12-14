@@ -1,6 +1,6 @@
-import React from 'react';
-
+// TicTacToeStats component to display game statistics
 export default function TicTacToeStats({ isXNext, scores, gamesPlayed }) {
+  // Render the Tic Tac Toe statistics component
   return (
     <div className="flex justify-center gap-6 mb-8">
       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">

@@ -1,6 +1,6 @@
-import React from 'react';
-
+// This component reveals the correct answer in the Word Scramble game mode.
 export default function WordScrambleAnswer({ word, show }) {
+  // Return null if not showing the answer
   if (!show) return null;
 
   return (

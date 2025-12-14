@@ -1,12 +1,12 @@
-import React from 'react';
-
-export default function WordBuilderBoard({ 
-  availableLetters, 
-  currentWord, 
+// This component renders the Word Builder game board, including available letters, current word, and found words.
+export default function WordBuilderBoard({
+  availableLetters,
+  currentWord,
   foundWords,
   onLetterClick,
   onRemoveLetter
 }) {
+  // Render the Word Builder game board
   return (
     <div className="word-builder-board">
       {/* Current Word Display */}

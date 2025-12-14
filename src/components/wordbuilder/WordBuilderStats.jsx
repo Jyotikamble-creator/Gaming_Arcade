@@ -1,29 +1,32 @@
-import React from 'react';
-
-export default function WordBuilderStats({ 
-  difficulty, 
-  time, 
+// This component displays the statistics for the Word Builder game mode, including difficulty, timer, words found, and score.
+export default function WordBuilderStats({
+  difficulty,
+  time,
   wordsFound,
   totalWords,
   minWords,
   score,
   hintsUsed
 }) {
+  // Helper function to format time in mm:ss
   function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 
+  // Difficulty configuration
   const difficultyConfig = {
     easy: { color: 'green', label: 'Easy', emoji: '😊' },
     medium: { color: 'yellow', label: 'Medium', emoji: '🤔' },
     hard: { color: 'red', label: 'Hard', emoji: '😤' }
   };
 
+  // Calculate progress
   const config = difficultyConfig[difficulty] || difficultyConfig.easy;
   const progress = (wordsFound / minWords) * 100;
 
+  // Render the Word Builder statistics
   return (
     <div className="word-builder-stats">
       {/* Difficulty Badge */}
