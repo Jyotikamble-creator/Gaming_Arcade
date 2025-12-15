@@ -1,12 +1,17 @@
-import React from 'react'
-import { useLocation } from 'react-router-dom'
+// This component handles user authentication by rendering either the Login or Signup component
+import { useLocation } from 'react-router-dom';
+// Importing necessary components for authentication
 import Login from '../components/auth/Login'
-import Signup from '../components/auth/Signup'
+// Importing Signup component
+import Signup from '../components/auth/Signup';
 
+// Defining the Auth component
 export default function Auth() {
+  // Using useLocation hook to determine the current path
   const location = useLocation()
   const isLogin = location.pathname === '/login'
 
+  // Rendering the Auth component
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">

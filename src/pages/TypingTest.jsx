@@ -1,13 +1,18 @@
-import React, {useEffect, useState} from 'react';
+// Page for the Typing Test game where users can test their typing speed and accuracy.
+import React, { useEffect, useState } from 'react';
+// API and logging imports
 import { fetchTypingPassage, submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Component imports
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import MetricCard from '../components/typetesting/MetricCard';
 import TypingArea from '../components/typetesting/TypingArea';
 import CompletionModal from '../components/typetesting/CompletionModal';
 
-export default function TypingTest(){
+// Main Typing Test component
+export default function TypingTest() {
   const [text, setText] = useState('');
   const [input, setInput] = useState('');
   const [startTime, setStartTime] = useState(null);
@@ -23,7 +28,8 @@ export default function TypingTest(){
     fetchData();
   }, []);
 
-  async function load(){
+  // Function to load typing passage
+  async function load() {
     try {
       setIsLoading(true);
       logger.info('Loading typing passage', {}, LogTags.TYPING_TEST);
@@ -43,8 +49,9 @@ export default function TypingTest(){
     }
   }
 
-  function onChange(e){
-    if(!startTime) setStartTime(Date.now());
+  // Function to handle input changes
+  function onChange(e) {
+    if (!startTime) setStartTime(Date.now());
     setInput(e.target.value);
 
     // Calculate accuracy
@@ -54,21 +61,23 @@ export default function TypingTest(){
     const newAccuracy = inputChars.length > 0 ? Math.round((correctChars / inputChars.length) * 100) : 100;
     setAccuracy(newAccuracy);
 
-    if(e.target.value.trim() === text.trim()){ finish(); }
+    if (e.target.value.trim() === text.trim()) { finish(); }
   }
 
-  async function finish(){
+  // Function to finish the test
+  async function finish() {
     setDone(true);
-    const seconds = (Date.now()-startTime)/1000;
+    const seconds = (Date.now() - startTime) / 1000;
     const words = text.split(/\s+/).length;
-    const calculatedWpm = Math.round((words / seconds)*60);
+    const calculatedWpm = Math.round((words / seconds) * 60);
     setWpm(calculatedWpm);
 
-    await submitScore({ game:'typing-test', score: calculatedWpm, meta:{seconds, words, accuracy} });
+    await submitScore({ game: 'typing-test', score: calculatedWpm, meta: { seconds, words, accuracy } });
     logger.info('Typing test completed', { wpm: calculatedWpm, accuracy, seconds }, LogTags.SAVE_SCORE);
   }
 
-  if(isLoading) {
+  // Loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -79,6 +88,7 @@ export default function TypingTest(){
     );
   }
 
+  // Render the page
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -96,11 +106,11 @@ export default function TypingTest(){
         </div>
 
         {/* Typing Area */}
-        <TypingArea 
-          sourceText={text} 
-          typedInput={input} 
-          onChange={onChange} 
-          disabled={done} 
+        <TypingArea
+          sourceText={text}
+          typedInput={input}
+          onChange={onChange}
+          disabled={done}
         />
 
         {/* New Passage Button */}
@@ -127,6 +137,7 @@ export default function TypingTest(){
         <div className="mt-12">
           <Leaderboard game="typing-test" />
         </div>
+
       </div>
     </div>
   );

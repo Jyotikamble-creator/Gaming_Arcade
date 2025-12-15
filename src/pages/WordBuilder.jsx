@@ -1,6 +1,10 @@
+// Word Builder Game Page Component
 import React, { useState, useEffect } from 'react';
+// API and Logging
 import { submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Component Imports
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import WordBuilderBoard from '../components/wordbuilder/WordBuilderBoard';
@@ -48,6 +52,7 @@ const wordChallenges = [
   }
 ];
 
+// Main Word Builder Component
 export default function WordBuilder() {
   const [difficulty, setDifficulty] = useState('easy');
   const [currentChallenge, setCurrentChallenge] = useState(null);
@@ -78,10 +83,10 @@ export default function WordBuilder() {
 
   function startNewGame(diff) {
     logger.info('Starting new Word Builder game', { difficulty: diff }, LogTags.GAME_LOAD);
-    
+
     const challenges = wordChallenges.filter(c => c.difficulty === diff);
     const challenge = challenges[Math.floor(Math.random() * challenges.length)];
-    
+
     setCurrentChallenge(challenge);
     setAvailableLetters(challenge.letters.map((letter, idx) => ({ letter, id: idx, used: false })));
     setCurrentWord([]);
@@ -96,52 +101,55 @@ export default function WordBuilder() {
     setDifficulty(diff);
   }
 
+  // Letter click handler
   function handleLetterClick(letterId) {
     if (isCompleted) return;
-    
+
     const letterObj = availableLetters.find(l => l.id === letterId && !l.used);
     if (!letterObj) return;
-    
+
     // Mark letter as used
-    setAvailableLetters(prev => 
+    setAvailableLetters(prev =>
       prev.map(l => l.id === letterId ? { ...l, used: true } : l)
     );
-    
+
     // Add to current word
     setCurrentWord(prev => [...prev, { letter: letterObj.letter, id: letterId }]);
     setMessage('');
   }
 
+  // Remove letter from current word
   function handleRemoveLetter(index) {
     if (isCompleted) return;
-    
+
     const letterToRemove = currentWord[index];
-    
+
     // Mark letter as available again
-    setAvailableLetters(prev => 
+    setAvailableLetters(prev =>
       prev.map(l => l.id === letterToRemove.id ? { ...l, used: false } : l)
     );
-    
+
     // Remove from current word
     setCurrentWord(prev => prev.filter((_, i) => i !== index));
     setMessage('');
   }
 
+  // Submit current word
   function handleSubmitWord() {
     if (currentWord.length < 3) {
       showMessage('Word must be at least 3 letters!', 'error');
       return;
     }
-    
+
     const word = currentWord.map(l => l.letter).join('');
-    
+
     // Check if already found
     if (foundWords.includes(word)) {
       showMessage('You already found this word!', 'error');
       clearCurrentWord();
       return;
     }
-    
+
     // Check if valid word
     if (currentChallenge.targetWords.includes(word)) {
       const wordScore = calculateWordScore(word);
@@ -149,9 +157,9 @@ export default function WordBuilder() {
       setScore(prev => prev + wordScore);
       showMessage(`Great! +${wordScore} points`, 'success');
       clearCurrentWord();
-      
+
       logger.info('Word found', { word, score: wordScore }, LogTags.GAME_COMPLETE);
-      
+
       // Check if completed
       if (foundWords.length + 1 >= currentChallenge.minWords) {
         completeGame();
@@ -162,6 +170,7 @@ export default function WordBuilder() {
     }
   }
 
+  // Shuffle available letters
   function handleShuffle() {
     if (isCompleted) return;
     setAvailableLetters(prev => {
@@ -174,17 +183,18 @@ export default function WordBuilder() {
     });
   }
 
+  // Give a hint
   function handleHint() {
     if (isCompleted) return;
-    
+
     // Find a word that hasn't been found yet
     const unfoundWords = currentChallenge.targetWords.filter(w => !foundWords.includes(w));
     if (unfoundWords.length === 0) return;
-    
+
     const hintWord = unfoundWords[0];
     showMessage(`Try: ${hintWord}`, 'hint');
     setHintsUsed(prev => prev + 1);
-    
+
     logger.info('Hint used', { hintWord, hintsUsed: hintsUsed + 1 }, LogTags.GAME_COMPLETE);
   }
 
@@ -194,12 +204,14 @@ export default function WordBuilder() {
     setCurrentWord([]);
   }
 
+  // Calculate word score
   function calculateWordScore(word) {
     const baseScore = word.length * 10;
     const bonusMultiplier = word.length >= 6 ? 2 : 1;
     return baseScore * bonusMultiplier;
   }
 
+  // Show message
   function showMessage(msg, type) {
     setMessage(msg);
     setMessageType(type);
@@ -209,16 +221,17 @@ export default function WordBuilder() {
     }, 3000);
   }
 
+  // Complete game
   function completeGame() {
     setIsCompleted(true);
     const finalTime = Math.floor((Date.now() - startTime) / 1000);
-    
+
     // Calculate final score
     const timeBonusThreshold = { easy: 180, medium: 240, hard: 300 }[difficulty];
     const timeBonus = finalTime < timeBonusThreshold ? Math.floor((timeBonusThreshold - finalTime) * 2) : 0;
     const hintPenalty = hintsUsed * 50;
     const finalScore = Math.max(score + timeBonus - hintPenalty, 0);
-    
+
     submitScore({
       game: 'word-builder',
       score: finalScore,
@@ -230,16 +243,17 @@ export default function WordBuilder() {
         hintsUsed
       }
     });
-    
-    logger.info('Word Builder completed', { 
-      score: finalScore, 
-      wordsFound: foundWords.length, 
+
+    logger.info('Word Builder completed', {
+      score: finalScore,
+      wordsFound: foundWords.length,
       time: finalTime,
       hintsUsed,
-      difficulty 
+      difficulty
     }, LogTags.SAVE_SCORE);
   }
 
+  // Render
   if (!currentChallenge) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -251,6 +265,7 @@ export default function WordBuilder() {
     );
   }
 
+  // Main render
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -277,11 +292,10 @@ export default function WordBuilder() {
 
         {/* Message Display */}
         {message && (
-          <div className={`text-center mb-6 p-4 rounded-lg ${
-            messageType === 'success' ? 'bg-green-500/20 text-green-300' :
-            messageType === 'error' ? 'bg-red-500/20 text-red-300' :
-            'bg-blue-500/20 text-blue-300'
-          }`}>
+          <div className={`text-center mb-6 p-4 rounded-lg ${messageType === 'success' ? 'bg-green-500/20 text-green-300' :
+              messageType === 'error' ? 'bg-red-500/20 text-red-300' :
+                'bg-blue-500/20 text-blue-300'
+            }`}>
             <p className="text-lg font-semibold">{message}</p>
           </div>
         )}
@@ -346,6 +360,7 @@ export default function WordBuilder() {
         <div className="mt-12">
           <Leaderboard game="word-builder" />
         </div>
+
       </div>
     </div>
   );

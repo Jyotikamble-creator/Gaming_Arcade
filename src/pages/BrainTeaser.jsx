@@ -1,18 +1,25 @@
+// Brain Teaser game page component
 import React, { useState, useEffect } from 'react';
+// API function to submit score
 import { submitScore } from '../api/Api';
+// Logger module
 import { logger, LogTags } from '../lib/logger';
+// Components
 import Instructions from '../components/shared/Instructions';
+// Brain Teaser components
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import BrainTeaserStats from '../components/brainteaser/BrainTeaserStats';
 import BrainTeaserDisplay from '../components/brainteaser/BrainTeaserDisplay';
 import BrainTeaserTimer from '../components/brainteaser/BrainTeaserTimer';
 import BrainTeaserCompletedModal from '../components/brainteaser/BrainTeaserCompletedModal';
 
+// Game constants
 const GAME_DURATION = 60; // 60 seconds
 const SHAPES = ['circle', 'square', 'triangle', 'diamond', 'star', 'hexagon'];
 const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
 const PATTERNS = ['horizontal', 'vertical', 'diagonal', 'zigzag'];
 
+// Brain Teaser game component
 export default function BrainTeaser() {
   const [gameStarted, setGameStarted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
@@ -28,10 +35,10 @@ export default function BrainTeaser() {
   const generateMatchShapePuzzle = () => {
     const targetShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
     const targetColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-    
+
     const options = [];
     const correctIndex = Math.floor(Math.random() * 4);
-    
+
     for (let i = 0; i < 4; i++) {
       if (i === correctIndex) {
         options.push({ shape: targetShape, color: targetColor });
@@ -39,19 +46,19 @@ export default function BrainTeaser() {
         // Create similar but different options
         const wrongShape = Math.random() > 0.5 ? targetShape : SHAPES[Math.floor(Math.random() * SHAPES.length)];
         const wrongColor = Math.random() > 0.5 ? targetColor : COLORS[Math.floor(Math.random() * COLORS.length)];
-        
+
         // Ensure it's not exactly the same
         if (wrongShape === targetShape && wrongColor === targetColor) {
-          options.push({ 
-            shape: SHAPES[(SHAPES.indexOf(targetShape) + 1) % SHAPES.length], 
-            color: targetColor 
+          options.push({
+            shape: SHAPES[(SHAPES.indexOf(targetShape) + 1) % SHAPES.length],
+            color: targetColor
           });
         } else {
           options.push({ shape: wrongShape, color: wrongColor });
         }
       }
     }
-    
+
     return {
       type: 'match-shape',
       question: `Find the shape that matches:`,
@@ -67,28 +74,28 @@ export default function BrainTeaser() {
     const baseShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
     const baseColor = COLORS[Math.floor(Math.random() * COLORS.length)];
     const oddIndex = Math.floor(Math.random() * 5);
-    
+
     const options = [];
     for (let i = 0; i < 5; i++) {
       if (i === oddIndex) {
         // The odd one differs in one property
         const differBy = Math.random() > 0.5 ? 'shape' : 'color';
         if (differBy === 'shape') {
-          options.push({ 
-            shape: SHAPES[(SHAPES.indexOf(baseShape) + 1) % SHAPES.length], 
-            color: baseColor 
+          options.push({
+            shape: SHAPES[(SHAPES.indexOf(baseShape) + 1) % SHAPES.length],
+            color: baseColor
           });
         } else {
-          options.push({ 
-            shape: baseShape, 
-            color: COLORS[(COLORS.indexOf(baseColor) + 1) % COLORS.length] 
+          options.push({
+            shape: baseShape,
+            color: COLORS[(COLORS.indexOf(baseColor) + 1) % COLORS.length]
           });
         }
       } else {
         options.push({ shape: baseShape, color: baseColor });
       }
     }
-    
+
     return {
       type: 'find-odd',
       question: 'Find the odd one out:',
@@ -103,21 +110,21 @@ export default function BrainTeaser() {
     const patternLength = 4;
     const shapes = [];
     const patternType = PATTERNS[Math.floor(Math.random() * PATTERNS.length)];
-    
+
     // Create a repeating pattern
     const basePattern = [
       SHAPES[Math.floor(Math.random() * SHAPES.length)],
       SHAPES[Math.floor(Math.random() * SHAPES.length)],
       SHAPES[Math.floor(Math.random() * SHAPES.length)]
     ];
-    
+
     for (let i = 0; i < patternLength; i++) {
       shapes.push(basePattern[i % basePattern.length]);
     }
-    
+
     // What comes next?
     const nextShape = basePattern[patternLength % basePattern.length];
-    
+
     // Create options
     const options = [nextShape];
     while (options.length < 4) {
@@ -126,12 +133,12 @@ export default function BrainTeaser() {
         options.push(randomShape);
       }
     }
-    
+
     // Shuffle options
     const correctAnswer = 0;
     const shuffledOptions = options.sort(() => Math.random() - 0.5);
     const newCorrectAnswer = shuffledOptions.indexOf(nextShape);
-    
+
     return {
       type: 'pattern',
       question: 'What comes next in the pattern?',
@@ -159,7 +166,7 @@ export default function BrainTeaser() {
     setBestStreak(0);
     setGameCompleted(false);
     setCurrentPuzzle(generatePuzzle());
-    
+
     logger.info('Brain Teaser game started', {}, LogTags.WORD_GUESS);
   };
 
@@ -168,7 +175,7 @@ export default function BrainTeaser() {
     if (!currentPuzzle || feedback) return;
 
     const isCorrect = selectedIndex === currentPuzzle.correctAnswer;
-    
+
     if (isCorrect) {
       const points = currentPuzzle.points + (streak >= 3 ? Math.floor(streak / 3) * 5 : 0);
       setScore(prev => prev + points);
@@ -178,19 +185,19 @@ export default function BrainTeaser() {
         if (newStreak > bestStreak) setBestStreak(newStreak);
         return newStreak;
       });
-      
+
       setFeedback({ type: 'success', message: `Correct! +${points} points` });
-      
-      logger.info('Brain teaser solved', { 
-        type: currentPuzzle.type, 
+
+      logger.info('Brain teaser solved', {
+        type: currentPuzzle.type,
         points,
-        streak: streak + 1 
+        streak: streak + 1
       }, LogTags.WORD_GUESS);
     } else {
       setStreak(0);
       setFeedback({ type: 'error', message: 'Wrong answer!' });
     }
-    
+
     // Next puzzle after short delay
     setTimeout(() => {
       setFeedback(null);
@@ -207,7 +214,7 @@ export default function BrainTeaser() {
         if (prev <= 1) {
           clearInterval(timer);
           setGameCompleted(true);
-          
+
           // Submit score
           submitScore({
             game: 'brain-teaser',
@@ -220,7 +227,7 @@ export default function BrainTeaser() {
           }).catch(error => {
             logger.error('Failed to submit Brain Teaser score', error, {}, LogTags.SAVE_SCORE);
           });
-          
+
           return 0;
         }
         return prev - 1;

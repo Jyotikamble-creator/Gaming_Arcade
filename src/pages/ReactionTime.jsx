@@ -1,16 +1,22 @@
+// Reaction Time Tester Game Component
 import React, { useState, useEffect, useRef } from 'react';
+// API functions
 import { submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Components
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import ReactionStats from '../components/reactiontime/ReactionStats';
 import ReactionDisplay from '../components/reactiontime/ReactionDisplay';
 import ReactionCompletedModal from '../components/reactiontime/ReactionCompletedModal';
 
+// Constants
 const TOTAL_ROUNDS = 5;
 const MIN_WAIT_TIME = 2000; // 2 seconds
 const MAX_WAIT_TIME = 5000; // 5 seconds
 
+// Reaction Time Page Component
 export default function ReactionTime() {
   const [gameState, setGameState] = useState('idle'); // idle, waiting, ready, clicked, completed
   const [currentRound, setCurrentRound] = useState(0);
@@ -20,7 +26,7 @@ export default function ReactionTime() {
   const [averageTime, setAverageTime] = useState(0);
   const [bestTime, setBestTime] = useState(null);
   const [gameCompleted, setGameCompleted] = useState(false);
-  
+
   const timeoutRef = useRef(null);
 
   // Start the game
@@ -32,7 +38,7 @@ export default function ReactionTime() {
     setGameCompleted(false);
     setTooEarly(false);
     setGameState('ready-to-start');
-    
+
     logger.info('Reaction Time game started', {}, LogTags.WORD_GUESS);
   };
 
@@ -40,10 +46,10 @@ export default function ReactionTime() {
   const startRound = () => {
     setTooEarly(false);
     setGameState('waiting');
-    
+
     // Random delay between MIN_WAIT_TIME and MAX_WAIT_TIME
     const waitTime = Math.random() * (MAX_WAIT_TIME - MIN_WAIT_TIME) + MIN_WAIT_TIME;
-    
+
     timeoutRef.current = setTimeout(() => {
       setGameState('ready');
       setStartTime(Date.now());
@@ -57,40 +63,40 @@ export default function ReactionTime() {
       setTooEarly(true);
       setGameState('idle');
       clearTimeout(timeoutRef.current);
-      
+
       setTimeout(() => {
         setTooEarly(false);
       }, 2000);
-      
+
       return;
     }
-    
+
     if (gameState === 'ready') {
       // Calculate reaction time
       const reactionTime = Date.now() - startTime;
       const newReactionTimes = [...reactionTimes, reactionTime];
       setReactionTimes(newReactionTimes);
       setGameState('clicked');
-      
+
       // Update best time
       if (bestTime === null || reactionTime < bestTime) {
         setBestTime(reactionTime);
       }
-      
+
       logger.info('Reaction recorded', { reactionTime, round: currentRound + 1 }, LogTags.WORD_GUESS);
-      
+
       // Check if game is complete
       if (currentRound + 1 >= TOTAL_ROUNDS) {
         const avg = Math.round(newReactionTimes.reduce((a, b) => a + b, 0) / newReactionTimes.length);
         setAverageTime(avg);
-        
+
         setTimeout(() => {
           setGameCompleted(true);
-          
+
           // Calculate score (lower time = higher score)
           // Perfect score of 500 for avg 200ms, decreasing as avg increases
           const score = Math.max(0, Math.round(500 - (avg - 200) * 0.5));
-          
+
           submitScore({
             game: 'reaction-time',
             score,
@@ -131,6 +137,7 @@ export default function ReactionTime() {
     return { text: '💪 Keep Practicing!', color: 'text-orange-300' };
   };
 
+  // Render
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-5xl">

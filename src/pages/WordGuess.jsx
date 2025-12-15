@@ -1,15 +1,20 @@
-import React, { useEffect, useState } from 'react'
-import { fetchWords } from '../api/wordApi'
-import { saveScore } from '../api/scoreApi'
-import Leaderboard from '../components/leaderboard/Leaderboard'
-import WordDisplay from '../components/wordguess/WordDisplay'
-import LetterSelector from '../components/wordguess/LetterSelector'
-import GameControls from '../components/wordguess/GameControls'
-import GameStats from '../components/wordguess/GameStats'
-import GameMessage from '../components/wordguess/GameMessage'
-import Instructions from '../components/shared/Instructions'
-import { logger, LogTags } from '../lib/logger'
+// Word Guess Game
+import React, { useEffect, useState } from 'react';
+// API
+import { fetchWords } from '../api/wordApi';
+// Logger
+import { saveScore } from '../api/scoreApi';
+// Components
+import Leaderboard from '../components/leaderboard/Leaderboard';
+import WordDisplay from '../components/wordguess/WordDisplay';
+import LetterSelector from '../components/wordguess/LetterSelector';
+import GameControls from '../components/wordguess/GameControls';
+import GameStats from '../components/wordguess/GameStats';
+import GameMessage from '../components/wordguess/GameMessage';
+import Instructions from '../components/shared/Instructions';
+import { logger, LogTags } from '../lib/logger';
 
+// Main component
 export default function WordGuess() {
   const [wordData, setWordData] = useState({ word: '', description: '' })
   const [chosen, setChosen] = useState([])
@@ -25,6 +30,7 @@ export default function WordGuess() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Load a new word 
   async function load() {
     try {
       setIsLoading(true)
@@ -48,6 +54,7 @@ export default function WordGuess() {
     }
   }
 
+  // Select a letter
   function select(l) {
     if (chosen.includes(l) || msg) return
     setChosen(prev => [...prev, l])
@@ -59,15 +66,17 @@ export default function WordGuess() {
     }
   }
 
+  // Game over
   useEffect(() => {
     if (wrong >= 3) {
       setMsg('Game Over')
       setDisplayWord(true)
       // save score (best-effort)
-      saveScore({ game: 'word-guess', playerName: 'guest', score }).catch(() => {})
+      saveScore({ game: 'word-guess', playerName: 'guest', score }).catch(() => { })
     }
   }, [wrong])
 
+  // Use a hint
   function useHint() {
     if (hints <= 0) return
     const unrevealed = wordData.word.split('').filter(c => !chosen.includes(c))
@@ -77,11 +86,12 @@ export default function WordGuess() {
     setHints(h => h - 1)
     setScore(s => Math.max(0, s - 5))
   }
-
+  // Remove the last letter
   function removeLast() {
     setChosen(prev => prev.slice(0, -1))
   }
 
+  // Check win
   async function checkWin() {
     const ok = wordData.word.split('').every(c => chosen.includes(c))
     if (ok) {
@@ -99,6 +109,7 @@ export default function WordGuess() {
     }
   }
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -110,6 +121,7 @@ export default function WordGuess() {
     )
   }
 
+  // Render
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

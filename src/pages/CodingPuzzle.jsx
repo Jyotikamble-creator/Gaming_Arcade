@@ -1,6 +1,10 @@
+// A React component for a coding puzzle game where users solve programming-related puzzles
 import React, { useState, useEffect } from 'react';
+// API function to submit score
 import { submitScore } from '../api/Api';
+// Logger module
 import { logger, LogTags } from '../lib/logger';
+// Components
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import PuzzleDisplay from '../components/codingpuzzle/PuzzleDisplay';
@@ -43,6 +47,7 @@ const PUZZLE_CATEGORIES = {
       difficulty: "easy"
     }
   ],
+  // Code output questions
   codeOutput: [
     {
       question: "What does this print?\nfor i in range(3):\n    print(i * 2)",
@@ -75,6 +80,7 @@ const PUZZLE_CATEGORIES = {
       difficulty: "medium"
     }
   ],
+  // Logic questions
   logic: [
     {
       question: "If all Bloops are Razzies and all Razzies are Lazzies, are all Bloops definitely Lazzies?",
@@ -107,6 +113,7 @@ const PUZZLE_CATEGORIES = {
       difficulty: "medium"
     }
   ],
+  // Bitwise operations
   bitwise: [
     {
       question: "What is 5 & 3 in binary operation? (AND operation)",
@@ -141,6 +148,7 @@ const PUZZLE_CATEGORIES = {
   ]
 };
 
+// Difficulty points
 const DIFFICULTY_POINTS = {
   easy: 10,
   medium: 20,
@@ -149,6 +157,7 @@ const DIFFICULTY_POINTS = {
 
 const TOTAL_PUZZLES = 10;
 
+// CodingPuzzle
 export default function CodingPuzzle() {
   const [category, setCategory] = useState(null);
   const [currentPuzzle, setCurrentPuzzle] = useState(null);
@@ -169,22 +178,24 @@ export default function CodingPuzzle() {
     const availablePuzzles = categoryPuzzles.filter(
       (puzzle, index) => !usedPuzzles.includes(`${selectedCategory}-${index}`)
     );
-    
+
+    // If all puzzles have been used, return null
     if (availablePuzzles.length === 0) {
       return null;
     }
-    
+
+    // Select a random puzzle
     const randomPuzzle = availablePuzzles[Math.floor(Math.random() * availablePuzzles.length)];
     const puzzleIndex = categoryPuzzles.indexOf(randomPuzzle);
     setUsedPuzzles([...usedPuzzles, `${selectedCategory}-${puzzleIndex}`]);
-    
+
     return randomPuzzle;
   };
 
   // Start game
   const startGame = (selectedCategory) => {
     const puzzle = getRandomPuzzle(selectedCategory);
-    
+
     setCategory(selectedCategory);
     setCurrentPuzzle(puzzle);
     setUserAnswer('');
@@ -197,7 +208,7 @@ export default function CodingPuzzle() {
     setIsPlaying(true);
     setGameCompleted(false);
     setUsedPuzzles([]);
-    
+
     logger.info('Coding Puzzle game started', { category: selectedCategory }, LogTags.WORD_GUESS);
   };
 
@@ -206,13 +217,14 @@ export default function CodingPuzzle() {
     if (!userAnswer.trim()) return;
 
     const isCorrect = userAnswer.trim().toLowerCase() === currentPuzzle.answer.toLowerCase();
-    
+
     if (isCorrect) {
       // Calculate score
       let points = DIFFICULTY_POINTS[currentPuzzle.difficulty];
       if (!showHint) points += 5; // Bonus for not using hint
       if (streak >= 2) points += streak * 2; // Streak bonus
-      
+
+      // Update state
       setScore(prev => prev + points);
       setPuzzlesSolved(prev => prev + 1);
       setStreak(prev => {
@@ -220,21 +232,23 @@ export default function CodingPuzzle() {
         if (newStreak > bestStreak) setBestStreak(newStreak);
         return newStreak;
       });
-      
+
       setFeedback({ type: 'success', message: `Correct! +${points} points` });
-      
-      logger.info('Coding puzzle solved', { 
-        difficulty: currentPuzzle.difficulty, 
+
+      // Log
+      logger.info('Coding puzzle solved', {
+        difficulty: currentPuzzle.difficulty,
         points,
-        streak: streak + 1 
+        streak: streak + 1
       }, LogTags.WORD_GUESS);
-      
+
       // Check if game completed
       if (puzzlesSolved + 1 >= TOTAL_PUZZLES) {
         setTimeout(() => {
           setGameCompleted(true);
           setIsPlaying(false);
-          
+
+          // Submit score
           submitScore({
             game: 'coding-puzzle',
             score: score + points,
@@ -260,7 +274,7 @@ export default function CodingPuzzle() {
     } else {
       setStreak(0);
       setFeedback({ type: 'error', message: 'Incorrect! Try again.' });
-      
+
       setTimeout(() => {
         setFeedback(null);
       }, 2000);
@@ -276,7 +290,7 @@ export default function CodingPuzzle() {
   const skipPuzzle = () => {
     setStreak(0);
     const nextPuzzle = getRandomPuzzle(category);
-    
+
     if (nextPuzzle) {
       setCurrentPuzzle(nextPuzzle);
       setUserAnswer('');
@@ -298,6 +312,7 @@ export default function CodingPuzzle() {
     startGame(category);
   };
 
+  // Render
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -319,7 +334,7 @@ export default function CodingPuzzle() {
           <div className="max-w-2xl mx-auto">
             <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 shadow-2xl">
               <h2 className="text-2xl font-bold text-white mb-6 text-center">Choose a Puzzle Type</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button
                   onClick={() => startGame('patterns')}
@@ -329,7 +344,7 @@ export default function CodingPuzzle() {
                   <div className="text-xl mb-2">Number Patterns</div>
                   <div className="text-sm text-blue-200">Find the next number in sequences</div>
                 </button>
-                
+
                 <button
                   onClick={() => startGame('codeOutput')}
                   className="bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-8 px-6 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
@@ -338,7 +353,7 @@ export default function CodingPuzzle() {
                   <div className="text-xl mb-2">Code Output</div>
                   <div className="text-sm text-green-200">Predict what the code will print</div>
                 </button>
-                
+
                 <button
                   onClick={() => startGame('logic')}
                   className="bg-gradient-to-br from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold py-8 px-6 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
@@ -347,7 +362,7 @@ export default function CodingPuzzle() {
                   <div className="text-xl mb-2">Logic Puzzles</div>
                   <div className="text-sm text-orange-200">Solve brain teasers and riddles</div>
                 </button>
-                
+
                 <button
                   onClick={() => startGame('bitwise')}
                   className="bg-gradient-to-br from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-8 px-6 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
@@ -416,6 +431,7 @@ export default function CodingPuzzle() {
             <Leaderboard game="coding-puzzle" />
           </div>
         )}
+
       </div>
     </div>
   );

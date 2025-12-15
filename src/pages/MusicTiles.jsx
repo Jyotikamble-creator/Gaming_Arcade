@@ -1,10 +1,15 @@
+// Music Tiles game page component.
 import React, { useState, useEffect, useCallback } from 'react';
+// API functions
 import TileGrid from '../components/musictiles/TileGrid';
+// Logger
 import ScoreDisplay from '../components/musictiles/ScoreDisplay';
 import GameControls from '../components/musictiles/GameControls';
 import Instructions from '../components/shared/Instructions';
+// API for saving score
 import { saveScore } from '../api/scoreApi';
 
+// MusicTiles page component
 const MusicTiles = () => {
   const [tiles, setTiles] = useState(Array(16).fill().map(() => ({ active: false, timing: 0 })));
   const [sequence, setSequence] = useState([]);
@@ -14,6 +19,7 @@ const MusicTiles = () => {
   const [gameState, setGameState] = useState('ready'); // ready, playing, paused, gameOver
   const [speed, setSpeed] = useState(1000);
 
+  // Generate a new sequence based on the current level
   const generateSequence = useCallback(() => {
     const newSequence = [];
     for (let i = 0; i < level + 3; i++) {
@@ -22,16 +28,19 @@ const MusicTiles = () => {
     setSequence(newSequence);
   }, [level]);
 
+  // Play the current sequence
   const playSequence = useCallback(() => {
     setGameState('playing');
     setCurrentStep(0);
 
+    // Recursive function to play each step
     const playStep = (step) => {
       if (step >= sequence.length) {
         setGameState('waiting');
         return;
       }
 
+      // Play the step
       setTiles(prevTiles => {
         const newTiles = prevTiles.map((tile, index) => ({
           ...tile,
@@ -40,6 +49,7 @@ const MusicTiles = () => {
         return newTiles;
       });
 
+      // Deactivate tile after a delay
       setTimeout(() => {
         setTiles(prevTiles => prevTiles.map(tile => ({ ...tile, active: false })));
         setTimeout(() => playStep(step + 1), speed / 2);
@@ -49,6 +59,7 @@ const MusicTiles = () => {
     setTimeout(() => playStep(0), 500);
   }, [sequence, speed]);
 
+  // Handle tile click
   const handleTileClick = useCallback((index) => {
     if (gameState !== 'waiting') return;
 
@@ -73,6 +84,7 @@ const MusicTiles = () => {
     }
   }, [gameState, sequence, generateSequence, playSequence]);
 
+  // Start the game
   const startGame = () => {
     setScore(0);
     setLevel(1);
@@ -82,6 +94,7 @@ const MusicTiles = () => {
     setTimeout(() => playSequence(), 1000);
   };
 
+  // Reset the game
   const resetGame = () => {
     setGameState('ready');
     setTiles(Array(16).fill().map(() => ({ active: false, timing: 0 })));
@@ -92,6 +105,7 @@ const MusicTiles = () => {
     setSpeed(1000);
   };
 
+  // Save game score
   const saveGameScore = async () => {
     try {
       await saveScore('music-tiles', score, { level, speed });
@@ -101,6 +115,7 @@ const MusicTiles = () => {
     }
   };
 
+  // Effect to generate initial sequence when level changes
   return (
     <div className="min-h-screen text-light-text p-4">
       <div className="max-w-4xl mx-auto">
@@ -110,6 +125,8 @@ const MusicTiles = () => {
             <div className="flex-1">
               <TileGrid tiles={tiles} onTileClick={handleTileClick} />
             </div>
+
+            {/* Score and controls */}
             <div className="lg:w-64 space-y-4">
               <ScoreDisplay score={score} level={level} gameState={gameState} />
               <GameControls
@@ -121,7 +138,7 @@ const MusicTiles = () => {
               />
             </div>
           </div>
-          
+
           {/* Instructions */}
           <div className="mt-6">
             <Instructions gameType="music-tiles" />

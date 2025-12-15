@@ -1,13 +1,18 @@
-import React, {useEffect, useState} from 'react';
+// Page component for the Word Scramble game.
+import React, { useEffect, useState } from 'react';
+// API and logging imports
 import { fetchScramble, submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Component imports
 import Instructions from '../components/shared/Instructions';
 import WordScrambleStats from '../components/wordscramble/WordScrambleStats';
 import WordScrambleDisplay from '../components/wordscramble/WordScrambleDisplay';
 import WordScrambleInput from '../components/wordscramble/WordScrambleInput';
 import WordScrambleAnswer from '../components/wordscramble/WordScrambleAnswer';
 
-export default function WordScramble(){
+// Main Word Scramble page component
+export default function WordScramble() {
   const [data, setData] = useState({ word: 'REACT', scrambled: 'TCAER' });
   const [guess, setGuess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +24,8 @@ export default function WordScramble(){
     load();
   }, []);
 
-  async function load(){
+  // Load a new scrambled word from the API
+  async function load() {
     try {
       setIsLoading(true);
       logger.info('Loading word scramble', {}, LogTags.WORD_SCRAMBLE);
@@ -38,26 +44,29 @@ export default function WordScramble(){
     }
   }
 
-  async function check(){
+  // Check if the guess is correct
+  async function check() {
     const isCorrect = guess.toUpperCase() === data.word.toUpperCase();
     setAttempts(prev => prev + 1);
 
-    if(isCorrect){
+    if (isCorrect) {
       setCorrect(true);
       const score = Math.max(100 - (attempts * 10), 10);
-      await submitScore({game:'word-scramble', score, meta:{attempts: attempts + 1, word: data.word}});
+      await submitScore({ game: 'word-scramble', score, meta: { attempts: attempts + 1, word: data.word } });
       logger.info('Word scramble correct', { score, attempts: attempts + 1, word: data.word }, LogTags.SAVE_SCORE);
     } else {
       logger.debug('Word scramble incorrect attempt', { attempt: attempts + 1, guess, word: data.word }, LogTags.WORD_SCRAMBLE);
     }
   }
 
-  function revealAnswer(){
+  // Reveal the correct answer
+  function revealAnswer() {
     setShowAnswer(true);
     logger.debug('Word scramble answer revealed', { word: data.word }, LogTags.WORD_SCRAMBLE);
   }
 
-  if(isLoading) {
+  // Render loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -68,6 +77,7 @@ export default function WordScramble(){
     );
   }
 
+  // Render main game UI
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

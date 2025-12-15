@@ -1,6 +1,10 @@
+// MathQuiz page component that manages the math quiz game logic and UI.
 import React, { useEffect, useState } from 'react';
+// API functions
 import { fetchMathQuestions, submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Components
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import ProgressBar from '../components/mathsquiz/ProgressBar';
@@ -8,7 +12,8 @@ import TimerDisplay from '../components/mathsquiz/TimerDisplay';
 import ActionButton from '../components/mathsquiz/ActionButton';
 import MathQuestionCard from '../components/mathsquiz/MathQuestionCard';
 
-export default function MathQuiz(){
+// MathQuiz page component
+export default function MathQuiz() {
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -32,7 +37,8 @@ export default function MathQuiz(){
     }
   }, [timeLeft, quizCompleted, isLoading]);
 
-  async function load(){
+  // Function to load math questions from API
+  async function load() {
     try {
       setIsLoading(true);
       logger.info('Loading math questions', {}, LogTags.MATH_QUIZ);
@@ -58,6 +64,7 @@ export default function MathQuiz(){
     }
   }
 
+  // Handle answer selection
   function handleAnswer(selectedOption) {
     if (feedbackStatus !== 'none') return;
 
@@ -69,6 +76,7 @@ export default function MathQuiz(){
       setScore(s => s + 10);
     }
 
+    // Proceed to next question after a delay
     setTimeout(() => {
       const nextIndex = index + 1;
       if (nextIndex >= questions.length) {
@@ -84,6 +92,7 @@ export default function MathQuiz(){
     }, 1500);
   }
 
+  // Skip current question
   function skipQuestion() {
     const nextIndex = index + 1;
     if (nextIndex >= questions.length) {
@@ -97,6 +106,7 @@ export default function MathQuiz(){
     }
   }
 
+  // Render loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -108,6 +118,7 @@ export default function MathQuiz(){
     );
   }
 
+  // Render error state if no questions
   if (!questions.length) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
@@ -126,6 +137,7 @@ export default function MathQuiz(){
 
   const q = questions[index];
 
+  // Render the quiz
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -157,13 +169,13 @@ export default function MathQuiz(){
         </div>
 
         {/* Question Card */}
-        <MathQuestionCard 
-          question={q.q} 
-          options={q.options} 
-          onAnswer={handleAnswer} 
-          feedbackStatus={feedbackStatus} 
-          selectedAnswer={selectedAnswer} 
-          correctAnswer={q.ans} 
+        <MathQuestionCard
+          question={q.q}
+          options={q.options}
+          onAnswer={handleAnswer}
+          feedbackStatus={feedbackStatus}
+          selectedAnswer={selectedAnswer}
+          correctAnswer={q.ans}
         />
 
         {/* Skip Button */}

@@ -1,13 +1,18 @@
-import React, {useEffect, useState, useCallback} from 'react';
+// Simon Says Game Page
+import React, { useEffect, useState, useCallback } from 'react';
+// API functions
 import { startSimon, submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Components
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import SimonSaysStats from '../components/simonsays/SimonSaysStats';
 import SimonSaysGrid from '../components/simonsays/SimonSaysGrid';
 import SimonSaysGameOverModal from '../components/simonsays/SimonSaysGameOverModal';
 
-export default function SimonSays(){
+// Simon Says Page Component
+export default function SimonSays() {
   const [colors, setColors] = useState([]);
   const [seq, setSeq] = useState([]);
   const [playerSeq, setPlayerSeq] = useState([]);
@@ -18,6 +23,7 @@ export default function SimonSays(){
   const [gameWon, setGameWon] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Initialize game
   useEffect(() => {
     const initializeGame = async () => {
       try {
@@ -45,6 +51,7 @@ export default function SimonSays(){
     initializeGame();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Restart game
   const restartGame = async () => {
     try {
       setIsLoading(true);
@@ -68,8 +75,9 @@ export default function SimonSays(){
     }
   };
 
+  // Next round
   const nextRound = useCallback((prev) => {
-    const next = [...prev, colors[Math.floor(Math.random()*colors.length)]];
+    const next = [...prev, colors[Math.floor(Math.random() * colors.length)]];
     setSeq(next);
     setPlayerSeq([]);
     setRound(next.length);
@@ -78,7 +86,7 @@ export default function SimonSays(){
     // Show sequence with animation
     let i = 0;
     const showNext = () => {
-      if(i < next.length){
+      if (i < next.length) {
         setActiveColor(next[i]);
         setTimeout(() => {
           setActiveColor(null);
@@ -92,8 +100,9 @@ export default function SimonSays(){
     setTimeout(showNext, 1000);
   }, [colors]);
 
-  function press(c){
-    if(isShowingSequence || gameOver || gameWon) return;
+  // Press button
+  function press(c) {
+    if (isShowingSequence || gameOver || gameWon) return;
 
     const pos = playerSeq.length;
     const newSeq = [...playerSeq, c];
@@ -103,18 +112,18 @@ export default function SimonSays(){
     setActiveColor(c);
     setTimeout(() => setActiveColor(null), 200);
 
-    if(seq[pos] !== c){
+    if (seq[pos] !== c) {
       // Wrong sequence
       setGameOver(true);
       const score = round - 1;
-      submitScore({game:'simon-says', score, meta:{roundsCompleted: round - 1}});
+      submitScore({ game: 'simon-says', score, meta: { roundsCompleted: round - 1 } });
       logger.info('Simon Says game over - wrong sequence', { score, round }, LogTags.SAVE_SCORE);
-    } else if(newSeq.length === seq.length){
+    } else if (newSeq.length === seq.length) {
       // Round completed
-      if(newSeq.length === 10){
+      if (newSeq.length === 10) {
         // Game won
         setGameWon(true);
-        submitScore({game:'simon-says', score: 100, meta:{roundsCompleted: 10}});
+        submitScore({ game: 'simon-says', score: 100, meta: { roundsCompleted: 10 } });
         logger.info('Simon Says game won', { score: 100 }, LogTags.SAVE_SCORE);
       } else {
         // Next round
@@ -123,7 +132,8 @@ export default function SimonSays(){
     }
   }
 
-  if(isLoading) {
+  // Render
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -134,6 +144,7 @@ export default function SimonSays(){
     );
   }
 
+  // Main render
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

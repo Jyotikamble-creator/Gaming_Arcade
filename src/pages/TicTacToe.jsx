@@ -1,6 +1,10 @@
+// Tic-tac-toe game page component
 import React, { useState } from 'react';
+// API functions
 import { saveScore } from '../api/scoreApi';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Components
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import TicTacToeStats from '../components/tictactoe/TicTacToeStats';
@@ -8,6 +12,7 @@ import TicTacToeBoard from '../components/tictactoe/TicTacToeBoard';
 import TicTacToeControls from '../components/tictactoe/TicTacToeControls';
 import TicTacToeGameStatus from '../components/tictactoe/TicTacToeGameStatus';
 
+// TicTacToe component
 export default function TicTacToe() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
@@ -15,6 +20,7 @@ export default function TicTacToe() {
   const [scores, setScores] = useState({ X: 0, O: 0 });
   const [gamesPlayed, setGamesPlayed] = useState(0);
 
+  // Function to calculate the winner
   const calculateWinner = (squares) => {
     const lines = [
       [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -30,6 +36,7 @@ export default function TicTacToe() {
     return null;
   };
 
+  // Function to handle a click
   const handleClick = (i) => {
     if (board[i] || winner) return;
 
@@ -43,7 +50,7 @@ export default function TicTacToe() {
       setWinner(win);
       setScores(prev => ({ ...prev, [win]: prev[win] + 1 }));
       setGamesPlayed(prev => prev + 1);
-      saveScore({ game: 'tic-tac-toe', playerName: 'guest', score: 10 }).catch(() => {});
+      saveScore({ game: 'tic-tac-toe', playerName: 'guest', score: 10 }).catch(() => { });
       logger.info('Tic-tac-toe game won', { winner: win, gamesPlayed: gamesPlayed + 1 }, LogTags.SAVE_SCORE);
     } else if (newBoard.every(cell => cell)) {
       setWinner('Draw');
@@ -52,6 +59,7 @@ export default function TicTacToe() {
     }
   };
 
+  // Function to reset the game
   const resetGame = () => {
     setBoard(Array(9).fill(null));
     setIsXNext(true);
@@ -59,6 +67,7 @@ export default function TicTacToe() {
     logger.debug('Tic-tac-toe game reset', {}, LogTags.TIC_TAC_TOE);
   };
 
+  // Function to reset scores
   const resetScores = () => {
     setScores({ X: 0, O: 0 });
     setGamesPlayed(0);
@@ -66,6 +75,7 @@ export default function TicTacToe() {
     logger.info('Tic-tac-toe scores reset', {}, LogTags.TIC_TAC_TOE);
   };
 
+  // Render
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

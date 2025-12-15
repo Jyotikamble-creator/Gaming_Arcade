@@ -1,13 +1,18 @@
-import React, {useEffect, useState, useRef} from 'react';
+// Page component for the Whack-a-Mole game
+import React, { useEffect, useState, useRef } from 'react';
+// API and logging imports
 import { startWhack, submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Component imports
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import WhackMoleStats from '../components/whackmole/WhackMoleStats';
 import WhackMoleGrid from '../components/whackmole/WhackMoleGrid';
 import WhackMoleGameOverModal from '../components/whackmole/WhackMoleGameOverModal';
 
-export default function WhackMole(){
+// Whack-a-Mole game component
+export default function WhackMole() {
   const [grid, setGrid] = useState([]);
   const [active, setActive] = useState(null);
   const [score, setScore] = useState(0);
@@ -18,6 +23,7 @@ export default function WhackMole(){
   const timerRef = useRef(null);
   const gameTimerRef = useRef(null);
 
+  // Initialize game on component mount
   useEffect(() => {
     const initializeGame = async () => {
       try {
@@ -25,7 +31,7 @@ export default function WhackMole(){
         logger.info('Starting whack-a-mole game', {}, LogTags.WHACK_MOLE);
         const r = await startWhack();
         const gridSize = r.data.gridSize || 9;
-        setGrid(Array.from({length: gridSize}, (_,i)=>i));
+        setGrid(Array.from({ length: gridSize }, (_, i) => i));
         setScore(0);
         setTimeLeft(r.data.duration || 30);
         setGameStarted(false);
@@ -34,7 +40,7 @@ export default function WhackMole(){
         logger.info('Whack-a-mole initialized', { gridSize, duration: r.data.duration || 30 }, LogTags.WHACK_MOLE);
       } catch (error) {
         logger.error('Failed to start whack-a-mole', error, {}, LogTags.WHACK_MOLE);
-        setGrid(Array.from({length: 9}, (_,i)=>i));
+        setGrid(Array.from({ length: 9 }, (_, i) => i));
         setTimeLeft(30);
       } finally {
         setIsLoading(false);
@@ -54,13 +60,14 @@ export default function WhackMole(){
     };
   }, []);
 
+  // Function to restart the game
   const restartGame = async () => {
     try {
       setIsLoading(true);
       logger.info('Restarting whack-a-mole game', {}, LogTags.WHACK_MOLE);
       const r = await startWhack();
       const gridSize = r.data.gridSize || 9;
-      setGrid(Array.from({length: gridSize}, (_,i)=>i));
+      setGrid(Array.from({ length: gridSize }, (_, i) => i));
       setScore(0);
       setTimeLeft(r.data.duration || 30);
       setGameStarted(false);
@@ -69,26 +76,27 @@ export default function WhackMole(){
       logger.info('Whack-a-mole restarted', { gridSize, duration: r.data.duration || 30 }, LogTags.WHACK_MOLE);
     } catch (error) {
       logger.error('Failed to restart whack-a-mole', error, {}, LogTags.WHACK_MOLE);
-      setGrid(Array.from({length: 9}, (_,i)=>i));
+      setGrid(Array.from({ length: 9 }, (_, i) => i));
       setTimeLeft(30);
     } finally {
       setIsLoading(false);
     }
   };
 
-  function startGame(){
+  // Function to start the game
+  function startGame() {
     setGameStarted(true);
     logger.info('Whack-a-mole game started', {}, LogTags.WHACK_MOLE);
 
     // Mole popping timer
-    timerRef.current = setInterval(()=> {
-      setActive(Math.floor(Math.random()*grid.length));
+    timerRef.current = setInterval(() => {
+      setActive(Math.floor(Math.random() * grid.length));
     }, 800);
 
     // Game duration timer
-    gameTimerRef.current = setInterval(()=> {
+    gameTimerRef.current = setInterval(() => {
       setTimeLeft(prev => {
-        if(prev <= 1){
+        if (prev <= 1) {
           endGame();
           return 0;
         }
@@ -97,25 +105,28 @@ export default function WhackMole(){
     }, 1000);
   }
 
-  function whack(i){
-    if(i === active && gameStarted && !gameEnded){
+  // Function to whack a mole
+  function whack(i) {
+    if (i === active && gameStarted && !gameEnded) {
       setScore(s => s + 10);
       setActive(null);
       logger.debug('Mole whacked', { score: score + 10 }, LogTags.WHACK_MOLE);
     }
   }
 
-  async function endGame(){
+  // Function to end the game
+  async function endGame() {
     setGameEnded(true);
     clearInterval(timerRef.current);
     clearInterval(gameTimerRef.current);
     setActive(null);
 
-    await submitScore({game:'whack-a-mole', score, meta:{duration: 30 - timeLeft}});
+    await submitScore({ game: 'whack-a-mole', score, meta: { duration: 30 - timeLeft } });
     logger.info('Whack-a-mole game ended', { finalScore: score, timePlayed: 30 - timeLeft }, LogTags.SAVE_SCORE);
   }
 
-  if(isLoading) {
+  // Loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -126,6 +137,7 @@ export default function WhackMole(){
     );
   }
 
+  // Game UI
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

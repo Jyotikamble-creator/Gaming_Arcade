@@ -1,17 +1,23 @@
+// A game where players navigate a grid of numbers to reach a target sum.
 import React, { useState, useEffect, useCallback } from 'react';
+// API functions
 import { submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Components
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import MazeGrid from '../components/numbermaze/MazeGrid';
 import MazeStats from '../components/numbermaze/MazeStats';
 import MazeCompletedModal from '../components/numbermaze/MazeCompletedModal';
 
+// Constants
 const GRID_SIZE = 5; // 5x5 grid for good challenge
 const DIRECTIONS = [
   [-1, 0], [1, 0], [0, -1], [0, 1] // up, down, left, right
 ];
 
+// Main Number Maze Component
 export default function NumberMaze() {
   const [grid, setGrid] = useState([]);
   const [playerPos, setPlayerPos] = useState([0, 0]);
@@ -275,6 +281,7 @@ export default function NumberMaze() {
             onPlayAgain={resetGame}
           />
         )}
+        
       </div>
     </div>
   );

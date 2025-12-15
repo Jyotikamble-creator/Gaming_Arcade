@@ -1,6 +1,10 @@
+// Hangman Game Page Component
 import React, { useEffect, useState } from 'react';
+// API function to submit score
 import { submitScore } from '../api/Api';
+// Logger module
 import { logger, LogTags } from '../lib/logger';
+// Components
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import HangmanDrawing from '../components/hangman/HangmanDrawing';
@@ -24,6 +28,8 @@ const WORD_CATEGORIES = {
     { word: 'butterfly', hint: 'Colorful insect with beautiful wings' },
     { word: 'crocodile', hint: 'Large reptile that lives in water with powerful jaws' }
   ],
+
+  // Add more continent categories and hints here
   countries: [
     { word: 'australia', hint: 'Island continent known for kangaroos and Sydney Opera House' },
     { word: 'brazil', hint: 'Largest South American country, famous for football and carnival' },
@@ -36,6 +42,8 @@ const WORD_CATEGORIES = {
     { word: 'japan', hint: 'Island nation known for sushi and technology' },
     { word: 'mexico', hint: 'Country south of USA, famous for tacos' }
   ],
+
+  // Add more fruit categories and hints here
   fruits: [
     { word: 'strawberry', hint: 'Small red fruit with seeds on the outside' },
     { word: 'pineapple', hint: 'Tropical fruit with spiky skin and sweet yellow flesh' },
@@ -48,6 +56,8 @@ const WORD_CATEGORIES = {
     { word: 'coconut', hint: 'Hard brown tropical fruit with white flesh and milk' },
     { word: 'papaya', hint: 'Large orange tropical fruit with black seeds' }
   ],
+
+  // Add more technology categories and hints here
   technology: [
     { word: 'computer', hint: 'Electronic device you use to browse the internet' },
     { word: 'keyboard', hint: 'Device with keys you press to type' },
@@ -60,6 +70,7 @@ const WORD_CATEGORIES = {
     { word: 'wireless', hint: 'Technology that works without cables' },
     { word: 'blockchain', hint: 'Technology behind cryptocurrencies' }
   ],
+  // Add more sports categories and hints here
   sports: [
     { word: 'basketball', hint: 'Sport where you shoot a ball through a hoop' },
     { word: 'football', hint: 'Sport played with feet and a round ball (soccer)' },
@@ -72,6 +83,7 @@ const WORD_CATEGORIES = {
     { word: 'tennis', hint: 'Racket sport played on a court with a net' },
     { word: 'hockey', hint: 'Sport played on ice with sticks and a puck' }
   ],
+  // Add more nature categories and hints here
   nature: [
     { word: 'mountain', hint: 'Very tall natural elevation of land' },
     { word: 'rainbow', hint: 'Colorful arc in the sky after rain' },
@@ -88,6 +100,7 @@ const WORD_CATEGORIES = {
 
 const MAX_WRONG_GUESSES = 6;
 
+// Hangman Game Component
 export default function Hangman() {
   const [category, setCategory] = useState(null);
   const [word, setWord] = useState('');
@@ -110,7 +123,7 @@ export default function Hangman() {
   // Start new game
   const startGame = (selectedCategory) => {
     const wordData = getRandomWord(selectedCategory);
-    
+
     setCategory(selectedCategory);
     setWord(wordData.word);
     setHint(wordData.hint);
@@ -119,7 +132,7 @@ export default function Hangman() {
     setIsPlaying(true);
     setGameWon(false);
     setGameLost(false);
-    
+
     logger.info('Hangman game started', { category: selectedCategory, wordLength: wordData.word.length }, LogTags.WORD_GUESS);
   };
 
@@ -140,7 +153,7 @@ export default function Hangman() {
   // Continue to next word (same category)
   const nextWord = () => {
     const wordData = getRandomWord(category);
-    
+
     setWord(wordData.word);
     setHint(wordData.hint);
     setGuessedLetters([]);
@@ -168,25 +181,25 @@ export default function Hangman() {
     // Check if won
     const wordLetters = word.split('');
     const isWon = wordLetters.every(letter => guessedLetters.includes(letter));
-    
+
     if (isWon && !gameWon) {
       setGameWon(true);
       setWordsCompleted(prev => prev + 1);
-      
+
       // Calculate score
       let points = 50; // Base points
       points += (MAX_WRONG_GUESSES - wrongGuesses) * 10; // Bonus for fewer mistakes
       if (word.length > 7) points += 20; // Bonus for longer words
-      
+
       setScore(prev => prev + points);
-      
+
       logger.info('Hangman word completed', { word, points, wrongGuesses }, LogTags.WORD_GUESS);
     }
 
     // Check if lost
     if (wrongGuesses >= MAX_WRONG_GUESSES && !gameLost) {
       setGameLost(true);
-      
+
       // Submit final score
       submitScore({
         game: 'hangman',
@@ -198,11 +211,12 @@ export default function Hangman() {
       }).catch(error => {
         logger.error('Failed to submit Hangman score', error, {}, LogTags.SAVE_SCORE);
       });
-      
+
       logger.info('Hangman game lost', { word, wordsCompleted }, LogTags.WORD_GUESS);
     }
   }, [guessedLetters, wrongGuesses, word, isPlaying, gameWon, gameLost, score, wordsCompleted, category]);
 
+  // rendder component
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -224,7 +238,7 @@ export default function Hangman() {
           <div className="max-w-2xl mx-auto">
             <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 border border-indigo-500/30 shadow-2xl">
               <h2 className="text-2xl font-bold text-white mb-6 text-center">Choose a Category</h2>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <button
                   onClick={() => startGame('animals')}
@@ -233,7 +247,7 @@ export default function Hangman() {
                   <div className="text-3xl mb-2">🦁</div>
                   Animals
                 </button>
-                
+
                 <button
                   onClick={() => startGame('countries')}
                   className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
@@ -241,7 +255,7 @@ export default function Hangman() {
                   <div className="text-3xl mb-2">🌍</div>
                   Countries
                 </button>
-                
+
                 <button
                   onClick={() => startGame('fruits')}
                   className="bg-gradient-to-br from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
@@ -249,7 +263,7 @@ export default function Hangman() {
                   <div className="text-3xl mb-2">🍎</div>
                   Fruits
                 </button>
-                
+
                 <button
                   onClick={() => startGame('technology')}
                   className="bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
@@ -257,7 +271,7 @@ export default function Hangman() {
                   <div className="text-3xl mb-2">💻</div>
                   Technology
                 </button>
-                
+
                 <button
                   onClick={() => startGame('sports')}
                   className="bg-gradient-to-br from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
@@ -265,7 +279,7 @@ export default function Hangman() {
                   <div className="text-3xl mb-2">⚽</div>
                   Sports
                 </button>
-                
+
                 <button
                   onClick={() => startGame('nature')}
                   className="bg-gradient-to-br from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
@@ -298,7 +312,7 @@ export default function Hangman() {
               {/* Word Display and Clue */}
               <div className="space-y-6">
                 <WordDisplay word={word} guessedLetters={guessedLetters} />
-                
+
                 {/* Clue Section - Always visible */}
                 <div className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 backdrop-blur-sm rounded-xl p-6 border-2 border-yellow-500/40">
                   <div className="flex items-start gap-3">
@@ -313,8 +327,8 @@ export default function Hangman() {
             </div>
 
             {/* Keyboard */}
-            <Keyboard 
-              guessedLetters={guessedLetters} 
+            <Keyboard
+              guessedLetters={guessedLetters}
               onGuess={handleGuess}
               word={word}
             />

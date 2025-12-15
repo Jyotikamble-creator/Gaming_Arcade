@@ -1,17 +1,23 @@
+// Tower Stacker game page component
 import React, { useState, useEffect, useRef } from 'react';
+// API and logging imports
 import { submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Component imports
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import TowerDisplay from '../components/towerstacker/TowerDisplay';
 import TowerStats from '../components/towerstacker/TowerStats';
 import TowerCompletedModal from '../components/towerstacker/TowerCompletedModal';
 
+// Constants
 const BLOCK_HEIGHT = 30;
 const INITIAL_WIDTH = 200;
 const SPEED_INCREMENT = 0.5;
 const INITIAL_SPEED = 2;
 
+// Main TowerStacker component
 export default function TowerStacker() {
   const [gameState, setGameState] = useState('idle'); // idle, playing, gameOver
   const [tower, setTower] = useState([]);
@@ -23,7 +29,7 @@ export default function TowerStacker() {
   const [perfectDrops, setPerfectDrops] = useState(0);
   const [gameCompleted, setGameCompleted] = useState(false);
   const [highestLevel, setHighestLevel] = useState(0);
-  
+
   const animationRef = useRef(null);
   const containerWidth = 400;
 
@@ -34,7 +40,7 @@ export default function TowerStacker() {
       width: INITIAL_WIDTH,
       y: 0,
     };
-    
+
     setTower([initialBlock]);
     setCurrentBlock({
       x: 0,
@@ -48,7 +54,7 @@ export default function TowerStacker() {
     setPerfectDrops(0);
     setGameState('playing');
     setGameCompleted(false);
-    
+
     logger.info('Tower Stacker game started', {}, LogTags.WORD_GUESS);
   };
 
@@ -59,7 +65,7 @@ export default function TowerStacker() {
     const animate = () => {
       setCurrentBlock(prev => {
         if (!prev) return prev;
-        
+
         let newX = prev.x + speed * direction;
         let newDirection = direction;
 
@@ -73,7 +79,7 @@ export default function TowerStacker() {
         }
 
         setDirection(newDirection);
-        
+
         return { ...prev, x: newX };
       });
 
@@ -143,7 +149,7 @@ export default function TowerStacker() {
       width: overlap,
       y: (tower.length + 1) * BLOCK_HEIGHT,
     });
-    
+
     if (!isPerfect) {
       setPerfectDrops(0);
     }
@@ -153,10 +159,10 @@ export default function TowerStacker() {
   const calculateOverlap = (moving, stationary) => {
     const movingRight = moving.x + moving.width;
     const stationaryRight = stationary.x + stationary.width;
-    
+
     const overlapStart = Math.max(moving.x, stationary.x);
     const overlapEnd = Math.min(movingRight, stationaryRight);
-    
+
     return Math.max(0, overlapEnd - overlapStart);
   };
 
@@ -166,11 +172,11 @@ export default function TowerStacker() {
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
-    
+
     if (level > highestLevel) {
       setHighestLevel(level);
     }
-    
+
     completeGame(score, level);
   };
 
@@ -178,7 +184,7 @@ export default function TowerStacker() {
   const completeGame = async (finalScore, finalLevel) => {
     setGameCompleted(true);
     setGameState('gameOver');
-    
+
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
@@ -204,6 +210,7 @@ export default function TowerStacker() {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [gameState, currentBlock, tower, score, perfectDrops, level]);
 
+  // Render component
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

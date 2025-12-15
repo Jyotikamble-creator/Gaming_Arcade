@@ -1,7 +1,9 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import Sidebar from '../components/gamehub/Sidebar'
+// Dashboard page displaying a grid of game options with icons and links.
+import { Link, useNavigate } from 'react-router-dom';
+// Components
+import Sidebar from '../components/gamehub/Sidebar';
 
+// Game data
 const games = [
   { name: 'Word Guess', path: '/word-guess', icon: '📝', color: 'blue' },
   { name: 'Memory Card', path: '/memory-card', icon: '🃏', color: 'purple' },
@@ -28,17 +30,20 @@ const games = [
   { name: 'Music Tiles', path: '/music-tiles', icon: '🎵', color: 'purple' },
 ];
 
+// Dashboard Component
 export default function Dashboard() {
   const nav = useNavigate()
   const user = (() => {
     try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null }
   })()
 
+  // Redirect to login if not authenticated
   if (!user) {
     nav('/login')
     return null
   }
 
+  // Render dashboard
   return (
     <div className="flex h-screen text-light-text">
       {/* Sidebar */}

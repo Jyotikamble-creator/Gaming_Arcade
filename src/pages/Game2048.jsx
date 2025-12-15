@@ -1,6 +1,10 @@
+// 2048 Game Page Component
 import React, { useState, useEffect, useCallback } from 'react';
+// Assuming submitScore is a function to submit the score to the backend.
 import { submitScore } from '../api/Api';
+// Logger module
 import { logger, LogTags } from '../lib/logger';
+// Components
 import GameBoard from '../components/game2048/GameBoard';
 import ScoreDisplay from '../components/game2048/ScoreDisplay';
 import GameControls from '../components/game2048/GameControls';
@@ -8,18 +12,23 @@ import GameStatus from '../components/game2048/GameStatus';
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 
+// Game constants
 export default function Game2048() {
+  // State variables
   const [board, setBoard] = useState(() => initBoard());
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(() => {
     const saved = localStorage.getItem('game2048-best-score');
     return saved ? parseInt(saved, 10) : 0;
   });
+
+  // Game status
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
   const [newTiles, setNewTiles] = useState([]);
   const [mergedTiles, setMergedTiles] = useState([]);
 
+  // Game logic
   function initBoard() {
     const board = Array(4).fill().map(() => Array(4).fill(0));
     addRandomTile(board);
@@ -27,6 +36,7 @@ export default function Game2048() {
     return board;
   }
 
+  // Add a random tile to the board
   function addRandomTile(board) {
     const empty = [];
     for (let i = 0; i < 4; i++) {
@@ -42,11 +52,14 @@ export default function Game2048() {
     return null;
   }
 
+  // Move a tile to the left
   function moveLeft(board) {
+    // Check for empty cells
     let moved = false;
     let newScore = 0;
     const merged = [];
 
+    // Process each row
     for (let i = 0; i < 4; i++) {
       const row = board[i].filter(val => val !== 0);
       for (let j = 0; j < row.length - 1; j++) {
@@ -57,6 +70,8 @@ export default function Game2048() {
           row.splice(j + 1, 1);
         }
       }
+
+      // Fill the rest with zeros
       while (row.length < 4) row.push(0);
       for (let j = 0; j < 4; j++) {
         if (board[i][j] !== row[j]) moved = true;
@@ -66,12 +81,15 @@ export default function Game2048() {
     return { moved, score: newScore, merged };
   }
 
+  // Handle user input
   const handleMove = useCallback((direction) => {
     if (gameOver || gameWon) return;
 
+    // Make a copy of the board
     const newBoard = board.map(row => [...row]);
     let result = { moved: false, score: 0, merged: [] };
 
+    // Perform the move
     if (direction === 'left') {
       result = moveLeft(newBoard);
     } else if (direction === 'right') {
@@ -92,6 +110,7 @@ export default function Game2048() {
       result.merged = result.merged.map(([r, c]) => [3 - c, r]);
     }
 
+    // Update the board
     if (result.moved) {
       const newTilePos = addRandomTile(newBoard);
       setBoard(newBoard);
@@ -119,6 +138,7 @@ export default function Game2048() {
     }
   }, [board, gameOver, gameWon, score]);
 
+  // Check if any moves are possible
   function canMove(board) {
     // Check for empty cells
     for (let i = 0; i < 4; i++) {
@@ -142,6 +162,7 @@ export default function Game2048() {
     return false;
   }
 
+  // Handle keyboard input
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
@@ -165,6 +186,7 @@ export default function Game2048() {
     }
   }, [score, bestScore]);
 
+  // Restart the game
   function restart() {
     setBoard(initBoard());
     setScore(0);
@@ -179,6 +201,7 @@ export default function Game2048() {
     setGameWon(false);
   }
 
+  // Submit final score
   async function submitFinalScore() {
     try {
       await submitScore({
@@ -201,6 +224,7 @@ export default function Game2048() {
     }
   }, [gameOver, gameWon]);
 
+  // Render the component
   return (
     <div className="min-h-screen text-light-text relative">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

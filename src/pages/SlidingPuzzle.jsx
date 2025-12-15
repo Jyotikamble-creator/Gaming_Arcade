@@ -1,15 +1,21 @@
+// A React component for a Sliding Puzzle game with a 4x4 grid.
 import React, { useState, useEffect, useCallback } from 'react';
+// API function to submit score
 import { submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Components
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import PuzzleGrid from '../components/slidingpuzzle/PuzzleGrid';
 import PuzzleStats from '../components/slidingpuzzle/PuzzleStats';
 import PuzzleCompletedModal from '../components/slidingpuzzle/PuzzleCompletedModal';
 
+// Constants
 const GRID_SIZE = 4;
 const TOTAL_TILES = GRID_SIZE * GRID_SIZE;
 
+// SlidingPuzzle component
 export default function SlidingPuzzle() {
   const [tiles, setTiles] = useState([]);
   const [emptyIndex, setEmptyIndex] = useState(TOTAL_TILES - 1);
@@ -159,6 +165,7 @@ export default function SlidingPuzzle() {
     resetGame();
   }, [resetGame]);
 
+  // Render
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

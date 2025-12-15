@@ -1,6 +1,10 @@
+// Speed Math Game Page
 import React, { useEffect, useState } from 'react';
+// API and Logger Imports
 import { submitScore } from '../api/Api';
+// Logger Imports
 import { logger, LogTags } from '../lib/logger';
+// Component Imports
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import SpeedMathProblem from '../components/speedmath/SpeedMathProblem';
@@ -8,6 +12,7 @@ import SpeedMathStats from '../components/speedmath/SpeedMathStats';
 import SpeedMathTimer from '../components/speedmath/SpeedMathTimer';
 import SpeedMathCompletedModal from '../components/speedmath/SpeedMathCompletedModal';
 
+// Main Speed Math Component
 export default function SpeedMath() {
   const [difficulty, setDifficulty] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -107,24 +112,24 @@ export default function SpeedMath() {
   const endGame = async () => {
     setIsPlaying(false);
     setGameCompleted(true);
-    
+
     try {
-      await submitScore({ 
-        game: 'speed-math', 
-        score, 
-        meta: { 
-          problemsSolved, 
+      await submitScore({
+        game: 'speed-math',
+        score,
+        meta: {
+          problemsSolved,
           totalProblems,
           difficulty,
           bestStreak,
           accuracy: totalProblems > 0 ? Math.round((problemsSolved / totalProblems) * 100) : 0
-        } 
+        }
       });
-      logger.info('Speed Math game completed', { 
-        score, 
-        problemsSolved, 
+      logger.info('Speed Math game completed', {
+        score,
+        problemsSolved,
         totalProblems,
-        difficulty 
+        difficulty
       }, LogTags.SAVE_SCORE);
     } catch (error) {
       logger.error('Failed to submit Speed Math score', error, {}, LogTags.SAVE_SCORE);
@@ -152,7 +157,7 @@ export default function SpeedMath() {
         return newStreak;
       });
       setFeedback(`Correct! +${points} points`);
-      
+
       // Generate new problem after short delay
       setTimeout(() => {
         setCurrentProblem(generateProblem());
@@ -162,7 +167,7 @@ export default function SpeedMath() {
     } else {
       setStreak(0);
       setFeedback(`Wrong! Answer was ${currentProblem.answer}`);
-      
+
       // Generate new problem after showing correct answer
       setTimeout(() => {
         setCurrentProblem(generateProblem());
@@ -206,6 +211,7 @@ export default function SpeedMath() {
     setCurrentProblem(null);
   };
 
+  // Render component
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -227,39 +233,36 @@ export default function SpeedMath() {
           <div className="max-w-md mx-auto">
             <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 shadow-2xl">
               <h2 className="text-2xl font-bold text-white mb-6 text-center">Choose Difficulty</h2>
-              
+
               <div className="space-y-4 mb-8">
                 <button
                   onClick={() => setDifficulty('easy')}
-                  className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${
-                    difficulty === 'easy'
+                  className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${difficulty === 'easy'
                       ? 'bg-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
+                    }`}
                 >
                   🟢 Easy (5 pts)
                   <div className="text-sm font-normal mt-1">Addition & subtraction up to 50</div>
                 </button>
-                
+
                 <button
                   onClick={() => setDifficulty('medium')}
-                  className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${
-                    difficulty === 'medium'
+                  className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${difficulty === 'medium'
                       ? 'bg-yellow-600 text-white shadow-lg shadow-yellow-500/50 scale-105'
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
+                    }`}
                 >
                   🟡 Medium (10 pts)
                   <div className="text-sm font-normal mt-1">Mixed operations up to 100</div>
                 </button>
-                
+
                 <button
                   onClick={() => setDifficulty('hard')}
-                  className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${
-                    difficulty === 'hard'
+                  className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${difficulty === 'hard'
                       ? 'bg-red-600 text-white shadow-lg shadow-red-500/50 scale-105'
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
+                    }`}
                 >
                   🔴 Hard (15 pts)
                   <div className="text-sm font-normal mt-1">Large numbers & challenging problems</div>

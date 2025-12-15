@@ -1,6 +1,10 @@
+// Main page component for the Emoji Guess game.
 import React, { useEffect, useState } from 'react';
+// API functions
 import { fetchEmoji, submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Components
 import EmojiDisplay from '../components/emojiguess/EmojiDisplay';
 import GuessInput from '../components/emojiguess/GuessInput';
 import GameStats from '../components/emojiguess/GameStats';
@@ -17,6 +21,7 @@ import EmojiGuessControls from '../components/emojiguess/EmojiGuessControls';
 import EmojiGuessLoading from '../components/emojiguess/EmojiGuessLoading';
 import EmojiGuessError from '../components/emojiguess/EmojiGuessError';
 
+// Main Emoji Guess game component
 export default function EmojiGuess() {
   const [puzzle, setPuzzle] = useState(null);
   const [guess, setGuess] = useState('');
@@ -41,6 +46,7 @@ export default function EmojiGuess() {
     loadPuzzle();
   }, []);
 
+  // Load a new emoji puzzle from the API
   async function loadPuzzle() {
     try {
       setIsLoading(true);
@@ -65,6 +71,7 @@ export default function EmojiGuess() {
     }
   }
 
+  // Check the user's guess against the answer
   async function checkGuess() {
     if (!guess.trim()) {
       setMessage('Please enter a guess!');
@@ -136,16 +143,17 @@ export default function EmojiGuess() {
     } else {
       setStreak(0); // Reset streak on wrong answer
       if (newAttempts >= 3) {
-        setMessage(`❌ Wrong! The correct answer was "${puzzle.answer}". Try a new puzzle!`);
+        setMessage(` Wrong! The correct answer was "${puzzle.answer}". Try a new puzzle!`);
         setMessageType('error');
       } else {
         const remainingAttempts = 3 - newAttempts;
-        setMessage(`❌ Try again! ${remainingAttempts} attempt${remainingAttempts === 1 ? '' : 's'} left.`);
+        setMessage(` Try again! ${remainingAttempts} attempt${remainingAttempts === 1 ? '' : 's'} left.`);
         setMessageType('error');
       }
     }
   }
 
+  // Use a hint, if available
   function useHint() {
     if (hintsUsed >= 2) return; // Max 2 hints
     setHintsUsed(prev => prev + 1);
@@ -159,6 +167,7 @@ export default function EmojiGuess() {
     }
   }
 
+  // Reset the game
   function handleTryAgain() {
     setAttempts(0);
     setMessage('');
@@ -174,6 +183,7 @@ export default function EmojiGuess() {
     return <EmojiGuessError message={message} onRetry={loadPuzzle} />;
   }
 
+  // Main game UI
   return (
     <div className="min-h-screen text-light-text relative overflow-hidden">
       <AnimatedBackground />

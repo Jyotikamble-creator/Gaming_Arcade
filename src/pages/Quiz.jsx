@@ -1,13 +1,18 @@
-import React, {useEffect, useState} from 'react';
+// Quiz page component for a multiple-choice quiz game.
+import React, { useEffect, useState } from 'react';
+// API functions
 import { fetchQuiz, submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Components
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import QuizStats from '../components/quiz/QuizStats';
 import QuestionCard from '../components/quiz/QuestionCard';
 import QuizCompletedModal from '../components/quiz/QuizCompletedModal';
 
-export default function Quiz(){
+// Quiz Page Component
+export default function Quiz() {
   const [qs, setQs] = useState([]);
   const [i, setI] = useState(0);
   const [score, setScore] = useState(0);
@@ -20,7 +25,8 @@ export default function Quiz(){
     load();
   }, []);
 
-  async function load(){
+  // Load quiz questions
+  async function load() {
     try {
       setIsLoading(true);
       logger.info('Loading quiz questions', {}, LogTags.QUIZ);
@@ -50,12 +56,13 @@ export default function Quiz(){
     }
   }
 
-  function answer(opt){
+  // Handle answer selection
+  function answer(opt) {
     setSelectedAnswer(opt);
     setShowResult(true);
 
     const isCorrect = qs[i].ans === opt;
-    if(isCorrect) {
+    if (isCorrect) {
       setScore(s => s + 10);
       logger.debug('Quiz answer correct', { questionIndex: i, score: score + 10 }, LogTags.QUIZ);
     } else {
@@ -64,9 +71,9 @@ export default function Quiz(){
 
     // Move to next question after a delay
     setTimeout(() => {
-      if(i + 1 === qs.length){
+      if (i + 1 === qs.length) {
         setQuizCompleted(true);
-        submitScore({game:'quiz', playerName:'guest', score: isCorrect ? score + 10 : score, meta:{questionsAnswered: i + 1}});
+        submitScore({ game: 'quiz', playerName: 'guest', score: isCorrect ? score + 10 : score, meta: { questionsAnswered: i + 1 } });
         logger.info('Quiz completed', { finalScore: isCorrect ? score + 10 : score, questionsAnswered: i + 1 }, LogTags.SAVE_SCORE);
       } else {
         setI(i + 1);
@@ -76,7 +83,8 @@ export default function Quiz(){
     }, 1500);
   }
 
-  if(isLoading) {
+  // Loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -87,7 +95,8 @@ export default function Quiz(){
     );
   }
 
-  if(!qs.length) {
+  // Error state
+  if (!qs.length) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="bg-card-bg/90 backdrop-blur-sm rounded-xl p-8 border border-gray-700 max-w-md w-full text-center">
@@ -110,6 +119,7 @@ export default function Quiz(){
 
   const q = qs[i];
 
+  // Render the quiz
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

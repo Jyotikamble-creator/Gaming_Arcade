@@ -1,3 +1,4 @@
+// A pixel art creator where users can design pixel art on a grid and save their creations.
 import React, { useState, useCallback } from 'react';
 import PixelGrid from '../components/pixelartcreator/PixelGrid';
 import ColorPicker from '../components/pixelartcreator/ColorPicker';

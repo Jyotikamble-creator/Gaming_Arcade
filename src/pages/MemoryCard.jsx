@@ -1,8 +1,13 @@
+// Memory card game page component.
 import React, { useEffect, useState } from 'react';
+// API functions
 import { startMemory, submitScore } from '../api/Api';
+// Components
 import Board from '../components/memorycard/Board';
+// logger 
 import { logger, LogTags } from '../lib/logger';
 
+// MemoryCard page component
 export default function MemoryCard() {
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
@@ -14,6 +19,7 @@ export default function MemoryCard() {
     start();
   }, []);
 
+  // Start the game
   async function start() {
     try {
       setIsLoading(true);
@@ -42,6 +48,7 @@ export default function MemoryCard() {
     }
   }
 
+  // Handle card flip
   function flipCard(id) {
     if (flipped.includes(id) || matched.includes(id)) return;
     const next = [...flipped, id];
@@ -59,6 +66,7 @@ export default function MemoryCard() {
     }
   }
 
+  // Start a new game
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -70,6 +78,7 @@ export default function MemoryCard() {
     );
   }
 
+  // Render the game
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

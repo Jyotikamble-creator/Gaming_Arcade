@@ -1,6 +1,10 @@
+// Main page component for the Sudoku game
 import React, { useState, useEffect } from 'react';
+// API and logging imports
 import { submitScore } from '../api/Api';
+// Logger
 import { logger, LogTags } from '../lib/logger';
+// Component imports
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
 import SudokuBoard from '../components/sudoku/SudokuBoard';
@@ -11,18 +15,18 @@ import SudokuCompletedModal from '../components/sudoku/SudokuCompletedModal';
 // Generate a complete valid Sudoku board
 function generateCompleteBoard() {
   const board = Array(9).fill(null).map(() => Array(9).fill(0));
-  
+
   function isValid(board, row, col, num) {
     // Check row
     for (let x = 0; x < 9; x++) {
       if (board[row][x] === num) return false;
     }
-    
+
     // Check column
     for (let x = 0; x < 9; x++) {
       if (board[x][col] === num) return false;
     }
-    
+
     // Check 3x3 box
     const startRow = row - (row % 3);
     const startCol = col - (col % 3);
@@ -31,10 +35,11 @@ function generateCompleteBoard() {
         if (board[i + startRow][j + startCol] === num) return false;
       }
     }
-    
+
     return true;
   }
-  
+
+  // Backtracking function to fill the board
   function fillBoard(board) {
     for (let row = 0; row < 9; row++) {
       for (let col = 0; col < 9; col++) {
@@ -53,7 +58,7 @@ function generateCompleteBoard() {
     }
     return true;
   }
-  
+
   fillBoard(board);
   return board;
 }
@@ -62,30 +67,31 @@ function generateCompleteBoard() {
 function createPuzzle(difficulty = 'medium') {
   const completeBoard = generateCompleteBoard();
   const puzzle = completeBoard.map(row => [...row]);
-  
+
   // Difficulty settings: number of cells to remove
   const cellsToRemove = {
     easy: 30,
     medium: 45,
     hard: 55
   };
-  
+
   const toRemove = cellsToRemove[difficulty] || 45;
   let removed = 0;
-  
+
   while (removed < toRemove) {
     const row = Math.floor(Math.random() * 9);
     const col = Math.floor(Math.random() * 9);
-    
+
     if (puzzle[row][col] !== 0) {
       puzzle[row][col] = 0;
       removed++;
     }
   }
-  
+
   return { puzzle, solution: completeBoard };
 }
 
+// Main component
 export default function Sudoku() {
   const [difficulty, setDifficulty] = useState('medium');
   const [puzzle, setPuzzle] = useState(null);
@@ -116,6 +122,7 @@ export default function Sudoku() {
     }
   }, [startTime, isCompleted, isPaused]);
 
+  // Start a new game
   function startNewGame(diff) {
     logger.info('Starting new Sudoku game', { difficulty: diff }, LogTags.GAME_LOAD);
     const { puzzle: newPuzzle, solution: newSolution } = createPuzzle(diff);
@@ -135,38 +142,40 @@ export default function Sudoku() {
     setDifficulty(diff);
   }
 
+  // Handle cell click
   function handleCellClick(row, col) {
     if (isCompleted || isPaused) return;
     if (initialBoard[row][col] !== 0) return; // Can't select initial cells
-    
+
     setSelectedCell({ row, col });
   }
 
+  // Handle number input
   function handleNumberInput(num) {
     if (!selectedCell || isCompleted || isPaused) return;
-    
+
     const { row, col } = selectedCell;
     if (initialBoard[row][col] !== 0) return; // Can't modify initial cells
-    
+
     const newBoard = board.map(r => [...r]);
-    
+
     if (notesMode) {
       // Toggle note
       const key = `${row}-${col}`;
       const currentNotes = notes[key] || [];
       const newNotes = { ...notes };
-      
+
       if (currentNotes.includes(num)) {
         newNotes[key] = currentNotes.filter(n => n !== num);
       } else {
         newNotes[key] = [...currentNotes, num].sort();
       }
-      
+
       setNotes(newNotes);
     } else {
       // Set number
       newBoard[row][col] = num;
-      
+
       // Clear notes for this cell
       const key = `${row}-${col}`;
       if (notes[key]) {
@@ -174,15 +183,15 @@ export default function Sudoku() {
         delete newNotes[key];
         setNotes(newNotes);
       }
-      
+
       // Check if correct
       if (solution[row][col] !== num) {
         setMistakes(prev => prev + 1);
         logger.debug('Incorrect number placed', { row, col, num, correct: solution[row][col] }, LogTags.GAME_COMPLETE);
       }
-      
+
       setBoard(newBoard);
-      
+
       // Check if puzzle is completed
       checkCompletion(newBoard);
     }
@@ -190,14 +199,14 @@ export default function Sudoku() {
 
   function handleClearCell() {
     if (!selectedCell || isCompleted || isPaused) return;
-    
+
     const { row, col } = selectedCell;
     if (initialBoard[row][col] !== 0) return;
-    
+
     const newBoard = board.map(r => [...r]);
     newBoard[row][col] = 0;
     setBoard(newBoard);
-    
+
     // Clear notes for this cell
     const key = `${row}-${col}`;
     if (notes[key]) {
@@ -207,17 +216,18 @@ export default function Sudoku() {
     }
   }
 
+  // Handle hint
   function handleHint() {
     if (!selectedCell || isCompleted || isPaused) return;
-    
+
     const { row, col } = selectedCell;
     if (initialBoard[row][col] !== 0) return;
-    
+
     const newBoard = board.map(r => [...r]);
     newBoard[row][col] = solution[row][col];
     setBoard(newBoard);
     setHintsUsed(prev => prev + 1);
-    
+
     // Clear notes for this cell
     const key = `${row}-${col}`;
     if (notes[key]) {
@@ -225,26 +235,27 @@ export default function Sudoku() {
       delete newNotes[key];
       setNotes(newNotes);
     }
-    
+
     logger.info('Hint used', { row, col, hintsUsed: hintsUsed + 1 }, LogTags.GAME_COMPLETE);
-    
+
     checkCompletion(newBoard);
   }
 
+  // Check if puzzle is completed
   function checkCompletion(currentBoard) {
     // Check if all cells are filled
     const isFilled = currentBoard.every(row => row.every(cell => cell !== 0));
-    
+
     if (isFilled) {
       // Check if solution is correct
       const isCorrect = currentBoard.every((row, i) =>
         row.every((cell, j) => cell === solution[i][j])
       );
-      
+
       if (isCorrect) {
         setIsCompleted(true);
         const finalTime = Math.floor((Date.now() - startTime) / 1000);
-        
+
         // Calculate score based on time, mistakes, hints, and difficulty
         const difficultyMultiplier = { easy: 1, medium: 1.5, hard: 2 }[difficulty];
         const baseScore = 1000 * difficultyMultiplier;
@@ -252,7 +263,7 @@ export default function Sudoku() {
         const mistakesPenalty = mistakes * 50;
         const hintsPenalty = hintsUsed * 100;
         const finalScore = Math.max(Math.round(baseScore - timePenalty - mistakesPenalty - hintsPenalty), 100);
-        
+
         submitScore({
           game: 'sudoku',
           score: finalScore,
@@ -263,12 +274,13 @@ export default function Sudoku() {
             hintsUsed
           }
         });
-        
+
         logger.info('Sudoku completed', { score: finalScore, time: finalTime, mistakes, hintsUsed, difficulty }, LogTags.SAVE_SCORE);
       }
     }
   }
 
+  // Helper function to format time in mm:ss
   function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -277,13 +289,13 @@ export default function Sudoku() {
 
   function togglePause() {
     if (isCompleted) return;
-    
+
     if (isPaused) {
       // Resume: adjust start time to account for pause duration
       const pauseDuration = Math.floor((Date.now() - startTime) / 1000) - elapsedTime;
       setStartTime(Date.now() - (elapsedTime * 1000));
     }
-    
+
     setIsPaused(!isPaused);
   }
 
@@ -298,6 +310,7 @@ export default function Sudoku() {
     );
   }
 
+  // Render the Sudoku game
   return (
     <div className="min-h-screen text-light-text">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
