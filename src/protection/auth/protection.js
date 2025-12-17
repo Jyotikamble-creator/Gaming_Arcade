@@ -1,10 +1,16 @@
-'use client';
+// ProtectedRoute
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAppSelector } from '@/lib/hooks';
-import { AppLayout } from '@/components/layout/AppLayout';
+// This component protects routes by checking authentication and authorization.
+import { useEffect } from "react";
+// Next.js router
+import { useRouter } from "next/navigation";
+// Custom hooks
+import { useAppSelector } from "@/lib/hooks";
+// Custom components
+import { AppLayout } from "@/components/layout/AppLayout";
 
+// ProtectedRoute
 export default function ProtectedRoute({ children, requiredRole }) {
   const router = useRouter();
   const { token, user, status } = useAppSelector((state) => state.auth);
@@ -12,20 +18,25 @@ export default function ProtectedRoute({ children, requiredRole }) {
   useEffect(() => {
     // If no token, redirect to signup
     if (!token) {
-      router.push('/');
+      router.push("/");
       return;
     }
 
     // If we have a token but no user and we're not loading, try to fetch user
-    if (token && !user && status !== 'loading') {
+    if (token && !user && status !== "loading") {
       // User fetch will happen automatically in Providers component
       return;
     }
 
     // If user is loaded and we have role requirements, check them
-    if (user && requiredRole && user.role !== requiredRole && user.role !== 'admin') {
+    if (
+      user &&
+      requiredRole &&
+      user.role !== requiredRole &&
+      user.role !== "admin"
+    ) {
       // Redirect to dashboard if user doesn't have required role
-      router.push('/dashboard');
+      router.push("/dashboard");
       return;
     }
   }, [token, user, status, router, requiredRole]);
@@ -51,8 +62,8 @@ export default function ProtectedRoute({ children, requiredRole }) {
   }
 
   // If user fetch failed, redirect to the home/login page
-  if (status === 'failed' && !user) {
-    router.push('/');
+  if (status === "failed" && !user) {
+    router.push("/");
     return null;
   }
 

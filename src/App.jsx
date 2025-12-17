@@ -1,5 +1,8 @@
+// Main application component with routing and lazy loading
 import React, { Suspense, lazy } from "react";
+// React Router
 import { Routes, Route } from 'react-router-dom'
+// Logger
 import { logger, LogTags } from './lib/logger'
 
 // Core pages (loaded immediately)
@@ -48,6 +51,7 @@ function PageLoader() {
   )
 }
 
+// 404 Not Found component
 function NotFound() {
   logger.warn('404 Page not found accessed', { path: window.location.pathname }, LogTags.SESSIONS)
   return (
@@ -63,6 +67,7 @@ function NotFound() {
   )
 }
 
+// Main application component
 export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
@@ -73,7 +78,7 @@ export default function App() {
           <Route path="/login" element={<Auth />} />
           <Route path="/signup" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          
+
           {/* Game pages - lazy loaded */}
           <Route path="/word-guess" element={<WordGuess />} />
           <Route path="/memory-card" element={<MemoryCard />} />
@@ -98,13 +103,13 @@ export default function App() {
           <Route path="/number-maze" element={<NumberMaze />} />
           <Route path="/pixel-art-creator" element={<PixelArtCreator />} />
           <Route path="/music-tiles" element={<MusicTiles />} />
-          
+
           {/* Utility pages - lazy loaded */}
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/scores" element={<ScoresPage />} />
           <Route path="/progress" element={<ProgressPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
