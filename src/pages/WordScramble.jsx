@@ -6,6 +6,7 @@ import { fetchScramble, submitScore } from '../api/Api';
 import { logger, LogTags } from '../lib/logger';
 // Component imports
 import Instructions from '../components/shared/Instructions';
+import Leaderboard from '../components/leaderboard/Leaderboard';
 import WordScrambleStats from '../components/wordscramble/WordScrambleStats';
 import WordScrambleDisplay from '../components/wordscramble/WordScrambleDisplay';
 import WordScrambleInput from '../components/wordscramble/WordScrambleInput';
@@ -87,6 +88,11 @@ export default function WordScramble() {
           <p className="text-subtle-text">Unscramble the letters to form a word!</p>
         </div>
 
+        {/* Instructions */}
+        <div className="max-w-md mx-auto mb-6">
+          <Instructions gameType="word-scramble" />
+        </div>
+
         {/* Stats */}
         <WordScrambleStats
           attempts={attempts}
@@ -111,9 +117,9 @@ export default function WordScramble() {
         {/* Answer Reveal */}
         <WordScrambleAnswer word={data.word} show={correct || showAnswer} />
 
-        {/* Instructions */}
-        <div className="max-w-md mx-auto mb-6">
-          <Instructions gameType="word-scramble" />
+        {/* Leaderboard */}
+        <div className="mt-12">
+          <Leaderboard game="word-scramble" />
         </div>
       </div>
     </div>
