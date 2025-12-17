@@ -13,7 +13,7 @@ function shuffle(a) {
 // Start game
 router.get("/start", (req, res) => {
   // Create shuffled cards
-  const pairs = ["🍎", "🍌", "🍇", "🍊"];
+  const pairs = ["🍎", "🍌", "🍇", "🍊", "🍓", "🍑", "🥝", "🍍"];
   let cards = pairs
     .concat(pairs)
     .map((c, i) => ({ id: i, value: c, matched: false }));

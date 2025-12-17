@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { startMemory, submitScore } from '../api/Api';
 // Components
 import Board from '../components/memorycard/Board';
+import Instructions from '../components/shared/Instructions';
+import Leaderboard from '../components/leaderboard/Leaderboard';
 // logger 
 import { logger, LogTags } from '../lib/logger';
 
@@ -14,10 +16,24 @@ export default function MemoryCard() {
   const [matched, setMatched] = useState([]);
   const [moves, setMoves] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [gameWon, setGameWon] = useState(false);
 
   useEffect(() => {
     start();
   }, []);
+
+  useEffect(() => {
+    if (matched.length === cards.length && cards.length > 0 && !gameWon) {
+      setGameWon(true);
+      submitScore({
+        game: 'memory-card',
+        score: moves,
+        details: { moves, pairs: cards.length / 2 }
+      }).catch(error => {
+        logger.error('Failed to submit memory card score', error, {}, LogTags.MEMORY_CARD);
+      });
+    }
+  }, [matched, cards, gameWon, moves]);
 
   // Start the game
   async function start() {
@@ -29,20 +45,32 @@ export default function MemoryCard() {
       setFlipped([]);
       setMatched([]);
       setMoves(0);
+      setGameWon(false);
       logger.info('Memory card game started successfully', { cardCount: res.data.cards?.length }, LogTags.MEMORY_CARD);
     } catch (error) {
       logger.error('Failed to start memory game', error, {}, LogTags.MEMORY_CARD);
-      // Fallback to static cards if API fails
       setCards([
         { id: 0, value: '🍎' },
         { id: 1, value: '🍌' },
         { id: 2, value: '🍇' },
         { id: 3, value: '🍊' },
-        { id: 4, value: '🍎' },
-        { id: 5, value: '🍌' },
-        { id: 6, value: '🍇' },
-        { id: 7, value: '🍊' },
+        { id: 4, value: '🍓' },
+        { id: 5, value: '🍑' },
+        { id: 6, value: '🥝' },
+        { id: 7, value: '🍍' },
+        { id: 8, value: '🍎' },
+        { id: 9, value: '🍌' },
+        { id: 10, value: '🍇' },
+        { id: 11, value: '🍊' },
+        { id: 12, value: '🍓' },
+        { id: 13, value: '🍑' },
+        { id: 14, value: '🥝' },
+        { id: 15, value: '🍍' },
       ]);
+      setFlipped([]);
+      setMatched([]);
+      setMoves(0);
+      setGameWon(false);
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +124,20 @@ export default function MemoryCard() {
           disabled={false}
         />
 
+        {gameWon && (
+          <div className="text-center mt-4">
+            <div className="bg-green-600 text-white p-4 rounded-lg inline-block">
+              <h2 className="text-xl font-bold">🎉 Congratulations!</h2>
+              <p>You completed the game in {moves} moves!</p>
+            </div>
+          </div>
+        )}
+
+        {/* Instructions */}
+        <div className="max-w-md mx-auto mb-6">
+          <Instructions gameType="memory-card" />
+        </div>
+
         <div className="flex justify-center mt-8">
           <button
             onClick={start}
@@ -103,6 +145,11 @@ export default function MemoryCard() {
           >
             New Game
           </button>
+        </div>
+
+        {/* Leaderboard */}
+        <div className="mt-12">
+          <Leaderboard game="memory-card" />
         </div>
       </div>
     </div>
