@@ -2,7 +2,7 @@
 const MathQuestionCard = ({ question, options, onAnswer, feedbackStatus, selectedAnswer, correctAnswer }) => {
   // Render math question card
   return (
-    <div className="bg-gray-800 rounded-xl p-8 mb-8 text-center shadow-2xl">
+    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 mb-8 text-center shadow-2xl border border-gray-700">
       <h2 className="text-2xl font-bold text-white mb-6">{question}</h2>
       <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
         {options.map((option, i) => (

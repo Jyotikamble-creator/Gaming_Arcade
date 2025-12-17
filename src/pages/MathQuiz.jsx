@@ -147,6 +147,11 @@ export default function MathQuiz() {
           <p className="text-gray-400">Test your math skills!</p>
         </div>
 
+        {/* Instructions */}
+        <div className="max-w-md mx-auto mb-6">
+          <Instructions gameType="math-quiz" />
+        </div>
+
         {/* Progress and Score */}
         <div className="flex justify-center gap-6 mb-8">
           <div className="bg-gray-800 rounded-xl p-4 text-center">
@@ -181,11 +186,6 @@ export default function MathQuiz() {
         {/* Skip Button */}
         <div className="mb-8">
           <ActionButton onSkip={skipQuestion} />
-        </div>
-
-        {/* Instructions */}
-        <div className="max-w-md mx-auto mb-6">
-          <Instructions gameType="math-quiz" />
         </div>
 
         {/* Quiz Completed */}
