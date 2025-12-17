@@ -6,6 +6,7 @@ import { startMemory, submitScore } from '../api/Api';
 import Board from '../components/memorycard/Board';
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
+import AnimatedBackground from '../components/AnimatedBackground';
 // logger 
 import { logger, LogTags } from '../lib/logger';
 
@@ -108,8 +109,9 @@ export default function MemoryCard() {
 
   // Render the game
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">🧠 Memory Cards</h1>
           <p className="text-gray-400">Find all matching pairs to win!</p>

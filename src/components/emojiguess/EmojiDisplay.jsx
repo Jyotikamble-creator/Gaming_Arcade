@@ -12,7 +12,7 @@ const EmojiDisplay = ({ emojis, category, difficulty }) => {
 
   // Render the emoji display card with category and difficulty badges.
   return (
-    <div className="bg-card-bg rounded-lg p-8 border border-gray-700 mb-6">
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-8 border border-gray-700 mb-6">
       <div className="text-center">
         <div className="flex justify-center gap-3 mb-4">
           <span className="inline-block bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">

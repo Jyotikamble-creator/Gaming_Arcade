@@ -11,6 +11,7 @@ import TicTacToeStats from '../components/tictactoe/TicTacToeStats';
 import TicTacToeBoard from '../components/tictactoe/TicTacToeBoard';
 import TicTacToeControls from '../components/tictactoe/TicTacToeControls';
 import TicTacToeGameStatus from '../components/tictactoe/TicTacToeGameStatus';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // TicTacToe component
 export default function TicTacToe() {
@@ -77,8 +78,9 @@ export default function TicTacToe() {
 
   // Render
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">⭕ Tic Tac Toe</h1>

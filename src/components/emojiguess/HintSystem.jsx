@@ -11,7 +11,7 @@ const HintSystem = ({ showHint, answer, hintsUsed, onUseHint, maxHints }) => {
   };
 
   return (
-    <div className="bg-card-bg rounded-lg p-6 border border-gray-700 mb-6">
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <svg className="w-5 h-5 text-orange-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

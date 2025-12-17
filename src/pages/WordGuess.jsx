@@ -12,6 +12,7 @@ import GameControls from '../components/wordguess/GameControls';
 import GameStats from '../components/wordguess/GameStats';
 import GameMessage from '../components/wordguess/GameMessage';
 import Instructions from '../components/shared/Instructions';
+import AnimatedBackground from '../components/AnimatedBackground';
 import { logger, LogTags } from '../lib/logger';
 
 // Main component
@@ -123,8 +124,9 @@ export default function WordGuess() {
 
   // Render
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Word Guess</h1>

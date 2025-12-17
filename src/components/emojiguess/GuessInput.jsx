@@ -2,7 +2,7 @@
 // The component takes in the guess, setGuess, onSubmit, onKeyPress, and disabled props.
 const GuessInput = ({ guess, setGuess, onSubmit, onKeyPress, disabled }) => {
   return (
-    <div className="bg-card-bg rounded-lg p-6 border border-gray-700 mb-6">
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700 mb-6">
       <div className="max-w-md mx-auto">
         <label htmlFor="guess" className="block text-sm font-medium text-subtle-text mb-3 text-center">
           Your Guess

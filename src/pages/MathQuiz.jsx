@@ -11,6 +11,7 @@ import ProgressBar from '../components/mathsquiz/ProgressBar';
 import TimerDisplay from '../components/mathsquiz/TimerDisplay';
 import ActionButton from '../components/mathsquiz/ActionButton';
 import MathQuestionCard from '../components/mathsquiz/MathQuestionCard';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // MathQuiz page component
 export default function MathQuiz() {
@@ -139,8 +140,9 @@ export default function MathQuiz() {
 
   // Render the quiz
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">🧮 Math Quiz</h1>
