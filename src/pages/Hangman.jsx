@@ -100,8 +100,8 @@ const WORD_CATEGORIES = {
 
 const MAX_WRONG_GUESSES = 6;
 
-// Hangman Game Component
-export default function Hangman() {
+// Word Puzzle Game Component
+export default function WordPuzzle() {
   const [category, setCategory] = useState(null);
   const [word, setWord] = useState('');
   const [hint, setHint] = useState('');
@@ -202,14 +202,14 @@ export default function Hangman() {
 
       // Submit final score
       submitScore({
-        game: 'hangman',
+        game: 'word-puzzle',
         score,
         meta: {
           wordsCompleted,
           category
         }
       }).catch(error => {
-        logger.error('Failed to submit Hangman score', error, {}, LogTags.SAVE_SCORE);
+        logger.error('Failed to submit Word Puzzle score', error, {}, LogTags.SAVE_SCORE);
       });
 
       logger.info('Hangman game lost', { word, wordsCompleted }, LogTags.WORD_GUESS);
@@ -222,14 +222,14 @@ export default function Hangman() {
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-white mb-2">🎯 Hangman</h1>
+          <h1 className="text-5xl font-bold text-white mb-2">🎯 Word Puzzle</h1>
           <p className="text-gray-300">Guess the word before you run out of attempts!</p>
         </div>
 
         {/* Instructions */}
         {!isPlaying && (
           <div className="max-w-md mx-auto mb-8">
-            <Instructions gameType="hangman" />
+            <Instructions gameType="word-puzzle" />
           </div>
         )}
 
@@ -361,7 +361,7 @@ export default function Hangman() {
         {/* Leaderboard */}
         {!isPlaying && (
           <div className="mt-12">
-            <Leaderboard game="hangman" />
+            <Leaderboard game="word-puzzle" />
           </div>
         )}
       </div>

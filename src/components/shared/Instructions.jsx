@@ -181,9 +181,9 @@ const Instructions = ({ gameType }) => {
           ],
           tip: '💡 Tip: Speed and accuracy both matter! Build streaks for bonus points - every 3 correct answers in a row adds extra points!'
         };
-      case 'hangman':
+      case 'word-puzzle':
         return {
-          title: 'How to Play Hangman',
+          title: 'How to Play Word Puzzle',
           rules: [
             '• Choose a category to start playing',
             '• Click letters to guess the hidden word',

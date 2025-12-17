@@ -4,7 +4,7 @@ const HangmanDrawing = ({ wrongGuesses }) => {
   return (
     // Container for the hangman drawing
     <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 border border-indigo-500/30">
-      <h3 className="text-lg font-semibold text-white mb-4 text-center">Hangman</h3>
+      <h3 className="text-lg font-semibold text-white mb-4 text-center">Word Puzzle</h3>
       {/* SVG for the hangman drawing */}
       <svg className="w-full h-64" viewBox="0 0 200 250">
         {/* Gallows */}

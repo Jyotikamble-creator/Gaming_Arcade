@@ -25,7 +25,7 @@ const TicTacToe = lazy(() => import('./pages/TicTacToe'))
 const Sudoku = lazy(() => import('./pages/Sudoku'))
 const WordBuilder = lazy(() => import('./pages/WordBuilder'))
 const SpeedMath = lazy(() => import('./pages/SpeedMath'))
-const Hangman = lazy(() => import('./pages/Hangman'))
+const WordPuzzle = lazy(() => import('./pages/Hangman'))
 const CodingPuzzle = lazy(() => import('./pages/CodingPuzzle'))
 const ReactionTime = lazy(() => import('./pages/ReactionTime'))
 const BrainTeaser = lazy(() => import('./pages/BrainTeaser'))
@@ -94,7 +94,7 @@ export default function App() {
           <Route path="/sudoku" element={<Sudoku />} />
           <Route path="/word-builder" element={<WordBuilder />} />
           <Route path="/speed-math" element={<SpeedMath />} />
-          <Route path="/hangman" element={<Hangman />} />
+          <Route path="/hangman" element={<WordPuzzle />} />
           <Route path="/coding-puzzle" element={<CodingPuzzle />} />
           <Route path="/reaction-time" element={<ReactionTime />} />
           <Route path="/brain-teaser" element={<BrainTeaser />} />

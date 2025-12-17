@@ -19,7 +19,7 @@ const games = [
   { name: 'Sudoku', path: '/sudoku', icon: '🧩', color: 'violet' },
   { name: 'Word Builder', path: '/word-builder', icon: '🏗️', color: 'lime' },
   { name: 'Speed Math', path: '/speed-math', icon: '⚡', color: 'amber' },
-  { name: 'Hangman', path: '/hangman', icon: '🎯', color: 'rose' },
+  { name: 'Word Puzzle', path: '/hangman', icon: '🎯', color: 'rose' },
   { name: 'Coding Puzzle', path: '/coding-puzzle', icon: '💻', color: 'blue' },
   { name: 'Reaction Time', path: '/reaction-time', icon: '⏱️', color: 'indigo' },
   { name: 'Brain Teaser', path: '/brain-teaser', icon: '🧠', color: 'purple' },
