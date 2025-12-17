@@ -11,6 +11,7 @@ import SudokuBoard from '../components/sudoku/SudokuBoard';
 import SudokuControls from '../components/sudoku/SudokuControls';
 import SudokuStats from '../components/sudoku/SudokuStats';
 import SudokuCompletedModal from '../components/sudoku/SudokuCompletedModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // Generate a complete valid Sudoku board
 function generateCompleteBoard() {
@@ -312,8 +313,9 @@ export default function Sudoku() {
 
   // Render the Sudoku game
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent mb-2">

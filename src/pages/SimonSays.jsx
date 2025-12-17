@@ -10,6 +10,7 @@ import Leaderboard from '../components/leaderboard/Leaderboard';
 import SimonSaysStats from '../components/simonsays/SimonSaysStats';
 import SimonSaysGrid from '../components/simonsays/SimonSaysGrid';
 import SimonSaysGameOverModal from '../components/simonsays/SimonSaysGameOverModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // Simon Says Page Component
 export default function SimonSays() {
@@ -146,8 +147,9 @@ export default function SimonSays() {
 
   // Main render
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">🎯 Simon Says</h1>

@@ -10,6 +10,7 @@ import Leaderboard from '../components/leaderboard/Leaderboard';
 import WhackMoleStats from '../components/whackmole/WhackMoleStats';
 import WhackMoleGrid from '../components/whackmole/WhackMoleGrid';
 import WhackMoleGameOverModal from '../components/whackmole/WhackMoleGameOverModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // Whack-a-Mole game component
 export default function WhackMole() {
@@ -139,8 +140,9 @@ export default function WhackMole() {
 
   // Game UI
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">🔨 Whack-a-Mole</h1>

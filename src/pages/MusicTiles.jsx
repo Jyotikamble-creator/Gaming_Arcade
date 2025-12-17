@@ -8,6 +8,7 @@ import GameControls from '../components/musictiles/GameControls';
 import Instructions from '../components/shared/Instructions';
 // API for saving score
 import { saveScore } from '../api/scoreApi';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // MusicTiles page component
 const MusicTiles = () => {
@@ -117,8 +118,9 @@ const MusicTiles = () => {
 
   // Effect to generate initial sequence when level changes
   return (
-    <div className="min-h-screen text-light-text p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen text-light-text p-4 relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="max-w-4xl mx-auto relative z-10">
         <h1 className="text-4xl font-bold text-white text-center mb-8">🎵 Music Tiles</h1>
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex flex-col lg:flex-row gap-6">

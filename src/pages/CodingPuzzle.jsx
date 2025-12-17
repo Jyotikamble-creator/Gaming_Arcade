@@ -12,6 +12,7 @@ import PuzzleInput from '../components/codingpuzzle/PuzzleInput';
 import PuzzleStats from '../components/codingpuzzle/PuzzleStats';
 import PuzzleHint from '../components/codingpuzzle/PuzzleHint';
 import PuzzleCompletedModal from '../components/codingpuzzle/PuzzleCompletedModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // Puzzle categories with questions
 const PUZZLE_CATEGORIES = {
@@ -314,8 +315,9 @@ export default function CodingPuzzle() {
 
   // Render
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-5xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-2">🧩 Coding Puzzle Solver</h1>

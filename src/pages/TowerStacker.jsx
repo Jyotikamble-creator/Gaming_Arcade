@@ -10,6 +10,7 @@ import Leaderboard from '../components/leaderboard/Leaderboard';
 import TowerDisplay from '../components/towerstacker/TowerDisplay';
 import TowerStats from '../components/towerstacker/TowerStats';
 import TowerCompletedModal from '../components/towerstacker/TowerCompletedModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // Constants
 const BLOCK_HEIGHT = 30;
@@ -212,8 +213,9 @@ export default function TowerStacker() {
 
   // Render component
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Tower Stacker</h1>

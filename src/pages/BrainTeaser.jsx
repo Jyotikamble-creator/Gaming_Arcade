@@ -12,6 +12,7 @@ import BrainTeaserStats from '../components/brainteaser/BrainTeaserStats';
 import BrainTeaserDisplay from '../components/brainteaser/BrainTeaserDisplay';
 import BrainTeaserTimer from '../components/brainteaser/BrainTeaserTimer';
 import BrainTeaserCompletedModal from '../components/brainteaser/BrainTeaserCompletedModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // Game constants
 const GAME_DURATION = 60; // 60 seconds
@@ -238,8 +239,9 @@ export default function BrainTeaser() {
   }, [gameStarted, gameCompleted, score, puzzlesSolved, bestStreak]);
 
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-5xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-2">🧠 Brain Teasers</h1>

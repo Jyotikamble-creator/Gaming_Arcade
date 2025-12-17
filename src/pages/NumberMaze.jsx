@@ -10,6 +10,7 @@ import Leaderboard from '../components/leaderboard/Leaderboard';
 import MazeGrid from '../components/numbermaze/MazeGrid';
 import MazeStats from '../components/numbermaze/MazeStats';
 import MazeCompletedModal from '../components/numbermaze/MazeCompletedModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // Constants
 const GRID_SIZE = 5; // 5x5 grid for good challenge
@@ -234,8 +235,9 @@ export default function NumberMaze() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-4xl font-bold text-white mb-2">Number Maze</h1>

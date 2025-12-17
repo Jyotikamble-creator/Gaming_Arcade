@@ -11,6 +11,7 @@ import WordBuilderBoard from '../components/wordbuilder/WordBuilderBoard';
 import WordBuilderControls from '../components/wordbuilder/WordBuilderControls';
 import WordBuilderStats from '../components/wordbuilder/WordBuilderStats';
 import WordBuilderCompletedModal from '../components/wordbuilder/WordBuilderCompletedModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // Word challenges with given letters and target words
 const wordChallenges = [
@@ -267,8 +268,9 @@ export default function WordBuilder() {
 
   // Main render
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">

@@ -11,6 +11,7 @@ import SpeedMathProblem from '../components/speedmath/SpeedMathProblem';
 import SpeedMathStats from '../components/speedmath/SpeedMathStats';
 import SpeedMathTimer from '../components/speedmath/SpeedMathTimer';
 import SpeedMathCompletedModal from '../components/speedmath/SpeedMathCompletedModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // Main Speed Math Component
 export default function SpeedMath() {
@@ -213,8 +214,9 @@ export default function SpeedMath() {
 
   // Render component
   return (
-    <div className="min-h-screen text-light-text">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-2">⚡ Speed Math</h1>

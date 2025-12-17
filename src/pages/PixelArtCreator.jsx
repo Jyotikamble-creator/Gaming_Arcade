@@ -4,6 +4,7 @@ import PixelGrid from '../components/pixelartcreator/PixelGrid';
 import ColorPicker from '../components/pixelartcreator/ColorPicker';
 import Tools from '../components/pixelartcreator/Tools';
 import { saveScore } from '../api/scoreApi';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 const PixelArtCreator = () => {
   const [grid, setGrid] = useState(Array(16).fill().map(() => Array(16).fill('#ffffff')));
@@ -40,8 +41,9 @@ const PixelArtCreator = () => {
   };
 
   return (
-    <div className="min-h-screen text-light-text p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen text-light-text p-4 relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="max-w-4xl mx-auto relative z-10">
         <h1 className="text-4xl font-bold text-white text-center mb-8">Pixel Art Creator</h1>
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex flex-col lg:flex-row gap-6">

@@ -11,6 +11,7 @@ import GameControls from '../components/game2048/GameControls';
 import GameStatus from '../components/game2048/GameStatus';
 import Instructions from '../components/shared/Instructions';
 import Leaderboard from '../components/leaderboard/Leaderboard';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 // Game constants
 export default function Game2048() {
@@ -226,8 +227,9 @@ export default function Game2048() {
 
   // Render the component
   return (
-    <div className="min-h-screen text-light-text relative">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen text-light-text relative overflow-hidden">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-2">
