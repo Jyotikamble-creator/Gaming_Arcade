@@ -1,5 +1,7 @@
 // Login component for user authentication
 // Handles user input, form submission, and error display
+// change to next and type 
+
 import React, { useState } from 'react';
 // Icon imports
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
