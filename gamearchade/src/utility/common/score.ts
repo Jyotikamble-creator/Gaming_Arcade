@@ -220,3 +220,87 @@ export function formatTimeAgo(date: Date): string {
   
   return new Date(date).toLocaleDateString();
 }
+
+/**
+ * Validate score submission data
+ */
+export function validateScoreData(
+  game: string,
+  score: number,
+  playerName?: string
+): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  
+  if (!game || typeof game !== 'string' || game.trim().length === 0) {
+    errors.push('Game name is required and must be a non-empty string');
+  }
+  
+  if (typeof score !== 'number' || score < 0) {
+    errors.push('Score must be a non-negative number');
+  }
+  
+  if (playerName && typeof playerName !== 'string') {
+    errors.push('Player name must be a string');
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Get game display name
+ */
+export function getGameDisplayName(game: string): string {
+  const displayNames: Record<string, string> = {
+    'word-guess': 'Word Guess',
+    'word-scramble': 'Word Scramble',
+    'emoji-guess': 'Emoji Guess',
+    'math-quiz': 'Math Quiz',
+    'memory-card': 'Memory Card',
+    'quiz': 'Quiz',
+    'typing-test': 'Typing Test',
+    'whack-a-mole': 'Whack-a-Mole',
+    'simon-says': 'Simon Says',
+    'tic-tac-toe': 'Tic Tac Toe',
+    '2048': 'Game 2048',
+    'sudoku': 'Sudoku',
+    'word-builder': 'Word Builder',
+    'speed-math': 'Speed Math',
+    'hangman': 'Hangman',
+    'coding-puzzle': 'Coding Puzzle',
+    'reaction-time': 'Reaction Time',
+    'brain-teaser': 'Brain Teaser',
+    'tower-stacker': 'Tower Stacker',
+    'sliding-puzzle': 'Sliding Puzzle',
+    'number-maze': 'Number Maze',
+  };
+  
+  return displayNames[game] || game.split('-').map(
+    word => word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(' ');
+}
+
+/**
+ * Get rank suffix (1st, 2nd, 3rd, etc.)
+ */
+export function getRankSuffix(rank: number): string {
+  const lastDigit = rank % 10;
+  const lastTwoDigits = rank % 100;
+  
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
+    return `${rank}th`;
+  }
+  
+  switch (lastDigit) {
+    case 1:
+      return `${rank}st`;
+    case 2:
+      return `${rank}nd`;
+    case 3:
+      return `${rank}rd`;
+    default:
+      return `${rank}th`;
+  }
+}

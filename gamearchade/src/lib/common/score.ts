@@ -9,6 +9,10 @@ import {
   GameStats,
   PlayerStats
 } from '@/types/common/score';
+import { validateScoreData as validateScoreDataUtil } from '@/utility/common/score';
+
+// Re-export validation function
+export { validateScoreData } from '@/utility/common/score';
 
 /**
  * Create a new score entry
@@ -58,6 +62,29 @@ export async function getLeaderboard(
     _id: score._id.toString(),
     rank: index + 1,
   } as LeaderboardEntry));
+}
+
+/**
+ * Get scores for a specific user
+ */
+export async function getUserScores(
+  userId: string,
+  game?: string,
+  limit: number = 100
+): Promise<IScore[]> {
+  await connectDB();
+  
+  const query: any = { user: userId };
+  if (game) {
+    query.game = game;
+  }
+  
+  const scores = await ScoreModel.find(query)
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .lean();
+  
+  return scores;
 }
 
 /**
