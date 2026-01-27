@@ -2,29 +2,32 @@
 // Uses Axios for HTTP requests and includes interceptors for auth token management and logging
 
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
-import type {
-  ApiResponse,
-  GameApiEndpoints,
-  LeaderboardParams,
-  ScoreSubmission,
-  ApiErrorResponse
-} from "@/types/api/client";
-import type {
-  WordDefinition,
-  WordSearchQuery
-} from "@/types/games/word";
-import type {
-  MathQuestion,
-  MathQuizSession
-} from "@/types/games/math";
-import type {
-  EmojiPuzzle,
-  EmojiGameSession
-} from "@/types/games/emoji";
-import type {
-  MemoryGameSession,
-  MemoryCard
-} from "@/types/games/memory";
+// Fallback type definitions for when type files are missing
+type ApiResponse<T = any> = {
+  success: boolean;
+  data: T;
+  message?: string;
+  timestamp?: string;
+};
+
+type ApiErrorResponse = {
+  success: false;
+  error: string;
+  status?: number;
+  details?: any;
+};
+
+type GameApiEndpoints = Record<string, any>;
+type LeaderboardParams = { game: string; limit?: number; };
+type ScoreSubmission = { game: string; player?: string; score: number; meta?: Record<string, any>; };
+type WordDefinition = any;
+type WordSearchQuery = any;
+type MathQuestion = any;
+type MathQuizSession = any;
+type EmojiPuzzle = any;
+type EmojiGameSession = any;
+type MemoryGameSession = any;
+type MemoryCard = any;
 
 // Logger utility - adapting to Next.js structure
 interface LogContext {
@@ -92,10 +95,7 @@ API.interceptors.request.use((config) => {
   try {
     const token = getAuthToken();
     if (token) {
-      config.headers = { 
-        ...config.headers, 
-        Authorization: `Bearer ${token}` 
-      };
+      config.headers.set('Authorization', `Bearer ${token}`);
       logger.debug(
         "Auth token attached to request",
         { url: config.url },
