@@ -68,6 +68,19 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: For number patterns, look for common sequences (Fibonacci, powers, arithmetic). For code output, trace through the logic step by step!'
         };
+      case 'hangman':
+        return {
+          title: 'How to Play Hangman',
+          rules: [
+            '• Choose a category to start playing',
+            '• Click letters to guess the hidden word',
+            '• You have 6 wrong guesses before game over',
+            '• Use hints if you get stuck (costs 10 points)',
+            '• Longer words give bonus points',
+            '• Complete words to increase your score!'
+          ],
+          tip: '💡 Tip: Start with common vowels (A, E, I, O, U) and frequent consonants (R, S, T, N). Pay attention to word length!'
+        };
       case '2048':
         return {
           title: 'How to Play 2048',
