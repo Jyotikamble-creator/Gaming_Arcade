@@ -1,6 +1,22 @@
 // User model for MongoDB with TypeScript
 import mongoose, { Schema, Model } from 'mongoose';
-import { IUser } from '@/types/auth/auth';
+// import { IUser } from '@/types/auth/auth';
+
+// Define IUser interface locally to avoid import issues
+interface IUser {
+  _id?: any;
+  email: string;
+  passwordHash: string;
+  username?: string;
+  displayName?: string;
+  bio?: string;
+  avatar?: string;
+  favoriteGame?: string;
+  profileCompleted?: boolean;
+  meta?: Record<string, any>;
+  createdAt: Date;
+  lastLogin?: Date;
+}
 
 const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },

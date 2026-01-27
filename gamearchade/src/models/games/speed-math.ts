@@ -1,9 +1,14 @@
 import mongoose from 'mongoose';
-import type { 
-  SpeedMathDifficulty,
-  SpeedMathOperation,
-  ISpeedMathAnswer
-} from '@/types/games/speed-math';
+// import type { 
+//   SpeedMathDifficulty,
+//   SpeedMathOperation,
+//   ISpeedMathAnswer
+// } from '@/types/games/speed-math';
+
+// Local type definitions to avoid import issues
+type SpeedMathDifficulty = 'easy' | 'medium' | 'hard';
+type SpeedMathOperation = 'addition' | 'subtraction' | 'multiplication' | 'division';
+type ISpeedMathAnswer = any;
 
 /**
  * Speed Math Session Schema

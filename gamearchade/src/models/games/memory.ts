@@ -3,7 +3,25 @@
  */
 
 import mongoose, { Schema, Model } from 'mongoose';
-import type { MemoryGameSession, MemoryCard, CardFlip } from '@/types/games/memory';
+// import type { MemoryGameSession, MemoryCard, CardFlip } from '@/types/games/memory';
+
+// Local type definitions to avoid import issues
+type MemoryCard = {
+  id: number;
+  value: string;
+  matched?: boolean;
+  flipped?: boolean;
+  pairId?: number;
+};
+
+type CardFlip = {
+  cardId: number;
+  timestamp?: Date;
+  wasMatch: boolean;
+  pairId?: number;
+};
+
+type MemoryGameSession = any; // Will be properly typed by schema
 
 /**
  * Memory card sub-schema

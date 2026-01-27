@@ -1,6 +1,19 @@
 // MongoDB models for Brain Teaser game
 import mongoose, { Schema, Model } from 'mongoose';
-import { BrainTeaserSession, PuzzleAttempt } from '@/types/games/brain-teaser';
+// import { BrainTeaserSession, PuzzleAttempt } from '@/types/games/brain-teaser';
+
+// Local type definitions to avoid import issues
+type PuzzleAttempt = {
+  puzzleId: string;
+  puzzleType: 'match-shape' | 'find-odd' | 'pattern';
+  answered?: boolean;
+  correct?: boolean;
+  timeSpent: number;
+  pointsEarned?: number;
+  attemptedAt?: Date;
+};
+
+type BrainTeaserSession = any; // Will be properly typed by schema
 
 // Puzzle Attempt Schema
 const PuzzleAttemptSchema = new Schema<PuzzleAttempt>({

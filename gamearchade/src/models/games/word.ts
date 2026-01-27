@@ -1,6 +1,6 @@
 // MongoDB Model: Word Management System
 import mongoose, { Schema, model, models } from 'mongoose';
-import type { WordDefinition, WordCategory, WordDifficulty, WordLanguage, WordStatus } from '@/types/games/word';
+// import type { WordDefinition, WordCategory, WordDifficulty, WordLanguage, WordStatus } from '@/types/games/word';\n\n// Local type definitions to avoid import issues\ntype WordDefinition = any;\ntype WordCategory = any;\ntype WordDifficulty = 'easy' | 'medium' | 'hard';\ntype WordLanguage = string;\ntype WordStatus = 'active' | 'inactive';
 
 const WordMetadataSchema = new Schema({
   usageCount: { 

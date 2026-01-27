@@ -1,6 +1,17 @@
 // MongoDB model for Score with TypeScript
 import mongoose, { Schema, Model } from 'mongoose';
-import { IScore } from '@/types/common/score';
+// import { IScore } from '@/types/common/score';
+
+// Define IScore interface locally to avoid import issues
+interface IScore {
+  _id?: any;
+  game: string;
+  user?: any;
+  playerName: string;
+  score: number;
+  meta: Record<string, any>;
+  createdAt: Date;
+}
 
 const ScoreSchema = new Schema<IScore>({
   game: { type: String, required: true, index: true },

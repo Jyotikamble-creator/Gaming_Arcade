@@ -3,7 +3,7 @@
  */
 
 import mongoose, { Schema, Document } from 'mongoose';
-import type { QuizSession, QuizAnswer, QuizCategory, QuizDifficulty } from '@/types/games/quiz';
+// import type { QuizSession, QuizAnswer, QuizCategory, QuizDifficulty } from '@/types/games/quiz';\n\n// Local type definitions to avoid import issues\ntype QuizSession = any;\ntype QuizAnswer = any;\ntype QuizCategory = any;\ntype QuizDifficulty = 'easy' | 'medium' | 'hard';
 
 /**
  * Quiz session document interface

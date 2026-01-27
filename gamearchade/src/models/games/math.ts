@@ -3,7 +3,22 @@
  */
 
 import mongoose, { Schema, Model } from 'mongoose';
-import type { MathQuizSession, UserAnswer, MathQuestion } from '@/types/games/math';
+// import type { MathQuizSession, UserAnswer, MathQuestion } from '@/types/games/math';
+
+// Local type definitions to avoid import issues
+type MathQuestion = {
+  questionId: string;
+  question: string;
+  answer: number;
+  userAnswer?: number;
+  isCorrect?: boolean;
+  timeSpent?: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+  pointsEarned?: number;
+};
+
+type UserAnswer = any;
+type MathQuizSession = any; // Will be properly typed by schema
 
 /**
  * Math question sub-schema

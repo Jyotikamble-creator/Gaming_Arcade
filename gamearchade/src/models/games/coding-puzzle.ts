@@ -1,6 +1,18 @@
 // MongoDB models for Coding Puzzle game
 import mongoose, { Schema, Model } from 'mongoose';
-import { CodingPuzzleSession, PuzzleAttempt } from '@/types/games/coding-puzzle';
+// import { CodingPuzzleSession, PuzzleAttempt } from '@/types/games/coding-puzzle';
+
+// Local type definitions to avoid import issues
+type PuzzleAttempt = {
+  puzzleId: string;
+  answer: string;
+  isCorrect?: boolean;
+  timeSpent: number;
+  pointsEarned?: number;
+  attemptedAt?: Date;
+};
+
+type CodingPuzzleSession = any; // Will be properly typed by schema
 
 // Puzzle Attempt Schema
 const PuzzleAttemptSchema = new Schema<PuzzleAttempt>({

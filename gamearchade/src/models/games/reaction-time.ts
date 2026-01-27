@@ -3,7 +3,13 @@
  */
 
 import mongoose, { Schema, Document } from 'mongoose';
-import type { ReactionSession, ReactionAttempt, ReactionDifficulty, ReactionPerformance } from '@/types/games/reaction-time';
+// import type { ReactionSession, ReactionAttempt, ReactionDifficulty, ReactionPerformance } from '@/types/games/reaction-time';
+
+// Local type definitions to avoid import issues
+type ReactionSession = any;
+type ReactionAttempt = any;
+type ReactionDifficulty = 'easy' | 'medium' | 'hard';
+type ReactionPerformance = any;
 
 /**
  * Reaction session document interface

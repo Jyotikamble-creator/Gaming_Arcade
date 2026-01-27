@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import type { SimonColor } from '@/types/games/simon';
+// import type { SimonColor } from '@/types/games/simon';\n\n// Local type definitions to avoid import issues\ntype SimonColor = 'red' | 'green' | 'blue' | 'yellow';
 
 /**
  * Simon Game Session Schema

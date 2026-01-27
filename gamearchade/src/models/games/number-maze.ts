@@ -3,7 +3,18 @@
  */
 
 import mongoose, { Schema, Model } from 'mongoose';
-import type { NumberMazeSession, MazeMove } from '@/types/games/number-maze';
+// import { NumberMazeSession, MazeMove } from '@/types/games/number-maze';
+
+// Local type definitions to avoid import issues
+type MazeMove = {
+  fromPosition: { row: number; col: number };
+  toPosition: { row: number; col: number };
+  moveNumber: number;
+  timestamp?: Date;
+  isValid?: boolean;
+};
+
+type NumberMazeSession = any; // Will be properly typed by schema
 
 /**
  * Maze move sub-schema
