@@ -68,6 +68,19 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: For number patterns, look for common sequences (Fibonacci, powers, arithmetic). For code output, trace through the logic step by step!'
         };
+      case '2048':
+        return {
+          title: 'How to Play 2048',
+          rules: [
+            '• Use arrow keys or buttons to move tiles',
+            '• When two tiles with the same number touch, they merge into one',
+            '• After every move, a new tile (2 or 4) appears',
+            '• Goal is to create a tile with the number 2048',
+            '• Game ends when no more moves are possible',
+            '• You can continue playing after reaching 2048 for higher scores!'
+          ],
+          tip: '💡 Tip: Keep your highest value tile in one corner and build around it. Plan ahead to avoid getting stuck!'
+        };
       default:
         return {
           title: 'How to Play',
