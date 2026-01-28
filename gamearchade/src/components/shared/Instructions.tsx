@@ -122,6 +122,20 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: Focus on remembering the positions of unique cards. Start from corners and work systematically!'
         };
+      case 'number-maze':
+        return {
+          title: 'How to Play Number Maze',
+          rules: [
+            '• Navigate through a 5x5 grid of numbers',
+            '• Start at the top-left corner (always 0)',
+            '• Move up, down, left, or right to adjacent cells',
+            '• Cannot revisit cells you\'ve already been to',
+            '• Each cell adds its value to your running sum',
+            '• Goal is to reach the exact target number',
+            '• Score is based on moves taken and time elapsed!'
+          ],
+          tip: '💡 Tip: Plan your path carefully! Think ahead and consider both positive and negative numbers to reach your target efficiently.'
+        };
       default:
         return {
           title: 'How to Play',
