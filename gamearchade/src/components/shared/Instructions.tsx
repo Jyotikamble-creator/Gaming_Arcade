@@ -108,6 +108,20 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: Don\'t spend too much time on one question. Use mental math shortcuts and remember basic multiplication tables!'
         };
+      case 'memory-card':
+        return {
+          title: 'How to Play Memory Cards',
+          rules: [
+            '• Click on cards to flip them and reveal their values',
+            '• Find matching pairs by remembering card positions',
+            '• Only two cards can be flipped at a time',
+            '• Matched pairs stay face up',
+            '• Complete the game by matching all pairs',
+            '• Score is based on moves and time taken',
+            '• Fewer moves and less time = higher score!'
+          ],
+          tip: '💡 Tip: Focus on remembering the positions of unique cards. Start from corners and work systematically!'
+        };
       default:
         return {
           title: 'How to Play',
