@@ -94,6 +94,20 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: Keep your highest value tile in one corner and build around it. Plan ahead to avoid getting stuck!'
         };
+      case 'math-quiz':
+        return {
+          title: 'How to Play Math Quiz',
+          rules: [
+            '• Answer 10 randomly generated math questions',
+            '• You have 30 seconds per question',
+            '• Click on the correct answer option',
+            '• Each correct answer gives you 10 points',
+            '• Questions include addition, subtraction, multiplication, and division',
+            '• Skip questions if you get stuck (no points awarded)',
+            '• Try to answer all questions quickly and accurately!'
+          ],
+          tip: '💡 Tip: Don\'t spend too much time on one question. Use mental math shortcuts and remember basic multiplication tables!'
+        };
       default:
         return {
           title: 'How to Play',
