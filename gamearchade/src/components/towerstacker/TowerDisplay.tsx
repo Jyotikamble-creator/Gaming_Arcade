@@ -1,7 +1,7 @@
 // TowerDisplay component to render the game area
 import React from 'react';
-import { TowerDisplayProps } from '../../../../src/types/towerStacker';
-import { GAME_CONFIG, getBlockColor } from '../../../../src/utils/towerStackerUtils';
+import { TowerDisplayProps } from '@/types/games/tower-stacker';
+import { GAME_CONFIG, getBlockColor } from '@/utility/games/tower-stacker';
 
 export default function TowerDisplay({ 
   tower, 

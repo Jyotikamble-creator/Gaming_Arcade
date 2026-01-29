@@ -1,7 +1,7 @@
 // TicTacToeGameStatus component to display the game status
 import React from 'react';
-import { TicTacToeGameStatusProps } from '../../../../src/types/ticTacToe';
-import { getPlayerColor, getWinnerMessage } from '../../../../src/utils/ticTacToeUtils';
+import { TicTacToeGameStatusProps } from '@/types/games/tic-tac-toe';
+import { getPlayerColor, getWinnerMessage } from '@/utility/games/tic-tac-toe';
 
 export default function TicTacToeGameStatus({ winner }: TicTacToeGameStatusProps): JSX.Element | null {
   if (!winner) return null;

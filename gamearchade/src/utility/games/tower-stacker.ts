@@ -5,8 +5,77 @@ import {
   TowerStackerGameConfiguration,
   TowerStackerDifficulty,
   TowerStackerScoreCalculation,
-  TowerStackerPerformanceMetrics
+  TowerStackerPerformanceMetrics,
+  Block,
+  GameConfig
 } from "@/types/games/tower-stacker";
+
+// Game configuration constants
+export const GAME_CONFIG: GameConfig = {
+  BLOCK_HEIGHT: 40,
+  INITIAL_WIDTH: 100,
+  SPEED_INCREMENT: 0.5,
+  INITIAL_SPEED: 2,
+  CONTAINER_WIDTH: 400,
+  CONTAINER_HEIGHT: 600,
+  MAX_LEVELS: 20,
+  PERFECT_DROP_THRESHOLD: 5
+};
+
+/**
+ * Calculate overlap between two blocks
+ */
+export function calculateOverlap(block1: Block, block2: Block): number {
+  const leftEdge = Math.max(block1.x, block2.x);
+  const rightEdge = Math.min(block1.x + block1.width, block2.x + block2.width);
+  
+  return Math.max(0, rightEdge - leftEdge);
+}
+
+/**
+ * Check if a drop is perfect (within threshold)
+ */
+export function isPerfectDrop(currentBlock: Block, previousBlock: Block): boolean {
+  const centerCurrent = currentBlock.x + currentBlock.width / 2;
+  const centerPrevious = previousBlock.x + previousBlock.width / 2;
+  
+  return Math.abs(centerCurrent - centerPrevious) <= GAME_CONFIG.PERFECT_DROP_THRESHOLD;
+}
+
+/**
+ * Calculate score for a level
+ */
+export function calculateScore(level: number, isPerfect: boolean, combo: number = 0): number {
+  let baseScore = 10;
+  
+  if (isPerfect) {
+    baseScore += 20; // Perfect drop bonus
+    baseScore += combo * 5; // Combo bonus
+  }
+  
+  baseScore += level * 2; // Level bonus
+  
+  return baseScore;
+}
+
+/**
+ * Check if speed should increase
+ */
+export function shouldIncreaseSpeed(level: number): boolean {
+  return level % 5 === 0; // Increase speed every 5 levels
+}
+
+/**
+ * Generate block color based on level
+ */
+export function getBlockColor(level: number): string {
+  const colors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', 
+    '#FECA57', '#FF9FF3', '#54A0FF', '#5F27CD'
+  ];
+  
+  return colors[level % colors.length];
+}
 
 /**
  * Generate colors for Tower Stacker blocks
@@ -98,6 +167,35 @@ export function validateDrop(
 ): TowerStackerValidation {
   if (!previousBlock) {
     // First block - always valid
+    return {
+      isValid: true,
+      overlap: currentBlock.width,
+      isPerfect: true,
+      newWidth: currentBlock.width,
+      message: 'Perfect start!'
+    };
+  }
+
+  // Calculate overlap
+  const overlap = Math.max(0, Math.min(
+    currentBlock.position + currentBlock.width / 2,
+    previousBlock.position + previousBlock.width / 2
+  ) - Math.max(
+    currentBlock.position - currentBlock.width / 2,
+    previousBlock.position - previousBlock.width / 2
+  ));
+
+  const isValid = overlap > 0;
+  const isPerfect = overlap >= currentBlock.width * 0.9; // 90% overlap for perfect
+  
+  return {
+    isValid,
+    overlap,
+    isPerfect,
+    newWidth: overlap,
+    message: isPerfect ? 'Perfect drop!' : isValid ? 'Good drop!' : 'Block fell!'
+  };
+}
     return {
       isValidDrop: true,
       accuracy: 1.0,
