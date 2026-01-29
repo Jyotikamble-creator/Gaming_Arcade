@@ -1,6 +1,8 @@
 // MetricCard component to display a metric with label, value, and optional unit
-const MetricCard = ({ label, value, unit }) => {
-  // Render the metric card
+import React from 'react';
+import { MetricCardProps } from '../../types/typingTest';
+
+export default function MetricCard({ label, value, unit }: MetricCardProps): JSX.Element {
   return (
     <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 h-32 flex flex-col justify-center">
       <p className="text-sm font-semibold text-subtle-text uppercase">{label}</p>
@@ -16,6 +18,4 @@ const MetricCard = ({ label, value, unit }) => {
       </div>
     </div>
   );
-};
-
-export default MetricCard;
+}
