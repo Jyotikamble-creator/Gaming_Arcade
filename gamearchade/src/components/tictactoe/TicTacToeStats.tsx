@@ -1,6 +1,6 @@
 // TicTacToeStats component to display game statistics
 import React from 'react';
-import { TicTacToeStatsProps } from '../../types/ticTacToe';
+import { TicTacToeStatsProps } from '../../../../src/types/ticTacToe';
 
 export default function TicTacToeStats({ isXNext, scores, gamesPlayed }: TicTacToeStatsProps): JSX.Element {
   // Render the Tic Tac Toe statistics component

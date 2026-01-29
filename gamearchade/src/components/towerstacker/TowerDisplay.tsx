@@ -1,4 +1,7 @@
+// TowerDisplay component to render the game area
 import React from 'react';
+import { TowerDisplayProps } from '../../../../src/types/towerStacker';
+import { GAME_CONFIG, getBlockColor } from '../../../../src/utils/towerStackerUtils';
 
 export default function TowerDisplay({ 
   tower, 
@@ -8,8 +11,8 @@ export default function TowerDisplay({
   gameState, 
   onStart, 
   onDrop 
-}) {
-  const containerHeight = 600;
+}: TowerDisplayProps): JSX.Element {
+  const containerHeight = GAME_CONFIG.CONTAINER_HEIGHT;
   const maxVisibleBlocks = Math.floor(containerHeight / blockHeight);
 
   // Calculate visible range (show top blocks)
@@ -55,7 +58,6 @@ export default function TowerDisplay({
               {/* Tower Blocks */}
               {adjustedTower.map((block, index) => {
                 const actualIndex = visibleStart + index;
-                const hue = (actualIndex * 30) % 360;
                 return (
                   <div
                     key={actualIndex}
@@ -65,7 +67,7 @@ export default function TowerDisplay({
                       bottom: `${block.displayY}px`,
                       width: `${block.width}px`,
                       height: `${blockHeight}px`,
-                      backgroundColor: `hsl(${hue}, 70%, 60%)`,
+                      backgroundColor: getBlockColor(actualIndex),
                       border: '2px solid rgba(255, 255, 255, 0.3)',
                       borderRadius: '4px',
                     }}
@@ -82,7 +84,7 @@ export default function TowerDisplay({
                     bottom: `${adjustedCurrentBlock.displayY}px`,
                     width: `${adjustedCurrentBlock.width}px`,
                     height: `${blockHeight}px`,
-                    backgroundColor: `hsl(${(tower.length * 30) % 360}, 70%, 60%)`,
+                    backgroundColor: getBlockColor(tower.length),
                     border: '2px solid rgba(255, 255, 255, 0.5)',
                     borderRadius: '4px',
                     boxShadow: '0 0 20px rgba(255, 255, 255, 0.3)',
@@ -95,10 +97,10 @@ export default function TowerDisplay({
                 <div className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-lg">
                   <div className="text-center">
                     <h3 className="text-3xl font-bold text-white mb-4">
-                      {tower.length >= 20 ? '🎉 You Win!' : 'Game Over!'}
+                      {tower.length >= GAME_CONFIG.MAX_LEVELS ? '🎉 You Win!' : 'Game Over!'}
                     </h3>
                     <p className="text-subtle-text mb-6">
-                      {tower.length >= 20 
+                      {tower.length >= GAME_CONFIG.MAX_LEVELS 
                         ? 'You built a perfect tower!' 
                         : 'The block fell off!'}
                     </p>

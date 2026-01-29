@@ -10,7 +10,7 @@ import {
   TicTacToeBoard,
   TicTacToeControls,
   TicTacToeGameStatus
-} from '../components/tictactoe';
+} from '../../gamearchade/src/components/tictactoe';
 import AnimatedBackground from '../components/AnimatedBackground';
 
 // TicTacToe component

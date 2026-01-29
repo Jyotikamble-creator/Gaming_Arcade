@@ -1,15 +1,10 @@
+// TowerCompletedModal component to show game completion modal
 import React from 'react';
+import { TowerCompletedModalProps } from '../../../../src/types/towerStacker';
+import { getPerformanceRating, GAME_CONFIG } from '../../../../src/utils/towerStackerUtils';
 
-export default function TowerCompletedModal({ score, level, perfectDrops, onPlayAgain }) {
-  const getPerformanceRating = () => {
-    if (level >= 20) return { text: '🏆 Tower Master!', color: 'text-yellow-400' };
-    if (level >= 15) return { text: '⭐ Excellent!', color: 'text-green-400' };
-    if (level >= 10) return { text: '👍 Great Job!', color: 'text-blue-400' };
-    if (level >= 5) return { text: '👌 Good Try!', color: 'text-purple-400' };
-    return { text: '💪 Keep Practicing!', color: 'text-gray-400' };
-  };
-
-  const rating = getPerformanceRating();
+export default function TowerCompletedModal({ score, level, perfectDrops, onPlayAgain }: TowerCompletedModalProps): JSX.Element {
+  const rating = getPerformanceRating(level);
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
@@ -35,10 +30,10 @@ export default function TowerCompletedModal({ score, level, perfectDrops, onPlay
               </div>
             </div>
 
-            {level >= 20 && (
+            {level >= GAME_CONFIG.MAX_LEVELS && (
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
                 <p className="text-yellow-400 text-sm font-semibold">
-                  🎉 Perfect Tower! You completed all 20 levels!
+                  🎉 Perfect Tower! You completed all {GAME_CONFIG.MAX_LEVELS} levels!
                 </p>
               </div>
             )}
@@ -58,10 +53,10 @@ export default function TowerCompletedModal({ score, level, perfectDrops, onPlay
               <span className="mr-2">💡</span> Pro Tips:
             </h3>
             <ul className="text-subtle-text text-sm space-y-1">
-              <li>• Perfect drops (±5px) earn 20 bonus points</li>
+              <li>• Perfect drops (±{GAME_CONFIG.PERFECT_DROP_THRESHOLD}px) earn 20 bonus points</li>
               <li>• Build combo streaks for extra points</li>
               <li>• Speed increases every 5 levels</li>
-              <li>• Reach level 20 to win the game!</li>
+              <li>• Reach level {GAME_CONFIG.MAX_LEVELS} to win the game!</li>
             </ul>
           </div>
 

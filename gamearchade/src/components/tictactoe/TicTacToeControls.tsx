@@ -1,6 +1,6 @@
 // TicTacToeControls component for game control buttons
 import React from 'react';
-import { TicTacToeControlsProps } from '../../types/ticTacToe';
+import { TicTacToeControlsProps } from '../../../../src/types/ticTacToe';
 
 export default function TicTacToeControls({ onNewGame, onResetScores }: TicTacToeControlsProps): JSX.Element {
   // Render the control buttons
