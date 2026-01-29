@@ -3,9 +3,77 @@ import {
   WordBuilderDifficulty,
   WordBuilderGameMode,
   WordBuilderChallenge,
-  WordBuilderLetterTile,
-  WORD_BUILDER_CONSTANTS
+  WordBuilderLetter,
+  WordBuilderCurrentWordLetter
 } from '@/types/games/word-builder';
+
+// Specific word challenges for the classic game
+export const wordChallenges: WordBuilderChallenge[] = [
+  {
+    difficulty: 'easy',
+    letters: ['C', 'A', 'T', 'S', 'R', 'E'],
+    targetWords: ['CAT', 'CATS', 'CAST', 'CARE', 'CASE', 'RACE', 'SCARE', 'CRATE', 'STARE', 'CARES', 'REACT', 'CASTER', 'RECAST', 'TRACES', 'CRATES'],
+    minWords: 5
+  },
+  {
+    difficulty: 'easy',
+    letters: ['D', 'O', 'G', 'S', 'R', 'E'],
+    targetWords: ['DOG', 'DOGS', 'DOSE', 'DOES', 'RODE', 'ROSE', 'GOES', 'SORE', 'REDO', 'DOERS', 'GOERS', 'GORED', 'RODES'],
+    minWords: 5
+  },
+  {
+    difficulty: 'medium',
+    letters: ['P', 'L', 'A', 'Y', 'E', 'R', 'S'],
+    targetWords: ['PLAY', 'PLAYS', 'LAYER', 'RELAY', 'EARLY', 'YEARS', 'SPRAY', 'REPAY', 'LEAPY', 'SLAYER', 'PLAYER', 'PARLEY', 'REPLAY', 'PLAYERS', 'PARSLEY'],
+    minWords: 7
+  },
+  {
+    difficulty: 'medium',
+    letters: ['T', 'R', 'A', 'I', 'N', 'E', 'D'],
+    targetWords: ['TRAIN', 'TRADE', 'TREND', 'DRAIN', 'DINER', 'TREAD', 'RATED', 'RETINA', 'DETAIN', 'RAINED', 'TRAINED'],
+    minWords: 7
+  },
+  {
+    difficulty: 'hard',
+    letters: ['C', 'R', 'E', 'A', 'T', 'I', 'V', 'E'],
+    targetWords: ['CREATE', 'ACTIVE', 'NATIVE', 'REACTIVE', 'CREATIVE'],
+    minWords: 3
+  },
+  {
+    difficulty: 'hard',
+    letters: ['S', 'T', 'U', 'D', 'E', 'N', 'T', 'S'],
+    targetWords: ['STUDENT', 'STUDENTS', 'STUNTED', 'DENTIST', 'NESTLED'],
+    minWords: 3
+  }
+];
+
+/**
+ * Get random challenge for specified difficulty
+ */
+export function getRandomChallenge(difficulty: WordBuilderDifficulty): WordBuilderChallenge {
+  const challenges = wordChallenges.filter(c => c.difficulty === difficulty);
+  return challenges[Math.floor(Math.random() * challenges.length)];
+}
+
+/**
+ * Initialize available letters from challenge
+ */
+export function initializeLetters(challenge: WordBuilderChallenge): WordBuilderLetter[] {
+  return challenge.letters.map((letter, idx) => ({
+    letter,
+    id: idx,
+    used: false
+  }));
+}
+
+/**
+ * Calculate word score based on length and complexity
+ */
+export function calculateWordScore(word: string): number {
+  const baseScore = word.length * 10;
+  const bonusMultiplier = word.length >= 6 ? 2 : 1;
+  return baseScore * bonusMultiplier;
+}
 
 /**
  * Generate unique session ID

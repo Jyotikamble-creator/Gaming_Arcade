@@ -1,21 +1,127 @@
 // Word Builder Game Type Definitions
 
-export type WordBuilderDifficulty = 'easy' | 'medium' | 'hard' | 'expert' | 'master';
+export type WordBuilderDifficulty = 'easy' | 'medium' | 'hard';
 
 export type WordBuilderGameMode = 'classic' | 'timed' | 'endless' | 'puzzle' | 'challenge';
 
 export type WordValidationStatus = 'valid' | 'invalid' | 'already_used' | 'too_short' | 'invalid_letters';
 
-export interface WordBuilderChallenge {
+export type WordBuilderMessageType = 'success' | 'error' | 'hint' | '';
+
+// Simple Letter Interface
+export interface WordBuilderLetter {
+  letter: string;
   id: number;
+  used: boolean;
+}
+
+export interface WordBuilderCurrentWordLetter {
+  letter: string;
+  id: number;
+}
+
+export interface WordBuilderChallenge {
   difficulty: WordBuilderDifficulty;
   letters: string[];
   targetWords: string[];
   minWords: number;
-  maxScore: number;
-  timeLimit?: number;
-  description?: string;
-  category?: string;
+}
+
+export interface WordBuilderGameState {
+  difficulty: WordBuilderDifficulty;
+  currentChallenge: WordBuilderChallenge | null;
+  availableLetters: WordBuilderLetter[];
+  currentWord: WordBuilderCurrentWordLetter[];
+  foundWords: string[];
+  score: number;
+  startTime: number | null;
+  elapsedTime: number;
+  isCompleted: boolean;
+  message: string;
+  messageType: WordBuilderMessageType;
+  hintsUsed: number;
+}
+
+export interface WordBuilderSettings {
+  difficulty: WordBuilderDifficulty;
+  maxHints: number;
+}
+
+// Component Props Interfaces
+export interface WordBuilderStatsProps {
+  difficulty: WordBuilderDifficulty;
+  time: number;
+  wordsFound: number;
+  totalWords: number;
+  minWords: number;
+  score: number;
+  hintsUsed: number;
+}
+
+export interface WordBuilderBoardProps {
+  availableLetters: WordBuilderLetter[];
+  currentWord: WordBuilderCurrentWordLetter[];
+  foundWords: string[];
+  onLetterClick: (letterId: number) => void;
+  onRemoveLetter: (index: number) => void;
+}
+
+export interface WordBuilderControlsProps {
+  onSubmit: () => void;
+  onClear: () => void;
+  onShuffle: () => void;
+  onHint: () => void;
+  onNewGame: () => void;
+  onDifficultyChange: (difficulty: WordBuilderDifficulty) => void;
+  difficulty: WordBuilderDifficulty;
+  isCompleted: boolean;
+  canSubmit: boolean;
+  hintsUsed: number;
+  maxHints: number;
+}
+
+export interface WordBuilderCompletedModalProps {
+  isOpen: boolean;
+  score: number;
+  wordsFound: string[];
+  totalWords: number;
+  allWords: string[];
+  time: number;
+  difficulty: WordBuilderDifficulty;
+  hintsUsed: number;
+  onClose: () => void;
+  onNewGame: () => void;
+}
+
+export interface WordBuilderMessageProps {
+  message: string;
+  messageType: WordBuilderMessageType;
+}
+
+// Hook Return Type
+export interface UseWordBuilderReturn {
+  gameState: WordBuilderGameState;
+  difficulty: WordBuilderDifficulty;
+  currentChallenge: WordBuilderChallenge | null;
+  availableLetters: WordBuilderLetter[];
+  currentWord: WordBuilderCurrentWordLetter[];
+  foundWords: string[];
+  score: number;
+  elapsedTime: number;
+  isCompleted: boolean;
+  message: string;
+  messageType: WordBuilderMessageType;
+  hintsUsed: number;
+  isGameStarted: boolean;
+  error: string | null;
+  startNewGame: (difficulty?: WordBuilderDifficulty) => void;
+  handleLetterClick: (letterId: number) => void;
+  handleRemoveLetter: (index: number) => void;
+  handleSubmitWord: () => void;
+  handleShuffle: () => void;
+  handleHint: () => void;
+  clearCurrentWord: () => void;
+  resetGame: () => void;
 }
 
 export interface WordBuilderAttempt {
