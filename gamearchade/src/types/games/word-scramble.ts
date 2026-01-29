@@ -1,12 +1,89 @@
 // Word Scramble Game Type Definitions
 
-export type WordScrambleDifficulty = 'easy' | 'medium' | 'hard' | 'expert' | 'insane';
+export type WordScrambleDifficulty = 'easy' | 'medium' | 'hard';
 
 export type WordScrambleGameMode = 'classic' | 'timed' | 'streak' | 'marathon' | 'blitz' | 'zen';
 
 export type WordGuessStatus = 'correct' | 'incorrect' | 'too_short' | 'invalid_chars' | 'already_guessed';
 
 export type WordScrambleCategory = 'programming' | 'science' | 'animals' | 'countries' | 'technology' | 'general' | 'mixed';
+
+// Simple data interface for the game
+export interface WordScrambleData {
+  word: string;
+  scrambled: string;
+  category?: string;
+  difficulty?: WordScrambleDifficulty;
+  id?: number;
+}
+
+export interface WordScrambleGameState {
+  data: WordScrambleData;
+  guess: string;
+  isLoading: boolean;
+  attempts: number;
+  correct: boolean;
+  showAnswer: boolean;
+  score: number;
+  gameStartTime: number | null;
+  gameEndTime: number | null;
+  isGameOver: boolean;
+}
+
+// Component Props Interfaces
+export interface WordScrambleStatsProps {
+  attempts: number;
+  correct: boolean;
+  showAnswer: boolean;
+  score?: number;
+  maxAttempts?: number;
+}
+
+export interface WordScrambleDisplayProps {
+  scrambled: string;
+  isLoading?: boolean;
+}
+
+export interface WordScrambleInputProps {
+  guess: string;
+  onChange: (value: string) => void;
+  onCheck: () => void;
+  onReveal: () => void;
+  onNewWord: () => void;
+  correct: boolean;
+  showAnswer: boolean;
+  disabled?: boolean;
+  attempts?: number;
+  maxAttempts?: number;
+}
+
+export interface WordScrambleAnswerProps {
+  word: string;
+  show: boolean;
+  isCorrect?: boolean;
+  attempts?: number;
+}
+
+// Hook Return Type
+export interface UseWordScrambleReturn {
+  gameState: WordScrambleGameState;
+  data: WordScrambleData;
+  guess: string;
+  isLoading: boolean;
+  attempts: number;
+  correct: boolean;
+  showAnswer: boolean;
+  score: number;
+  isGameOver: boolean;
+  gameTime: number;
+  error: string | null;
+  setGuess: (guess: string) => void;
+  checkGuess: () => Promise<void>;
+  revealAnswer: () => void;
+  loadNewWord: () => Promise<void>;
+  resetGame: () => void;
+  getHint: () => string | null;
+}
 
 export interface WordScrambleWord {
   id: number;

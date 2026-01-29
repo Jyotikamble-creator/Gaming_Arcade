@@ -3,9 +3,65 @@ import {
   WordScrambleDifficulty,
   WordScrambleGameMode,
   WordScrambleCategory,
-  WordScrambleWord,
-  WORD_SCRAMBLE_CONSTANTS
+  WordScrambleData
 } from '@/types/games/word-scramble';
+
+/**
+ * Generate mock scrambled word data for classic game mode
+ */
+export function generateMockScrambleData(): WordScrambleData[] {
+  return [
+    { word: 'REACT', scrambled: 'TCAER', category: 'Technology' },
+    { word: 'JAVASCRIPT', scrambled: 'TPIRCSAVAJ', category: 'Programming' },
+    { word: 'COMPUTER', scrambled: 'RETUPOC', category: 'Technology' },
+    { word: 'ELEPHANT', scrambled: 'TNHAPELE', category: 'Animals' },
+    { word: 'MOUNTAIN', scrambled: 'NIATNUOM', category: 'Nature' },
+    { word: 'RAINBOW', scrambled: 'WOBNIAR', category: 'Nature' },
+    { word: 'KEYBOARD', scrambled: 'DRAOBYKE', category: 'Technology' },
+    { word: 'BUTTERFLY', scrambled: 'YLFRRETTUB', category: 'Animals' },
+    { word: 'TELESCOPE', scrambled: 'EPOCSELET', category: 'Science' },
+    { word: 'CHOCOLATE', scrambled: 'ETALOCOCH', category: 'Food' }
+  ];
+}
+
+/**
+ * Get a random scrambled word for simple game mode
+ */
+export function getRandomScrambledWord(): WordScrambleData {
+  const mockData = generateMockScrambleData();
+  const randomWord = mockData[Math.floor(Math.random() * mockData.length)];
+  
+  // Ensure the scrambled version is different from original
+  let scrambled = shuffleWord(randomWord.word);
+  while (scrambled === randomWord.word && randomWord.word.length > 1) {
+    scrambled = shuffleWord(randomWord.word);
+  }
+  
+  return {
+    ...randomWord,
+    scrambled
+  };
+}
+
+/**
+ * Validate if guess matches the word
+ */
+export function validateGuess(guess: string, word: string): boolean {
+  return guess.toUpperCase().trim() === word.toUpperCase().trim();
+}
+
+/**
+ * Calculate score based on attempts
+ */
+export function calculateScore(
+  baseScore: number = 100,
+  attempts: number,
+  penaltyPerAttempt: number = 10,
+  minimumScore: number = 10
+): number {
+  const score = baseScore - (attempts * penaltyPerAttempt);
+  return Math.max(score, minimumScore);
+}
 
 /**
  * Generate unique session ID
