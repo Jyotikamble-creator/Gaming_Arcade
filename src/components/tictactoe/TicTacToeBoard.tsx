@@ -1,8 +1,12 @@
 // TicTacToeBoard component to render the Tic Tac Toe game board
-export default function TicTacToeBoard({ board, onClick }) {
+import React from 'react';
+import { TicTacToeBoardProps } from '../../types/ticTacToe';
+
+export default function TicTacToeBoard({ board, onClick }: TicTacToeBoardProps): JSX.Element {
   // Helper function to render each square
-  const renderSquare = (i) => (
+  const renderSquare = (i: number): JSX.Element => (
     <button
+      key={i}
       className={`w-24 h-24 border-2 border-gray-600 text-4xl font-bold flex items-center justify-center transition-all duration-200 transform hover:scale-105 ${board[i] === 'X' ? 'text-blue-400' : board[i] === 'O' ? 'text-red-400' : 'bg-gray-700 hover:bg-gray-600'
         }`}
       onClick={() => onClick(i)}
