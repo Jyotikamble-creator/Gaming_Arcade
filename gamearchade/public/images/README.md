@@ -1,13 +1,24 @@
 # Images Directory
 
-Place your logo.png file here for the Gaming Arcade application.
+This directory contains static images for the GameArchade application.
 
-The logo should be:
-- Named: `logo.png`
-- Recommended size: 64x64 pixels or larger (will be displayed at 64x64)
-- Format: PNG with transparency (recommended)
+## Structure
 
-You can copy it from the Vite app:
-```
+- Add game-specific images here
+- Use descriptive filenames  
+- Optimize for web (WebP preferred)
+- Keep file sizes reasonable
+
+## Missing Assets
+
+- logo.png - Company/app logo (64x64px recommended)
+- Game-specific assets can be added as needed
+
+## Usage
+
+Images in this directory are served from `/images/` path in the application.
+
+You can copy logo from the main app:
+```bash
 cp ../../../public/images/logo.png ./logo.png
 ```
