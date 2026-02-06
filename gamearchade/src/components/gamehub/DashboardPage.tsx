@@ -34,7 +34,7 @@ const defaultGames: GameConfig[] = [
     difficulty: "medium",
     estimatedTime: "5-10 min",
     image: "/images/word-guess.jpg",
-    path: "/games/word-guess",
+    path: "/pages/wordguess",
     isFeatured: true
   },
   {
@@ -45,7 +45,7 @@ const defaultGames: GameConfig[] = [
     difficulty: "hard",
     estimatedTime: "10-15 min",
     image: "/images/brain-teaser.jpg",
-    path: "/games/brain-teaser",
+    path: "/pages/brainteaser",
     isNew: true
   },
   {
@@ -56,7 +56,7 @@ const defaultGames: GameConfig[] = [
     difficulty: "hard",
     estimatedTime: "15-30 min",
     image: "/images/coding-puzzle.jpg",
-    path: "/games/coding-puzzle"
+    path: "/pages/codingpuzzle"
   },
   {
     id: "memory-card",
@@ -66,7 +66,87 @@ const defaultGames: GameConfig[] = [
     difficulty: "easy",
     estimatedTime: "3-5 min",
     image: "/images/memory-card.jpg",
-    path: "/games/memory-card"
+    path: "/pages/memorycard"
+  },
+  {
+    id: "hangman",
+    title: "Hangman",
+    description: "Classic word guessing game - guess the word letter by letter",
+    category: "word",
+    difficulty: "easy",
+    estimatedTime: "3-7 min",
+    image: "/images/hangman.jpg",
+    path: "/pages/hangman"
+  },
+  {
+    id: "whack-mole",
+    title: "Whack-a-Mole",
+    description: "Test your reflexes in this fast-paced action game",
+    category: "action",
+    difficulty: "medium",
+    estimatedTime: "2-5 min",
+    image: "/images/whack-mole.jpg",
+    path: "/pages/whackmole"
+  },
+  {
+    id: "2048",
+    title: "2048",
+    description: "Combine tiles to reach the 2048 tile in this addictive puzzle game",
+    category: "puzzle",
+    difficulty: "medium",
+    estimatedTime: "10-20 min",
+    image: "/images/2048.jpg",
+    path: "/pages/game2048"
+  },
+  {
+    id: "math-quiz",
+    title: "Math Quiz",
+    description: "Test your math skills with quick calculations",
+    category: "educational",
+    difficulty: "easy",
+    estimatedTime: "5-10 min",
+    image: "/images/math-quiz.jpg",
+    path: "/pages/mathquiz"
+  },
+  {
+    id: "word-builder",
+    title: "Word Builder",
+    description: "Build words from given letters",
+    category: "word",
+    difficulty: "medium",
+    estimatedTime: "5-15 min",
+    image: "/images/word-builder.jpg",
+    path: "/pages/wordbuilder"
+  },
+  {
+    id: "word-scramble",
+    title: "Word Scramble",
+    description: "Unscramble letters to form words",
+    category: "word", 
+    difficulty: "medium",
+    estimatedTime: "3-8 min",
+    image: "/images/word-scramble.jpg",
+    path: "/pages/wordscramble"
+  },
+  {
+    id: "emoji-guess",
+    title: "Emoji Guess",
+    description: "Guess the phrase or word from emoji combinations",
+    category: "puzzle",
+    difficulty: "easy",
+    estimatedTime: "2-5 min",
+    image: "/images/emoji-guess.jpg",
+    path: "/pages/emoji"
+  },
+  {
+    id: "number-maze",
+    title: "Number Maze",
+    description: "Navigate through numbers to reach your target",
+    category: "puzzle",
+    difficulty: "hard",
+    estimatedTime: "5-12 min",
+    image: "/images/number-maze.jpg",
+    path: "/pages/numbermaze"
   }
 ];
 
