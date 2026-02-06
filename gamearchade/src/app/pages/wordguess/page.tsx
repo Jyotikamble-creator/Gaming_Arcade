@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useAuth } from '@/lib/auth/AuthContext';
+import { useAuth } from '@/lib/auth/AuthProvider';
 import { useWordGuess } from '@/hooks/useWordGuess';
 import DashboardLayout from '@/components/shared/DashboardLayout';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';

@@ -1,201 +1,87 @@
-// ForgotPassword component for GameArchade auth system
-
 "use client";
 
-import React, { useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import { Mail, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Mail, ArrowLeft, Loader2, CheckCircle } from 'lucide-react';
 
-// Types
-import type { 
-  ForgotPasswordFormData, 
-  AuthPageError, 
-  AuthMode 
-} from "@/types/auth/page";
-
-// API
-import { AuthApiClient } from "@/lib/auth/client";
-
-// Utilities
-import { AuthPageHelpers } from "@/utility/auth/page-helpers";
-
-// Logger
-import { Logger } from "@/lib/logger/client";
-
-/**
- * ForgotPassword component props
- */
 interface ForgotPasswordProps {
-  onModeChange: (mode: AuthMode) => void;
-  onSuccess?: () => void;
-  onError?: (error: AuthPageError) => void;
-  isLoading?: boolean;
+  onBackToLogin: () => void;
 }
 
-/**
- * Enhanced ForgotPassword Component
- */
-export default function ForgotPassword({ 
-  onModeChange, 
-  onSuccess, 
-  onError,
-  isLoading: externalLoading = false 
-}: ForgotPasswordProps) {
-  const logger = new Logger({ tag: 'FORGOT_PASSWORD_COMPONENT' });
-  const authClient = new AuthApiClient();
-
-  // Form state
-  const [formData, setFormData] = useState<ForgotPasswordFormData>({
-    email: ''
-  });
-
-  // UI state
+export default function ForgotPassword({ onBackToLogin }: ForgotPasswordProps) {
+  const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const isLoading = externalLoading || isSubmitting;
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
-  // Handle input changes
-  const handleChange = useCallback((field: keyof ForgotPasswordFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear field error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  }, [errors]);
-
-  // Handle field blur for validation
-  const handleBlur = useCallback((field: keyof ForgotPasswordFormData) => {
-    setTouched(prev => ({ ...prev, [field]: true }));
-    
-    // Validate email field
-    const emailErrors = AuthPageHelpers.Validation.validateEmail(formData.email);
-    if (emailErrors.length > 0) {
-      setErrors(prev => ({ ...prev, email: emailErrors }));
-    }
-  }, [formData]);
-
-  // Handle form submission
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (isLoading || isSuccess) return;
+    setError('');
 
-    logger.info('Forgot password attempt started', { email: formData.email });
+    if (!email.trim()) {
+      setError('Email is required');
+      return;
+    }
 
-    // Validate email
-    const emailErrors = AuthPageHelpers.Validation.validateEmail(formData.email);
-    
-    if (emailErrors.length > 0) {
-      setErrors({ email: emailErrors });
-      setTouched({ email: true });
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address');
       return;
     }
 
     setIsSubmitting(true);
-    setErrors({});
 
     try {
-      // Call forgot password API
-      await authClient.forgotPassword({ email: formData.email.trim() });
-
-      logger.info('Forgot password request successful', { email: formData.email });
-
-      // Show success state
-      setIsSuccess(true);
-
-      // Call success handler
-      onSuccess?.();
-    } catch (error: any) {
-      logger.error('Forgot password failed', { error, email: formData.email });
-      
-      const authError = AuthPageHelpers.Error.parseApiError(error);
-      onError?.(authError);
-
-      // Set form-specific errors
-      if (authError.field) {
-        setErrors({ [authError.field]: [authError.message] });
-      }
+      // Mock API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setIsSubmitted(true);
+    } catch (err) {
+      setError('Failed to send reset email. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isLoading, isSuccess, authClient, onSuccess, onError, logger]);
+  };
 
-  // Reset form and go back to login
-  const handleBackToLogin = useCallback(() => {
-    setFormData({ email: '' });
-    setErrors({});
-    setTouched({});
-    setIsSuccess(false);
-    onModeChange('login');
-  }, [onModeChange]);
-
-  // Send another email
-  const handleSendAnother = useCallback(() => {
-    setIsSuccess(false);
-    setErrors({});
-    setTouched({});
-  }, []);
-
-  // Success state
-  if (isSuccess) {
+  if (isSubmitted) {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.3 }}
-        className="w-full text-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center"
       >
-        {/* Success Icon */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-          className="flex justify-center mb-6"
-        >
-          <div className="bg-green-500/20 p-4 rounded-full">
-            <CheckCircle className="h-12 w-12 text-green-400" />
-          </div>
-        </motion.div>
-
-        {/* Success Message */}
-        <h2 className="text-2xl font-bold text-white mb-4">Check Your Email</h2>
-        <p className="text-gray-300 mb-2">
-          We've sent a password reset link to:
-        </p>
-        <p className="text-blue-400 font-medium mb-6">{formData.email}</p>
-        
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
-          <p className="text-blue-300 text-sm">
-            <strong>Next steps:</strong><br />
-            1. Check your email inbox (and spam folder)<br />
-            2. Click the reset link in the email<br />
-            3. Follow the instructions to create a new password
-          </p>
+        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-8 h-8 text-green-400" />
         </div>
-
-        {/* Action Buttons */}
-        <div className="space-y-3">
+        
+        <h2 className="text-2xl font-bold text-white mb-2">Check Your Email</h2>
+        <p className="text-white/70 mb-6">
+          We've sent a password reset link to <br />
+          <span className="font-medium text-white">{email}</span>
+        </p>
+        
+        <div className="space-y-4">
+          <p className="text-white/60 text-sm">
+            Didn't receive the email? Check your spam folder or try again.
+          </p>
+          
           <button
-            onClick={handleSendAnother}
-            className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            onClick={() => {
+              setIsSubmitted(false);
+              setEmail('');
+            }}
+            className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
           >
-            Send Another Email
+            Try Different Email
           </button>
+          
           <button
-            onClick={handleBackToLogin}
-            className="w-full px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center"
+            onClick={onBackToLogin}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Sign In
+            Back to Login
           </button>
         </div>
       </motion.div>
@@ -206,109 +92,73 @@ export default function ForgotPassword({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="w-full"
     >
-      {/* Header */}
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">Reset Your Password</h2>
-        <p className="text-subtle-text">
-          Enter your email address and we'll send you a link to reset your password
+        <h2 className="text-2xl font-bold text-white mb-2">Forgot Password?</h2>
+        <p className="text-white/70">
+          Don't worry! Enter your email address and we'll send you a link to reset your password.
         </p>
       </div>
 
-      {/* Forgot Password Form */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-sm"
+        >
+          {error}
+        </motion.div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Email Field */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+          <label className="block text-sm font-medium text-white mb-1">
             Email Address
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5 text-gray-400" />
+              <Mail className="h-5 w-5 text-white/40" />
             </div>
             <input
-              id="email"
               type="email"
-              autoComplete="email"
-              required
-              value={formData.email}
-              onChange={(e) => handleChange('email', e.target.value)}
-              onBlur={() => handleBlur('email')}
-              disabled={isLoading}
-              className={`
-                w-full pl-10 pr-3 py-3 border rounded-lg bg-gray-800 text-white
-                placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors
-                ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-600 focus:ring-blue-500'}
-                ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
-              `}
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (error) setError('');
+              }}
+              className="w-full pl-10 pr-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-colors"
               placeholder="Enter your email address"
+              disabled={isSubmitting}
+              required
             />
           </div>
-          {errors.email && touched.email && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              className="mt-1"
-            >
-              {errors.email.map((error, index) => (
-                <p key={index} className="text-red-400 text-sm">{error}</p>
-              ))}
-            </motion.div>
-          )}
         </div>
 
-        {/* Submit Button */}
-        <motion.button
+        <button
           type="submit"
-          disabled={isLoading || !formData.email.trim()}
-          whileHover={{ scale: isLoading ? 1 : 1.02 }}
-          whileTap={{ scale: isLoading ? 1 : 0.98 }}
-          className={`
-            w-full flex items-center justify-center px-4 py-3 border border-transparent
-            rounded-lg shadow-sm text-white font-medium transition-all duration-200
-            ${isLoading || !formData.email.trim()
-              ? 'bg-gray-600 cursor-not-allowed' 
-              : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            }
-          `}
+          disabled={isSubmitting}
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
         >
-          {isLoading ? (
-            <div className="flex items-center">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-              Sending Reset Link...
-            </div>
+          {isSubmitting ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span>Sending Reset Link...</span>
+            </>
           ) : (
-            <div className="flex items-center">
-              Send Reset Link
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </div>
+            <span>Send Reset Link</span>
           )}
-        </motion.button>
+        </button>
 
-        {/* Additional Info */}
-        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-          <p className="text-yellow-300 text-sm">
-            <strong>Having trouble?</strong><br />
-            Make sure to check your spam folder. If you don't receive an email within 5 minutes, 
-            try using the email address you originally signed up with.
-          </p>
-        </div>
-
-        {/* Back to Login Link */}
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={handleBackToLogin}
-            disabled={isLoading}
-            className="text-blue-400 hover:text-blue-300 font-medium transition-colors flex items-center justify-center mx-auto"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Sign In
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onBackToLogin}
+          disabled={isSubmitting}
+          className="w-full flex items-center justify-center space-x-2 text-white/70 hover:text-white transition-colors duration-200"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Login</span>
+        </button>
       </form>
     </motion.div>
   );

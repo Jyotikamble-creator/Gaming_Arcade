@@ -1,9 +1,8 @@
-// Dashboard page - Next.js App Router (/dashboard route)
 "use client";
 
 import React from 'react';
 import DashboardPage from "@/components/gamehub/DashboardPage";
-import { useAuth } from "@/hooks/auth/useAuth";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 

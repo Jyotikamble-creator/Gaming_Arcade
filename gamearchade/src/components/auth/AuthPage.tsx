@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 import Login from "./Login";
 import Signup from "./Signup";
 import ForgotPassword from "./ForgotPassword";
-import ResetPassword from "./ResetPassword";
+import { useAuth } from "@/lib/auth/AuthProvider";
 
-type AuthMode = "login" | "signup" | "forgot-password" | "reset-password";
+type AuthMode = "login" | "signup" | "forgot-password";
 
 interface AuthPageProps {
   mode?: AuthMode;
@@ -23,6 +23,7 @@ export default function AuthPage({
   className = ""
 }: AuthPageProps) {
   const [currentMode, setCurrentMode] = React.useState<AuthMode>(mode);
+  const { login, signup, loading: authLoading } = useAuth();
 
   const handleModeChange = (newMode: AuthMode) => {
     setCurrentMode(newMode);
@@ -37,6 +38,8 @@ export default function AuthPage({
             onSwitchToSignup={() => handleModeChange("signup")}
             onForgotPassword={() => handleModeChange("forgot-password")}
             onSuccess={onSuccess}
+            onLogin={login}
+            isLoading={authLoading}
           />
         );
       case "signup":
@@ -44,17 +47,13 @@ export default function AuthPage({
           <Signup 
             onSwitchToLogin={() => handleModeChange("login")}
             onSuccess={onSuccess}
+            onSignup={signup}
+            isLoading={authLoading}
           />
         );
       case "forgot-password":
         return (
           <ForgotPassword 
-            onBackToLogin={() => handleModeChange("login")}
-          />
-        );
-      case "reset-password":
-        return (
-          <ResetPassword 
             onBackToLogin={() => handleModeChange("login")}
           />
         );
@@ -64,6 +63,8 @@ export default function AuthPage({
             onSwitchToSignup={() => handleModeChange("signup")}
             onForgotPassword={() => handleModeChange("forgot-password")}
             onSuccess={onSuccess}
+            onLogin={login}
+            isLoading={authLoading}
           />
         );
     }
@@ -79,6 +80,9 @@ export default function AuthPage({
           className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20"
         >
           <div className="text-center mb-8">
+            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-white font-bold text-2xl">GA</span>
+            </div>
             <h1 className="text-3xl font-bold text-white mb-2">GameArchade</h1>
             <p className="text-white/70">Welcome to the ultimate gaming experience</p>
           </div>
