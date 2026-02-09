@@ -13,7 +13,7 @@ export default function EmojiGuess() {
   useEffect(() => {
     // Redirect to auth if not authenticated
     if (!user && !isLoading) {
-      router.push("/auth");
+      router.push("/pages/auth");
     }
   }, [user, isLoading, router]);
 

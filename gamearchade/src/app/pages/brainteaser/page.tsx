@@ -7,18 +7,18 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function BrainTeaser() {
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     // Redirect to auth if not authenticated
-    if (!user && !isLoading) {
-      router.push("/auth");
+    if (!user && !loading) {
+      router.push("/pages/auth");
     }
-  }, [user, isLoading, router]);
+  }, [user, loading, router]);
 
   // Show loading state while checking authentication
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
