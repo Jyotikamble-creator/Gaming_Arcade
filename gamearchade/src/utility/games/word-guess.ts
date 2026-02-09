@@ -5,6 +5,9 @@ import {
   WORD_GUESS_CONSTANTS 
 } from '@/types/games/word-guess';
 
+// Re-export constants for use in components
+export { WORD_GUESS_CONSTANTS };
+
 /**
  * Check if a letter is revealed in the word
  */

@@ -12,11 +12,11 @@ export default function Header() {
           </div>
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-50">GAME ARCADE</h1>
+          <h1 className="text-2xl font-bold text-light-text">GAME ARCHADE</h1>
         </div>
 
         <Link href="/pages/auth">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300">
+          <button className="bg-primary-blue hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300">
             Get Started
           </button>
         </Link>
