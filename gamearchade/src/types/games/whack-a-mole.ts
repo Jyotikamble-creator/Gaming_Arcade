@@ -5,6 +5,14 @@ export interface WhackMolePosition {
   index: number;
 }
 
+export interface WhackMoleConfig {
+  gridSize: number;
+  duration: number;
+  maxMoles: number;
+  spawnRate: number;
+  moleSpeed: number;
+}
+
 export interface WhackMole {
   id: string;
   position: WhackMolePosition;

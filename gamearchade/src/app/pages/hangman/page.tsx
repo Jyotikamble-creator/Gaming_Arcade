@@ -2,7 +2,7 @@
 
 import React from 'react';
 import HangmanPage from "@/components/hangman/HangmanPage";
-import { useAuth } from "@/hooks/auth/useAuth";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from 'next/navigation';
 
 export default function Hangman() {

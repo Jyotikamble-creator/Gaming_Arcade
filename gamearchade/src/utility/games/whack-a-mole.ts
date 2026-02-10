@@ -8,6 +8,79 @@ import {
 } from "@/types/games/whack-a-mole";
 
 /**
+ * Default whack-a-mole configuration
+ */
+export const WHACK_MOLE_CONFIG = {
+  gridSize: 9, // 3x3 grid
+  duration: 30, // 30 seconds
+  maxMoles: 3,
+  spawnRate: 1500, // milliseconds
+  moleSpeed: 1500 // milliseconds
+};
+
+/**
+ * Generate initial game grid
+ */
+export function generateGrid(size: number): any[] {
+  const grid = [];
+  for (let i = 0; i < size; i++) {
+    grid.push({
+      id: i,
+      hasMole: false,
+      moleType: null
+    });
+  }
+  return grid;
+}
+
+/**
+ * Calculate accuracy percentage
+ */
+export function calculateAccuracy(hits: number, total: number): number {
+  return total > 0 ? (hits / total) * 100 : 0;
+}
+
+/**
+ * Generate a random mole for the game
+ */
+export function generateRandomMole(gridSize: number): any {
+  const position = Math.floor(Math.random() * gridSize);
+  return {
+    id: `mole_${Date.now()}`,
+    position,
+    type: 'normal',
+    points: 10
+  };
+}
+
+/**
+ * Calculate final score with bonuses
+ */
+export function calculateFinalScore(baseScore: number, accuracy: number, streak: number): number {
+  const accuracyBonus = Math.floor(baseScore * (accuracy / 100) * 0.5);
+  const streakBonus = Math.floor(streak * 5);
+  return baseScore + accuracyBonus + streakBonus;
+}
+
+/**
+ * Validate game configuration
+ */
+export function validateGameConfig(config: any): boolean {
+  return config && 
+         typeof config.gridSize === 'number' && 
+         config.gridSize > 0 &&
+         typeof config.duration === 'number' && 
+         config.duration > 0;
+}
+
+/**
+ * Check if hit is valid
+ */
+export function isValidHit(hitPosition: number, molePosition: number): boolean {
+  return hitPosition === molePosition;
+}
+
+/**
  * Generate unique mole ID
  */
 export function generateMoleId(): string {
@@ -494,16 +567,31 @@ export function formatGameDuration(seconds: number): string {
 }
 
 /**
- * Get next level requirements
+ * Get performance rating with details
  */
-export function getNextLevelRequirements(currentLevel: number): {
-  scoreRequired: number;
-  accuracyRequired: number;
-  streakRequired: number;
-} {
+export function getPerformanceRating(score: number): { text: string; color: string; description: string } {
+  const ratings = {
+    'Legendary': { color: 'text-purple-400', description: 'Outstanding performance!' },
+    'Master': { color: 'text-blue-400', description: 'Excellent skills!' },
+    'Expert': { color: 'text-green-400', description: 'Great job!' },
+    'Advanced': { color: 'text-yellow-400', description: 'Good performance!' },
+    'Intermediate': { color: 'text-orange-400', description: 'Keep practicing!' },
+    'Beginner': { color: 'text-gray-400', description: 'Nice try!' },
+    'Novice': { color: 'text-red-400', description: 'Practice makes perfect!' }
+  };
+
+  let rating: string;
+  if (score >= 500) rating = 'Legendary';
+  else if (score >= 300) rating = 'Master';
+  else if (score >= 200) rating = 'Expert';
+  else if (score >= 100) rating = 'Advanced';
+  else if (score >= 50) rating = 'Intermediate';
+  else if (score >= 10) rating = 'Beginner';
+  else rating = 'Novice';
+
   return {
-    scoreRequired: currentLevel * 100 + 200,
-    accuracyRequired: Math.min(0.95, 0.6 + (currentLevel * 0.05)),
-    streakRequired: Math.min(20, currentLevel * 2 + 3)
+    text: rating,
+    color: ratings[rating as keyof typeof ratings].color,
+    description: ratings[rating as keyof typeof ratings].description
   };
 }

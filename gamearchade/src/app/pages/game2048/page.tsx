@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Game2048Page from "../../components/game2048/Game2048Page";
-import { useAuth } from "../../hooks/auth/useAuth";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from 'next/navigation';
 
 export default function Game2048() {

@@ -1,7 +1,7 @@
 // WhackMoleGameOverModal component to display game over results
 import React from 'react';
 import { WhackMoleGameOverModalProps } from '@/types/games/whack-a-mole';
-import { getPerformanceRating } from '@/utility/games/whack-a-mole';
+import { getWhackPerformanceRating } from '@/utility/games/whack-a-mole';
 
 export default function WhackMoleGameOverModal({
   score,

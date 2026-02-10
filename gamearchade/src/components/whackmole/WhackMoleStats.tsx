@@ -1,7 +1,7 @@
 // WhackMoleStats component to display game statistics
 import React from 'react';
 import { WhackMoleStatsProps } from '@/types/games/whack-a-mole';
-import { formatTime } from '@/utility/games/whack-a-mole';
+import { formatGameDuration } from '@/utility/games/whack-a-mole';
 
 export default function WhackMoleStats({ 
   score, 
@@ -19,7 +19,7 @@ export default function WhackMoleStats({
       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center min-w-[100px]">
         <span className="text-sm font-medium text-gray-300 block">TIME</span>
         <div className={`text-2xl font-bold ${timeLeft <= 5 ? 'text-red-400' : 'text-white'}`}>
-          {formatTime(timeLeft)}
+          {formatGameDuration(timeLeft)}
         </div>
       </div>
       
