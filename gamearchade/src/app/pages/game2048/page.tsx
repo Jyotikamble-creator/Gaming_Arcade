@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Game2048Page from "../../components/game2048/Game2048Page";
+import Game2048Page from "@/components/game2048/Game2048Page";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from 'next/navigation';
 

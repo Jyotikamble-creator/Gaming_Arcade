@@ -1,7 +1,7 @@
 // Emoji Guess page - Next.js App Router
 "use client";
 
-import EmojiGuessPage from "../../components/emojiguess/EmojiGuessPage";
+import EmojiGuessPage from "@/components/emojiguess/EmojiGuessPage";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
