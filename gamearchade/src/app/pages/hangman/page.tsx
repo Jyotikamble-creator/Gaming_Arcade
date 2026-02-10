@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import HangmanPage from "../../components/hangman/HangmanPage";
-import { useAuth } from "../../hooks/auth/useAuth";
+import HangmanPage from "@/components/hangman/HangmanPage";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from 'next/navigation';
 
 export default function Hangman() {
