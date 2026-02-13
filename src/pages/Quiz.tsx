@@ -12,7 +12,7 @@ import QuestionCard from '../components/quiz/QuestionCard';
 import QuizCompletedModal from '../components/quiz/QuizCompletedModal';
 import AnimatedBackground from '../components/AnimatedBackground';
 // Types
-import { QuizQuestion } from '../../gamearchade/src/types/games/quiz';
+import { QuizQuestion } from '../types/games/quiz';
 
 // Quiz Page Component
 export default function Quiz(): JSX.Element {

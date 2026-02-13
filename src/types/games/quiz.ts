@@ -30,8 +30,8 @@ export interface QuizQuestion {
   q: string; // question text
   options: string[]; // array of 4 options
   ans: string; // correct answer
-  category: QuizCategory;
-  difficulty: QuizDifficulty;
+  category?: QuizCategory;
+  difficulty?: QuizDifficulty;
   explanation?: string;
   points?: number;
   timeLimit?: number; // in seconds

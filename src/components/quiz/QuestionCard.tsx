@@ -1,6 +1,6 @@
 // Component to display a quiz question with multiple choice answers
 import React from 'react';
-import { QuestionCardProps } from '../../../gamearchade/src/types/games/quiz';
+import { QuestionCardProps } from '../../types/games/quiz';
 
 const QuestionCard: React.FC<QuestionCardProps> = ({ question, options, onAnswer, showResult, selectedAnswer, correctAnswer }) => {
   // Render question card

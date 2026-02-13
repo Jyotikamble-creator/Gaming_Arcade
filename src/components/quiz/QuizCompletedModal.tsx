@@ -1,6 +1,6 @@
 // Component to display quiz completion modal
 import React from 'react';
-import { QuizCompletedModalProps } from '../../../gamearchade/src/types/games/quiz';
+import { QuizCompletedModalProps } from '../../types/games/quiz';
 
 const QuizCompletedModal: React.FC<QuizCompletedModalProps> = ({ score, totalQuestions, onRestart }) => {
   // Render modal

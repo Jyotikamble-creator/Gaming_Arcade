@@ -1,3 +1,5 @@
+"use client";
+
 // Custom hook for WordScramble game state management
 import { useState, useEffect, useCallback } from 'react';
 import {

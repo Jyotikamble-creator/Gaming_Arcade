@@ -1,6 +1,6 @@
 // Component to display quiz statistics
 import React from 'react';
-import { QuizStatsProps } from '../../../gamearchade/src/types/games/quiz';
+import { QuizStatsProps } from '../../types/games/quiz';
 
 const QuizStats: React.FC<QuizStatsProps> = ({ current, total, score, progress }) => {
   return (

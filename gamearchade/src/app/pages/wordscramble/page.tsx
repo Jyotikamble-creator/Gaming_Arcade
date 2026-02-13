@@ -1,3 +1,5 @@
+"use client";
+
 // Main WordScramble page component
 import React from 'react';
 import { useWordScramble } from '@/hooks/useWordScramble';
@@ -6,38 +8,33 @@ import WordScrambleDisplay from '@/components/wordscramble/WordScrambleDisplay';
 import WordScrambleInput from '@/components/wordscramble/WordScrambleInput';
 import WordScrambleAnswer from '@/components/wordscramble/WordScrambleAnswer';
 import WordScrambleCompletedModal from '@/components/wordscramble/WordScrambleCompletedModal';
-import { validateGuess } from '@/utility/word-scramble-utils';
 
 export default function WordScramblePage(): JSX.Element {
   const {
-    state,
-    isLoading,
-    loadNewWord,
-    submitGuess,
-    revealAnswer,
-    resetStats
-  } = useWordScramble();
-
-  const {
-    word,
-    scrambled,
+    gameState,
+    data,
     guess,
     attempts,
     correct,
     showAnswer,
-    gameStartTime,
-    totalScore,
-    gamesPlayed,
-    showCompletedModal,
-    isCompleted
-  } = state;
+    score,
+    isGameOver,
+    gameTime,
+    isLoading,
+    loadNewWord,
+    checkGuess,
+    revealAnswer,
+    resetGame,
+    setGuess
+  } = useWordScramble();
 
-  const gameTime = gameStartTime ? Math.floor((Date.now() - gameStartTime) / 1000) : 0;
+  const { word, scrambled } = data;
 
-  const handleGuessSubmit = (newGuess: string): void => {
-    if (validateGuess(newGuess, word)) {
-      submitGuess(newGuess);
-    }
+  const isCompleted = isGameOver;
+
+  const handleGuessSubmit = async (newGuess: string): Promise<void> => {
+    setGuess(newGuess);
+    await checkGuess();
   };
 
   const handleNewGame = (): void => {
@@ -79,7 +76,7 @@ export default function WordScramblePage(): JSX.Element {
             </button>
             
             <button
-              onClick={resetStats}
+              onClick={resetGame}
               className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
               🔄 Reset Stats
@@ -90,10 +87,10 @@ export default function WordScramblePage(): JSX.Element {
         {/* Game Stats */}
         <div className="mb-8">
           <WordScrambleStats
-            totalScore={totalScore}
-            gamesPlayed={gamesPlayed}
             attempts={attempts}
-            gameTime={gameTime}
+            correct={correct}
+            showAnswer={showAnswer}
+            score={score}
           />
         </div>
 
@@ -217,9 +214,9 @@ export default function WordScramblePage(): JSX.Element {
 
         {/* Completed Modal */}
         <WordScrambleCompletedModal
-          isOpen={showCompletedModal}
+          isOpen={isGameOver}
           isCorrect={correct}
-          score={totalScore}
+          score={score}
           word={word}
           scrambled={scrambled}
           attempts={attempts}
