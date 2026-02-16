@@ -26,6 +26,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "gamearchade/src/components/towerstacker", "gamearchade/src/components/tictactoe", "gamearchade/src/app/pages/sudoku/Sudoku.tsx"],
+  "include": ["src/**/*", "gamearchade/src/components/towerstacker", "gamearchade/src/components/tictactoe", "gamearchade/src/app/pages/sudoku/Sudoku.tsx", "gamearchade/src/components/slidingpuzzle", "gamearchade/src/app/pages/slidingpuzzle/SlidingPuzzle.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
