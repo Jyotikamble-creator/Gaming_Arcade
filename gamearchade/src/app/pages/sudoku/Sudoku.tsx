@@ -1,17 +1,17 @@
 // Main page component for the Sudoku game
 import React, { useState, useEffect } from 'react';
 // API and logging imports
-import { submitScore } from '../api/Api';
+import { submitScore } from '../../../../../src/api/Api';
 // Logger
-import { logger, LogTags } from '../lib/logger';
+import { logger, LogTags } from '../../../../../src/lib/logger';
 // Component imports
-import Instructions from '../components/shared/Instructions';
-import Leaderboard from '../components/leaderboard/Leaderboard';
-import SudokuBoard from '../components/sudoku/SudokuBoard';
-import SudokuControls from '../components/sudoku/SudokuControls';
-import SudokuStats from '../components/sudoku/SudokuStats';
-import SudokuCompletedModal from '../components/sudoku/SudokuCompletedModal';
-import AnimatedBackground from '../components/AnimatedBackground';
+import Instructions from '../../../../../src/components/shared/Instructions';
+import Leaderboard from '../../../../../src/components/leaderboard/Leaderboard';
+import SudokuBoard from '../../../../../src/components/sudoku/SudokuBoard';
+import SudokuControls from '../../../../../src/components/sudoku/SudokuControls';
+import SudokuStats from '../../../../../src/components/sudoku/SudokuStats';
+import SudokuCompletedModal from '../../../../../src/components/sudoku/SudokuCompletedModal';
+import AnimatedBackground from '../../../../../src/components/AnimatedBackground';
 // Types
 import type {
   SudokuDifficulty,
@@ -19,7 +19,7 @@ import type {
   SudokuCellPosition,
   SudokuNotes,
   SudokuGameState
-} from '../types/games/sudoku';
+} from '../../../../../src/types/games/sudoku';
 
 // Generate a complete valid Sudoku board
 function generateCompleteBoard(): SudokuBoard {
