@@ -17,21 +17,11 @@ const MathQuiz = lazy(() => import('./pages/MathQuiz'))
 const TypingTest = lazy(() => import('./pages/TypingTest'))
 const Game2048 = lazy(() => import('./pages/Game2048'))
 const WordScramble = lazy(() => import('./pages/WordScramble'))
-const Quiz = lazy(() => import('../gamearchade/src/tsx/Quiz'))
 const EmojiGuess = lazy(() => import('./pages/EmojiGuess'))
 const WhackMole = lazy(() => import('./pages/WhackMole'))
-const SimonSays = lazy(() => import('./pages/SimonSays'))
 const TicTacToe = lazy(() => import('./pages/TicTacToe'))
-const Sudoku = lazy(() => import('../gamearchade/src/app/pages/sudoku/Sudoku'))
 const WordBuilder = lazy(() => import('./pages/WordBuilder'))
 const SpeedMath = lazy(() => import('./pages/SpeedMath'))
-const WordPuzzle = lazy(() => import('./pages/Hangman'))
-const CodingPuzzle = lazy(() => import('./pages/CodingPuzzle'))
-const ReactionTime = lazy(() => import('./pages/ReactionTime'))
-const BrainTeaser = lazy(() => import('./pages/BrainTeaser'))
-const TowerStacker = lazy(() => import('./pages/TowerStacker'))
-const SlidingPuzzle = lazy(() => import('../gamearchade/src/tsx/SlidingPuzzle'))
-const NumberMaze = lazy(() => import('./pages/NumberMaze'))
 const PixelArtCreator = lazy(() => import('./pages/PixelArtCreator'))
 const MusicTiles = lazy(() => import('./pages/MusicTiles'))
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
@@ -86,12 +76,9 @@ export default function App() {
           <Route path="/typing-test" element={<TypingTest />} />
           <Route path="/2048" element={<Game2048 />} />
           <Route path="/word-scramble" element={<WordScramble />} />
-          <Route path="/quiz" element={<Quiz />} />
           <Route path="/emoji-guess" element={<EmojiGuess />} />
           <Route path="/whack-a-mole" element={<WhackMole />} />
-          <Route path="/simon-says" element={<SimonSays />} />
           <Route path="/tic-tac-toe" element={<TicTacToe />} />
-          <Route path="/sudoku" element={<Sudoku />} />
           <Route path="/word-builder" element={<WordBuilder />} />
           <Route path="/speed-math" element={<SpeedMath />} />
           <Route path="/hangman" element={<WordPuzzle />} />
@@ -99,7 +86,6 @@ export default function App() {
           <Route path="/reaction-time" element={<ReactionTime />} />
           <Route path="/brain-teaser" element={<BrainTeaser />} />
           <Route path="/tower-stacker" element={<TowerStacker />} />
-          <Route path="/sliding-puzzle" element={<SlidingPuzzle />} />
           <Route path="/number-maze" element={<NumberMaze />} />
           <Route path="/pixel-art-creator" element={<PixelArtCreator />} />
           <Route path="/music-tiles" element={<MusicTiles />} />
