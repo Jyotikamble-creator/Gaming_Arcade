@@ -1,4 +1,7 @@
 // Component to display Sudoku game statistics including difficulty, time, mistakes, and hints used
+import React from 'react';
+import type { SudokuStatsProps, SudokuDifficulty } from '../../types/games/sudoku';
+
 export default function SudokuStats({
   difficulty,
   time,
@@ -6,16 +9,16 @@ export default function SudokuStats({
   hintsUsed,
   maxHints,
   maxMistakes = 3
-}) {
+}: SudokuStatsProps): JSX.Element {
   // Helper function to format time in mm:ss
-  function formatTime(seconds) {
+  function formatTime(seconds: number): string {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 
   // Difficulty configuration
-  const difficultyConfig = {
+  const difficultyConfig: Record<SudokuDifficulty, { color: string, label: string, emoji: string }> = {
     easy: { color: 'green', label: 'Easy', emoji: '😊' },
     medium: { color: 'yellow', label: 'Medium', emoji: '🤔' },
     hard: { color: 'red', label: 'Hard', emoji: '😤' }
