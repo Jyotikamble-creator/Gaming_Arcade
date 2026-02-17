@@ -11,25 +11,23 @@ import QuizStats from '../components/quiz/QuizStats';
 import QuestionCard from '../components/quiz/QuestionCard';
 import QuizCompletedModal from '../components/quiz/QuizCompletedModal';
 import AnimatedBackground from '../components/AnimatedBackground';
-// Types
-import { QuizQuestion } from '../../gamearchade/src/types/games/quiz';
 
 // Quiz Page Component
-export default function Quiz(): JSX.Element {
-  const [qs, setQs] = useState<QuizQuestion[]>([]);
-  const [i, setI] = useState<number>(0);
-  const [score, setScore] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [quizCompleted, setQuizCompleted] = useState<boolean>(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [showResult, setShowResult] = useState<boolean>(false);
+export default function Quiz() {
+  const [qs, setQs] = useState([]);
+  const [i, setI] = useState(0);
+  const [score, setScore] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
     load();
   }, []);
 
   // Load quiz questions
-  async function load(): Promise<void> {
+  async function load() {
     try {
       setIsLoading(true);
       logger.info('Loading quiz questions', {}, LogTags.QUIZ);
@@ -60,7 +58,7 @@ export default function Quiz(): JSX.Element {
   }
 
   // Handle answer selection
-  function answer(opt: string): void {
+  function answer(opt) {
     setSelectedAnswer(opt);
     setShowResult(true);
 

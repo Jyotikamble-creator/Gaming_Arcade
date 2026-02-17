@@ -8,6 +8,10 @@ export default defineConfig({
   base: process.env.NODE_ENV === 'production' ? '/' : '/',
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    alias: {
+      '@gamearchade': '/gamearchade/src',
+      '@src': '/src'
+    }
   },
   build: {
     outDir: 'dist',
