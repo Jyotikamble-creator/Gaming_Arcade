@@ -1,7 +1,7 @@
 // Simon Says Game Page
 import React, { useEffect, useState, useCallback } from 'react';
 // API functions
-import { startSimon, submitScore } from '../api/Api';
+import { startSimon, submitScore } from '../../../api/Api';
 // Logger
 import { logger, LogTags } from '../../../lib/logger';
 // Components

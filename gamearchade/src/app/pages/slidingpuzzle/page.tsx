@@ -1,16 +1,16 @@
 // A React component for a Sliding Puzzle game with a 4x4 grid.
 import React, { useState, useEffect, useCallback } from 'react';
 // API function to submit score
-import { submitScore } from '../../../../../src/api/Api';
+import { submitScore } from '../../../api/Api';
 // Logger
-import { logger, LogTags } from '../../../../../src/lib/logger';
+import { logger, LogTags } from '../../../lib/logger';
 // Components
-import Instructions from '../../../../../src/components/shared/Instructions';
-import Leaderboard from '../../../../../src/components/leaderboard/Leaderboard';
+import Instructions from '../../../components/shared/Instructions';
+import Leaderboard from '../../../components/leaderboard/Leaderboard';
 import PuzzleGrid from '../../../components/slidingpuzzle/PuzzleGrid';
 import PuzzleStats from '../../../components/slidingpuzzle/PuzzleStats';
 import PuzzleCompletedModal from '../../../components/slidingpuzzle/PuzzleCompletedModal';
-import AnimatedBackground from '../../../../../src/components/AnimatedBackground';
+import AnimatedBackground from '../../../components/AnimatedBackground';
 
 // Constants
 const GRID_SIZE = 4;
