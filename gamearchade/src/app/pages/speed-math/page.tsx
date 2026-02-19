@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import SpeedMath from '@/tsx/SpeedMath'
+import SpeedMath from '@/app/pages/speed-math/SpeedMath'
 
 export default function SpeedMathPage() {
   return (

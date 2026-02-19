@@ -5,13 +5,13 @@ import { submitScore } from '@src/api/Api';
 // Logger Imports
 import { logger, LogTags } from '@src/lib/logger';
 // Component Imports
-import Instructions from '../components/shared/Instructions';
-import Leaderboard from '../components/leaderboard/Leaderboard';
-import SpeedMathProblem from './speedmath/SpeedMathProblem';
-import SpeedMathStats from './speedmath/SpeedMathStats';
-import SpeedMathTimer from './speedmath/SpeedMathTimer';
-import SpeedMathCompletedModal from './speedmath/SpeedMathCompletedModal';
-import AnimatedBackground from '../components/AnimatedBackground';
+import Instructions from '../../../components/shared/Instructions';
+import Leaderboard from '../../../components/leaderboard/Leaderboard';
+import SpeedMathProblem from '../../../components/speedmath/SpeedMathProblem';
+import SpeedMathStats from '../../../components/speedmath/SpeedMathStats';
+import SpeedMathTimer from '../../../components/speedmath/SpeedMathTimer';
+import SpeedMathCompletedModal from '../../../components/speedmath/SpeedMathCompletedModal';
+import AnimatedBackground from '../../../components/AnimatedBackground';
 
 // Main Speed Math Component
 export default function SpeedMath(): JSX.Element {
