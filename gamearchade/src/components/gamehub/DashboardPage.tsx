@@ -25,130 +25,24 @@ interface DashboardPageProps {
   className?: string;
 }
 
-const defaultGames: GameConfig[] = [
-  {
-    id: "word-guess",
-    title: "Word Guess",
-    description: "Test your vocabulary with our word guessing game",
-    category: "word",
-    difficulty: "medium",
-    estimatedTime: "5-10 min",
-    image: "/images/word-guess.jpg",
-    path: "/pages/wordguess",
-    isFeatured: true
-  },
-  {
-    id: "brain-teaser",
-    title: "Brain Teaser",
-    description: "Challenge your mind with puzzles and logic problems",
-    category: "puzzle",
-    difficulty: "hard",
-    estimatedTime: "10-15 min",
-    image: "/images/brain-teaser.jpg",
-    path: "/pages/brainteaser",
-    isNew: true
-  },
-  {
-    id: "coding-puzzle",
-    title: "Coding Puzzle",
-    description: "Solve programming challenges and improve your coding skills",
-    category: "coding",
-    difficulty: "hard",
-    estimatedTime: "15-30 min",
-    image: "/images/coding-puzzle.jpg",
-    path: "/pages/codingpuzzle"
-  },
-  {
-    id: "memory-card",
-    title: "Memory Card",
-    description: "Test your memory with this classic card matching game",
-    category: "memory",
-    difficulty: "easy",
-    estimatedTime: "3-5 min",
-    image: "/images/memory-card.jpg",
-    path: "/pages/memorycard"
-  },
-  {
-    id: "hangman",
-    title: "Hangman",
-    description: "Classic word guessing game - guess the word letter by letter",
-    category: "word",
-    difficulty: "easy",
-    estimatedTime: "3-7 min",
-    image: "/images/hangman.jpg",
-    path: "/pages/hangman"
-  },
-  {
-    id: "whack-mole",
-    title: "Whack-a-Mole",
-    description: "Test your reflexes in this fast-paced action game",
-    category: "action",
-    difficulty: "medium",
-    estimatedTime: "2-5 min",
-    image: "/images/whack-mole.jpg",
-    path: "/pages/whackmole"
-  },
-  {
-    id: "2048",
-    title: "2048",
-    description: "Combine tiles to reach the 2048 tile in this addictive puzzle game",
-    category: "puzzle",
-    difficulty: "medium",
-    estimatedTime: "10-20 min",
-    image: "/images/2048.jpg",
-    path: "/pages/game2048"
-  },
-  {
-    id: "math-quiz",
-    title: "Math Quiz",
-    description: "Test your math skills with quick calculations",
-    category: "educational",
-    difficulty: "easy",
-    estimatedTime: "5-10 min",
-    image: "/images/math-quiz.jpg",
-    path: "/pages/mathquiz"
-  },
-  {
-    id: "word-builder",
-    title: "Word Builder",
-    description: "Build words from given letters",
-    category: "word",
-    difficulty: "medium",
-    estimatedTime: "5-15 min",
-    image: "/images/word-builder.jpg",
-    path: "/pages/wordbuilder"
-  },
-  {
-    id: "word-scramble",
-    title: "Word Scramble",
-    description: "Unscramble letters to form words",
-    category: "word", 
-    difficulty: "medium",
-    estimatedTime: "3-8 min",
-    image: "/images/word-scramble.jpg",
-    path: "/pages/wordscramble"
-  },
-  {
-    id: "emoji-guess",
-    title: "Emoji Guess",
-    description: "Guess the phrase or word from emoji combinations",
-    category: "puzzle",
-    difficulty: "easy",
-    estimatedTime: "2-5 min",
-    image: "/images/emoji-guess.jpg",
-    path: "/pages/emoji"
-  },
-  {
-    id: "number-maze",
-    title: "Number Maze",
-    description: "Navigate through numbers to reach your target",
-    category: "puzzle",
-    difficulty: "hard",
-    estimatedTime: "5-12 min",
-    image: "/images/number-maze.jpg",
-    path: "/pages/numbermaze"
-  }
-];
+import { DashboardHelpers } from '@/utility/dashboard/helpers';
+
+const helperGames = DashboardHelpers?.Games?.getDefaultGames?.() || [];
+
+const defaultGames: GameConfig[] = helperGames.map(g => ({
+  id: g.id || g.name?.toLowerCase().replace(/\s+/g, '-'),
+  title: g.name || g.title || g.id,
+  description: g.description || '',
+  category: g.category || 'uncategorized',
+  difficulty: g.difficulty || 'medium',
+  estimatedTime: g.estimatedTime || '5-10 min',
+  image: `/images/${(g.id || g.name || 'game').toString().toLowerCase().replace(/[^a-z0-9-]/g, '-')}.jpg`,
+  // Normalize path so it points at the app pages route used in this project
+  path: (g.path && g.path.startsWith('/pages')) ? g.path : `/pages${g.path.startsWith('/') ? g.path : '/' + (g.path || g.id)}`,
+  isNew: !!g.isNew,
+  isFeatured: !!g.isFeatured,
+  isComingSoon: !!g.isComingSoon
+}));
 
 function GameCard({ game }: { game: GameConfig }) {
   return (
