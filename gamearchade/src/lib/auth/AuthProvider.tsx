@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
 
 export interface User {
   id: string;
@@ -39,28 +38,22 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   // Initialize auth state on mount
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // Check for stored session
-        const storedUser = localStorage.getItem('gamearchade_user');
-        const storedToken = localStorage.getItem('gamearchade_token');
-        
+        const storedUser = localStorage.getItem('user');
+        const storedToken = localStorage.getItem('token');
+
         if (storedUser && storedToken) {
           const userData = JSON.parse(storedUser);
-          
-          // In a real app, verify the token with your backend here
-          // For demo, we'll trust the stored data
           setUser(userData);
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        // Clear potentially corrupted data
-        localStorage.removeItem('gamearchade_user');
-        localStorage.removeItem('gamearchade_token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
       } finally {
         setLoading(false);
       }
@@ -72,49 +65,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setLoading(true);
-      
-      // Mock API call - replace with real implementation
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock validation
-      if (email === 'demo@gamearchade.com' && password === 'password') {
-        const userData: User = {
-          id: '1',
-          name: 'Demo Player',
-          email: email,
-          displayName: 'Demo Player',
-          createdAt: new Date()
-        };
-        
-        // Store user data
-        localStorage.setItem('gamearchade_user', JSON.stringify(userData));
-        localStorage.setItem('gamearchade_token', 'demo-jwt-token');
-        
-        setUser(userData);
-        return { success: true };
-      } else {
-        // For demo, accept any email/password combo
-        const userData: User = {
-          id: Date.now().toString(),
-          name: email.split('@')[0],
-          email: email,
-          displayName: email.split('@')[0],
-          createdAt: new Date()
-        };
-        
-        localStorage.setItem('gamearchade_user', JSON.stringify(userData));
-        localStorage.setItem('gamearchade_token', 'demo-jwt-token');
-        
-        setUser(userData);
-        return { success: true };
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      return { 
-        success: false, 
-        error: 'Login failed. Please try again.' 
+
+      // Simulate network delay / mock API
+      await new Promise((res) => setTimeout(res, 800));
+
+      const userData: User = {
+        id: email === 'demo@gamearchade.com' ? '1' : Date.now().toString(),
+        name: email.split('@')[0],
+        email,
+        displayName: email.split('@')[0],
+        createdAt: new Date()
       };
+
+      // Persist using the keys expected by the API client
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', 'demo-jwt-token');
+
+      setUser(userData);
+      return { success: true };
+    } catch (err) {
+      console.error('Login error:', err);
+      return { success: false, error: 'Login failed. Please try again.' };
     } finally {
       setLoading(false);
     }
@@ -123,58 +94,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signup = async (name: string, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setLoading(true);
-      
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Check if user already exists (mock check)
-      const existingUser = localStorage.getItem(`user_${email}`);
-      if (existingUser) {
-        return {
-          success: false,
-          error: 'User with this email already exists.'
-        };
-      }
-      
+
+      await new Promise((res) => setTimeout(res, 800));
+
       const userData: User = {
         id: Date.now().toString(),
-        name: name,
-        email: email,
+        name,
+        email,
         displayName: name,
         createdAt: new Date()
       };
-      
-      // Store user data
-      localStorage.setItem('gamearchade_user', JSON.stringify(userData));
-      localStorage.setItem('gamearchade_token', 'demo-jwt-token');
-      localStorage.setItem(`user_${email}`, 'registered'); // Track registered emails
-      
+
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', 'demo-jwt-token');
+      localStorage.setItem(`user_${email}`, 'registered');
+
       setUser(userData);
       return { success: true };
-      
-    } catch (error) {
-      console.error('Signup error:', error);
-      return { 
-        success: false, 
-        error: 'Signup failed. Please try again.' 
-      };
+    } catch (err) {
+      console.error('Signup error:', err);
+      return { success: false, error: 'Signup failed. Please try again.' };
     } finally {
       setLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('gamearchade_user');
-    localStorage.removeItem('gamearchade_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
     setUser(null);
-    router.push('/');
   };
 
   const updateProfile = async (data: Partial<User>): Promise<void> => {
     if (!user) return;
-    
     const updatedUser = { ...user, ...data };
-    localStorage.setItem('gamearchade_user', JSON.stringify(updatedUser));
+    localStorage.setItem('user', JSON.stringify(updatedUser));
     setUser(updatedUser);
   };
 
@@ -188,9 +142,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     updateProfile
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
+export { AuthContext };
