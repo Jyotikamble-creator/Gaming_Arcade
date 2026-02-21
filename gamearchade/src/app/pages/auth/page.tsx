@@ -16,10 +16,17 @@ export default function Auth() {
     const validate = async () => {
       if (!loading && isAuthenticated) {
         try {
+          // Short-circuit demo token: our client uses 'demo-jwt-token' for local demo accounts.
+          const storedToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+          if (storedToken === 'demo-jwt-token') {
+            router.push('/dashboard');
+            return;
+          }
+
           const resp = await meApi();
           if (resp && resp.success && resp.data?.user) {
             // Valid session, go to dashboard
-            router.push("/dashboard");
+            router.push('/dashboard');
             return;
           }
         } catch (err) {
