@@ -3,21 +3,39 @@
 import AuthPage from "@/components/auth/AuthPage";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { useEffect } from "react";
+import { me as meApi } from "@/lib/auth/client";
+import { useEffect, useState } from "react";
 
 export default function Auth() {
   const router = useRouter();
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated, logout } = useAuth();
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // Redirect to dashboard if already authenticated
-    if (!loading && isAuthenticated) {
-      router.push("/dashboard");
-    }
-  }, [isAuthenticated, loading, router]);
+    // Validate stored session with backend before redirecting.
+    const validate = async () => {
+      if (!loading && isAuthenticated) {
+        try {
+          const resp = await meApi();
+          if (resp && resp.success && resp.data?.user) {
+            // Valid session, go to dashboard
+            router.push("/dashboard");
+            return;
+          }
+        } catch (err) {
+          // Invalid session — ensure local state is cleared
+          try { logout(); } catch {}
+        }
+      }
+
+      setChecking(false);
+    };
+
+    void validate();
+  }, [isAuthenticated, loading, router, logout]);
 
   // Show loading state while checking authentication
-  if (loading) {
+  if (loading || checking) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <div className="text-center">

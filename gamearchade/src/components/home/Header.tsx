@@ -1,8 +1,19 @@
+"use client";
+
 // Header component for the home page
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // Displays logo, title, and navigation button.
 export default function Header() {
+  const router = useRouter();
+
+  // Always navigate to the auth page first; `auth` page will
+  // redirect authenticated users to their dashboard.
+  const handleGetStarted = () => {
+    router.push('/pages/auth');
+  };
+
   return (
     <header className="container mx-auto px-4 pt-6">
       <nav className="flex justify-around items-center">
@@ -15,11 +26,9 @@ export default function Header() {
           <h1 className="text-2xl font-bold text-light-text">GAME ARCHADE</h1>
         </div>
 
-        <Link href="/dashboard">
-          <button className="bg-primary-blue hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300">
-            Get Started
-          </button>
-        </Link>
+        <button onClick={handleGetStarted} className="bg-primary-blue hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300">
+          Get Started
+        </button>
       </nav>
     </header>
   );
