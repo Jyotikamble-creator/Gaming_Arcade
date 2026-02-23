@@ -9,7 +9,7 @@ import WordScrambleInput from '@/components/wordscramble/WordScrambleInput';
 import WordScrambleAnswer from '@/components/wordscramble/WordScrambleAnswer';
 import WordScrambleCompletedModal from '@/components/wordscramble/WordScrambleCompletedModal';
 
-export default function WordScramblePage(): JSX.Element {
+export default function WordScramblePage() {
   const {
     gameState,
     data,
@@ -45,12 +45,24 @@ export default function WordScramblePage(): JSX.Element {
     // Modal close logic is handled by the hook
   };
 
+  const handleGuessChange = (value: string): void => {
+    setGuess(value);
+  };
+
+  const handleCheck = (): void => {
+    checkGuess();
+  };
+
+  const handleReveal = (): void => {
+    revealAnswer();
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-pink-500 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold mb-4 bg-linear-to-r from-yellow-400 to-pink-500 bg-clip-text text-transparent">
             Word Scramble
           </h1>
           <p className="text-xl text-gray-300 mb-6">
@@ -62,7 +74,7 @@ export default function WordScramblePage(): JSX.Element {
             <button
               onClick={handleNewGame}
               disabled={isLoading}
-              className="px-6 py-3 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:transform-none"
+              className="px-6 py-3 bg-linear-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:transform-none"
             >
               {isLoading ? '⏳ Loading...' : '🔄 New Word'}
             </button>
@@ -70,28 +82,18 @@ export default function WordScramblePage(): JSX.Element {
             <button
               onClick={revealAnswer}
               disabled={showAnswer || !word || isLoading}
-              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:transform-none"
+              className="px-6 py-3 bg-linear-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:transform-none"
             >
               💡 Reveal Answer
             </button>
             
             <button
               onClick={resetGame}
-              className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+              className="px-6 py-3 bg-linear-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
               🔄 Reset Stats
             </button>
           </div>
-        </div>
-
-        {/* Game Stats */}
-        <div className="mb-8">
-          <WordScrambleStats
-            attempts={attempts}
-            correct={correct}
-            showAnswer={showAnswer}
-            score={score}
-          />
         </div>
 
         {/* Main Game Area */}
@@ -103,7 +105,6 @@ export default function WordScramblePage(): JSX.Element {
                 <WordScrambleDisplay
                   scrambled={scrambled}
                   isLoading={isLoading}
-                  attempts={attempts}
                 />
               </div>
 
@@ -112,11 +113,14 @@ export default function WordScramblePage(): JSX.Element {
                 <div className="mb-8">
                   <WordScrambleInput
                     guess={guess}
-                    word={word}
-                    isCompleted={isCompleted}
-                    isLoading={isLoading}
+                    onChange={handleGuessChange}
+                    onCheck={handleCheck}
+                    onReveal={handleReveal}
+                    onNewWord={handleNewGame}
+                    correct={correct}
+                    showAnswer={showAnswer}
+                    disabled={isLoading}
                     attempts={attempts}
-                    onGuessSubmit={handleGuessSubmit}
                   />
                 </div>
               )}
@@ -126,8 +130,7 @@ export default function WordScramblePage(): JSX.Element {
                 <div className="mb-8">
                   <WordScrambleAnswer
                     word={word}
-                    scrambled={scrambled}
-                    guess={guess}
+                    show={showAnswer}
                     isCorrect={correct}
                     attempts={attempts}
                   />
@@ -160,12 +163,24 @@ export default function WordScramblePage(): JSX.Element {
               <button
                 onClick={handleNewGame}
                 disabled={isLoading}
-                className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold text-xl rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
+                className="px-8 py-4 bg-linear-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold text-xl rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
               >
                 {isLoading ? '⏳ Loading...' : '🚀 Start Playing'}
               </button>
             </div>
           )}
+        </div>
+
+        {/* Game Stats */}
+        <div className="mt-8 mb-8 max-w-4xl mx-auto">
+          <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-gray-700">
+            <WordScrambleStats
+              attempts={attempts}
+              correct={correct}
+              showAnswer={showAnswer}
+              score={score}
+            />
+          </div>
         </div>
 
         {/* Game Instructions */}
@@ -217,8 +232,8 @@ export default function WordScramblePage(): JSX.Element {
           isOpen={isGameOver}
           isCorrect={correct}
           score={score}
-          word={word}
-          scrambled={scrambled}
+          word={word || ''}
+          scrambled={scrambled || ''}
           attempts={attempts}
           guess={guess}
           gameTime={gameTime}

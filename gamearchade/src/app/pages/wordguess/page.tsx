@@ -37,7 +37,7 @@ const WordGuessCompletedModal = dynamic(() => import('@/components/wordguess/Wor
   ssr: false
 });
 
-export default function WordGuessPage(): JSX.Element {
+export default function WordGuessPage() {
   const { user } = useAuth();
   const [gameKey, setGameKey] = useState<number>(0);
   const [showCompletedModal, setShowCompletedModal] = useState<boolean>(false);
@@ -140,7 +140,7 @@ export default function WordGuessPage(): JSX.Element {
               🔤 Word Guess
             </h1>
             <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-              Guess the word by selecting letters. You have 3 wrong guesses allowed!
+              Guess the word by selecting letters. 
             </p>
           </div>
 
@@ -159,24 +159,7 @@ export default function WordGuessPage(): JSX.Element {
             showWord={displayWord}
           />
 
-          {/* Game Stats */}
-          <GameStats
-            key={`stats-${gameKey}`}
-            score={score}
-            wrongGuesses={wrongGuesses}
-            maxWrongGuesses={3}
-            hints={hints}
-            maxHints={3}
-          />
-
-          {/* Game Message */}
-          <GameMessage
-            message={message}
-            word={wordData.word}
-            showWord={displayWord}
-            isWon={isWon}
-            isGameOver={isGameOver}
-          />
+        
 
           {/* Game Area */}
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
@@ -203,6 +186,25 @@ export default function WordGuessPage(): JSX.Element {
               />
             </div>
           </div>
+
+  {/* Game Stats */}
+          <GameStats
+            key={`stats-${gameKey}`}
+            score={score}
+            wrongGuesses={wrongGuesses}
+            maxWrongGuesses={3}
+            hints={hints}
+            maxHints={3}
+          />
+          {/* Game Message */}
+          <GameMessage
+            message={message}
+            word={wordData.word}
+            showWord={displayWord}
+            isWon={isWon}
+            isGameOver={isGameOver}
+          />
+
 
           {/* Instructions */}
           {!isGameOver && (
