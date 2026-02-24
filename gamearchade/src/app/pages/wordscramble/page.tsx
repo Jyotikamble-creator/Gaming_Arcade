@@ -3,11 +3,11 @@
 // Main WordScramble page component
 import React from 'react';
 import { useWordScramble } from '@/hooks/useWordScramble';
-import WordScrambleStats from '@/components/wordscramble/WordScrambleStats';
-import WordScrambleDisplay from '@/components/wordscramble/WordScrambleDisplay';
-import WordScrambleInput from '@/components/wordscramble/WordScrambleInput';
-import WordScrambleAnswer from '@/components/wordscramble/WordScrambleAnswer';
-import WordScrambleCompletedModal from '@/components/wordscramble/WordScrambleCompletedModal';
+import WordScrambleStats from '@/components/games/wordscramble/WordScrambleStats';
+import WordScrambleDisplay from '@/components/games/wordscramble/WordScrambleDisplay';
+import WordScrambleInput from '@/components/games/wordscramble/WordScrambleInput';
+import WordScrambleAnswer from '@/components/games/wordscramble/WordScrambleAnswer';
+import WordScrambleCompletedModal from '@/components/games/wordscramble/WordScrambleCompletedModal';
 
 export default function WordScramblePage() {
   const {

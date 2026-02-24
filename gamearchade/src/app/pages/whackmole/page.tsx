@@ -10,15 +10,15 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorComponent from '@/components/shared/ErrorComponent';
 
 // Dynamic imports for better performance
-const WhackMoleStats = dynamic(() => import('@/components/whackmole/WhackMoleStats'), {
+const WhackMoleStats = dynamic(() => import('@/components/games/whackmole/WhackMoleStats'), {
   loading: () => <div className="animate-pulse bg-gray-700/50 h-20 rounded-lg"></div>
 });
 
-const WhackMoleGrid = dynamic(() => import('@/components/whackmole/WhackMoleGrid'), {
+const WhackMoleGrid = dynamic(() => import('@/components/games/whackmole/WhackMoleGrid'), {
   loading: () => <div className="animate-pulse bg-gray-700/50 h-96 rounded-lg"></div>
 });
 
-const WhackMoleGameOverModal = dynamic(() => import('@/components/whackmole/WhackMoleGameOverModal'), {
+const WhackMoleGameOverModal = dynamic(() => import('@/components/games/whackmole/WhackMoleGameOverModal'), {
   ssr: false
 });
 

@@ -7,10 +7,10 @@ import { logger, LogTags } from '@src/lib/logger';
 // Component Imports
 import Instructions from '../../../components/shared/Instructions';
 import Leaderboard from '../../../components/leaderboard/Leaderboard';
-import SpeedMathProblem from '../../../components/speedmath/SpeedMathProblem';
-import SpeedMathStats from '../../../components/speedmath/SpeedMathStats';
-import SpeedMathTimer from '../../../components/speedmath/SpeedMathTimer';
-import SpeedMathCompletedModal from '../../../components/speedmath/SpeedMathCompletedModal';
+import SpeedMathProblem from '../../../components/games/speedmath/SpeedMathProblem';
+import SpeedMathStats from '../../../components/games/speedmath/SpeedMathStats';
+import SpeedMathTimer from '../../../components/games/speedmath/SpeedMathTimer';
+import SpeedMathCompletedModal from '../../../components/games/speedmath/SpeedMathCompletedModal';
 import AnimatedBackground from '../../../components/AnimatedBackground';
 
 // Main Speed Math Component

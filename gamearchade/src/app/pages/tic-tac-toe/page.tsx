@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { TicTacToeBoard, TicTacToeControls, TicTacToeGameStatus } from '@/components/tictactoe'
+import { TicTacToeBoard, TicTacToeControls, TicTacToeGameStatus } from '@/components/games/tictactoe'
 
 export default function TicTacToePage() {
   return (

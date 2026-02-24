@@ -1,8 +1,8 @@
 "use client"
 import React, { useCallback, useMemo, useState } from 'react'
-import PixelGrid from '@/components/pixelartcreator/PixelGrid'
-import ColorPicker from '@/components/pixelartcreator/ColorPicker'
-import Tools from '@/components/pixelartcreator/Tools'
+import PixelGrid from '@/components/games/pixelartcreator/PixelGrid'
+import ColorPicker from '@/components/games/pixelartcreator/ColorPicker'
+import Tools from '@/components/games/pixelartcreator/Tools'
 
 const GRID_SIZE = 16
 

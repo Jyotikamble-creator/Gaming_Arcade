@@ -7,9 +7,9 @@ import { logger, LogTags } from '../../../lib/logger';
 // Components
 import Instructions from '../../../components/shared/Instructions';
 import Leaderboard from '../../../components/leaderboard/Leaderboard';
-import SimonSaysStats from '../../../components/simonsays/SimonSaysStats';
-import SimonSaysGrid from '../../../components/simonsays/SimonSaysGrid';
-import SimonSaysGameOverModal from '../../../components/simonsays/SimonSaysGameOverModal';
+import SimonSaysStats from '../../../components/games/simonsays/SimonSaysStats';
+import SimonSaysGrid from '../../../components/games/simonsays/SimonSaysGrid';
+import SimonSaysGameOverModal from '../../../components/games/simonsays/SimonSaysGameOverModal';
 import AnimatedBackground from '../../../components/AnimatedBackground';
 
 // Simon Says Page Component

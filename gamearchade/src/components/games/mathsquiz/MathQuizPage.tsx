@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Instructions from '../shared/Instructions';
-import Leaderboard from '../leaderboard/Leaderboard';
+import Instructions from '../../shared/Instructions';
+import Leaderboard from '../../leaderboard/Leaderboard';
 import ProgressBar from './ProgressBar';
 import TimerDisplay from './TimerDisplay';
 import ActionButton from './ActionButton';
 import MathQuestionCard from './MathQuestionCard';
-import AnimatedBackground from '../AnimatedBackground';
+import AnimatedBackground from '../../AnimatedBackground';
 
 // TypeScript interfaces
 interface User {

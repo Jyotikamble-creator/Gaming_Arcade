@@ -10,23 +10,23 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorComponent from '@/components/shared/ErrorComponent';
 
 // Dynamic imports for better performance
-const WordBuilderStats = dynamic(() => import('@/components/wordbuilder/WordBuilderStats'), {
+const WordBuilderStats = dynamic(() => import('@/components/games/wordbuilder/WordBuilderStats'), {
   loading: () => <div className="animate-pulse bg-gray-700/50 h-32 rounded-lg"></div>
 });
 
-const WordBuilderBoard = dynamic(() => import('@/components/wordbuilder/WordBuilderBoard'), {
+const WordBuilderBoard = dynamic(() => import('@/components/games/wordbuilder/WordBuilderBoard'), {
   loading: () => <div className="animate-pulse bg-gray-700/50 h-96 rounded-lg"></div>
 });
 
-const WordBuilderControls = dynamic(() => import('@/components/wordbuilder/WordBuilderControls'), {
+const WordBuilderControls = dynamic(() => import('@/components/games/wordbuilder/WordBuilderControls'), {
   loading: () => <div className="animate-pulse bg-gray-700/50 h-80 rounded-lg"></div>
 });
 
-const WordBuilderMessage = dynamic(() => import('@/components/wordbuilder/WordBuilderMessage'), {
+const WordBuilderMessage = dynamic(() => import('@/components/games/wordbuilder/WordBuilderMessage'), {
   ssr: false
 });
 
-const WordBuilderCompletedModal = dynamic(() => import('@/components/wordbuilder/WordBuilderCompletedModal'), {
+const WordBuilderCompletedModal = dynamic(() => import('@/components/games/wordbuilder/WordBuilderCompletedModal'), {
   ssr: false
 });
 

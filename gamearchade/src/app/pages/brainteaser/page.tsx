@@ -1,7 +1,7 @@
 // Brain Teaser page - Next.js App Router
 "use client";
 
-import BrainTeaserPage from "@/components/brainteaser/BrainTeaserPage";
+import BrainTeaserPage from "@/components/games/brainteaser/BrainTeaserPage";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

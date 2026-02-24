@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
-import TowerDisplay from '@/components/towerstacker/TowerDisplay'
-import TowerStats from '@/components/towerstacker/TowerStats'
+import TowerDisplay from '@/components/games/towerstacker/TowerDisplay'
+import TowerStats from '@/components/games/towerstacker/TowerStats'
 import { useTowerStacker } from '@/hooks/useTowerStacker'
 
 export default function TowerStackerPage() {

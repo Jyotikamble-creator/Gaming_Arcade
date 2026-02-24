@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import Instructions from "../shared/Instructions";
-import Leaderboard from "../leaderboard/Leaderboard";
+import Instructions from "../../shared/Instructions";
+import Leaderboard from "../../leaderboard/Leaderboard";
 import BrainTeaserStats from "./BrainTeaserStats";
 import BrainTeaserDisplay from "./BrainTeaserDisplay";
 import BrainTeaserTimer from "./BrainTeaserTimer";
 import BrainTeaserCompletedModal from "./BrainTeaserCompletedModal";
-import AnimatedBackground from "../AnimatedBackground";
+import AnimatedBackground from "../../AnimatedBackground";
 
 type BrainTeaserPageProps = {
   initialPuzzle?: any;

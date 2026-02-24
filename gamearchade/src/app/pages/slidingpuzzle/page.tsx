@@ -7,9 +7,9 @@ import { logger, LogTags } from '../../../lib/logger';
 // Components
 import Instructions from '../../../components/shared/Instructions';
 import Leaderboard from '../../../components/leaderboard/Leaderboard';
-import PuzzleGrid from '../../../components/slidingpuzzle/PuzzleGrid';
-import PuzzleStats from '../../../components/slidingpuzzle/PuzzleStats';
-import PuzzleCompletedModal from '../../../components/slidingpuzzle/PuzzleCompletedModal';
+import PuzzleGrid from '../../../components/games/slidingpuzzle/PuzzleGrid';
+import PuzzleStats from '../../../components/games/slidingpuzzle/PuzzleStats';
+import PuzzleCompletedModal from '../../../components/games/slidingpuzzle/PuzzleCompletedModal';
 import AnimatedBackground from '../../../components/AnimatedBackground';
 
 // Constants

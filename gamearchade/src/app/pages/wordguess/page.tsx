@@ -9,31 +9,31 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorComponent from '@/components/shared/ErrorComponent';
 
 // Dynamic imports for better performance
-const WordHintDisplay = dynamic(() => import('@/components/wordguess/WordHintDisplay'), {
+const WordHintDisplay = dynamic(() => import('@/components/games/wordguess/WordHintDisplay'), {
   loading: () => <div className="animate-pulse bg-gray-700/50 h-32 rounded-lg"></div>
 });
 
-const WordDisplay = dynamic(() => import('@/components/wordguess/WordDisplay'), {
+const WordDisplay = dynamic(() => import('@/components/games/wordguess/WordDisplay'), {
   loading: () => <div className="animate-pulse bg-gray-700/50 h-48 rounded-lg"></div>
 });
 
-const GameStats = dynamic(() => import('@/components/wordguess/GameStats'), {
+const GameStats = dynamic(() => import('@/components/games/wordguess/GameStats'), {
   loading: () => <div className="animate-pulse bg-gray-700/50 h-40 rounded-lg"></div>
 });
 
-const GameMessage = dynamic(() => import('@/components/wordguess/GameMessage'), {
+const GameMessage = dynamic(() => import('@/components/games/wordguess/GameMessage'), {
   ssr: false
 });
 
-const LetterSelector = dynamic(() => import('@/components/wordguess/LetterSelector'), {
+const LetterSelector = dynamic(() => import('@/components/games/wordguess/LetterSelector'), {
   loading: () => <div className="animate-pulse bg-gray-700/50 h-64 rounded-lg"></div>
 });
 
-const GameControls = dynamic(() => import('@/components/wordguess/GameControls'), {
+const GameControls = dynamic(() => import('@/components/games/wordguess/GameControls'), {
   loading: () => <div className="animate-pulse bg-gray-700/50 h-48 rounded-lg"></div>
 });
 
-const WordGuessCompletedModal = dynamic(() => import('@/components/wordguess/WordGuessCompletedModal'), {
+const WordGuessCompletedModal = dynamic(() => import('@/components/games/wordguess/WordGuessCompletedModal'), {
   ssr: false
 });
 

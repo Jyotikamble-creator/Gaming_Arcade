@@ -1,7 +1,7 @@
 // Math Quiz page - Next.js App Router
 "use client";
 
-import MathQuizPage from "@/components/mathsquiz/MathQuizPage";
+import MathQuizPage from "@/components/games/mathsquiz/MathQuizPage";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
