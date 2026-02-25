@@ -37,55 +37,55 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ gameType, limit = 10 }) => {
         setLoading(true);
         setError(null);
         
-        // Mock API call for now
-        const mockScores: Score[] = [
-          {
-            _id: '1',
-            score: 2500,
-            playerName: 'EmojiMaster',
-            createdAt: new Date().toISOString(),
-            meta: { attempts: 1, hintsUsed: 0 }
-          },
-          {
-            _id: '2',
-            score: 2200,
-            playerName: 'PuzzlePro',
-            createdAt: new Date(Date.now() - 86400000).toISOString(),
-            meta: { attempts: 2, hintsUsed: 1 }
-          },
-          {
-            _id: '3',
-            score: 1900,
-            playerName: 'GameGuru',
-            createdAt: new Date(Date.now() - 172800000).toISOString(),
-            meta: { attempts: 3, hintsUsed: 2 }
-          }
-        ];
+        // // Mock API call for now
+        // const mockScores: Score[] = [
+        //   {
+        //     _id: '1',
+        //     score: 2500,
+        //     playerName: 'EmojiMaster',
+        //     createdAt: new Date().toISOString(),
+        //     meta: { attempts: 1, hintsUsed: 0 }
+        //   },
+        //   {
+        //     _id: '2',
+        //     score: 2200,
+        //     playerName: 'PuzzlePro',
+        //     createdAt: new Date(Date.now() - 86400000).toISOString(),
+        //     meta: { attempts: 2, hintsUsed: 1 }
+        //   },
+        //   {
+        //     _id: '3',
+        //     score: 1900,
+        //     playerName: 'GameGuru',
+        //     createdAt: new Date(Date.now() - 172800000).toISOString(),
+        //     meta: { attempts: 3, hintsUsed: 2 }
+        //   }
+        // ];
 
-        if (mounted) {
-          let filteredScores = mockScores;
+      //   if (mounted) {
+      //     let filteredScores = mockScores;
           
-          if (timeFilter === 'week') {
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            filteredScores = mockScores.filter(score => new Date(score.createdAt) >= weekAgo);
-          } else if (timeFilter === 'month') {
-            const monthAgo = new Date();
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            filteredScores = mockScores.filter(score => new Date(score.createdAt) >= monthAgo);
-          }
+      //     if (timeFilter === 'week') {
+      //       const weekAgo = new Date();
+      //       weekAgo.setDate(weekAgo.getDate() - 7);
+      //       filteredScores = mockScores.filter(score => new Date(score.createdAt) >= weekAgo);
+      //     } else if (timeFilter === 'month') {
+      //       const monthAgo = new Date();
+      //       monthAgo.setMonth(monthAgo.getMonth() - 1);
+      //       filteredScores = mockScores.filter(score => new Date(score.createdAt) >= monthAgo);
+      //     }
           
-          setScores(filteredScores.slice(0, limit));
-        }
-      } catch (e) {
-        if (mounted) {
-          setError(e instanceof Error ? e.message : 'Failed to load scores');
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
+      //     setScores(filteredScores.slice(0, limit));
+      //   }
+      // } catch (e) {
+      //   if (mounted) {
+      //     setError(e instanceof Error ? e.message : 'Failed to load scores');
+      //   }
+      // } finally {
+      //   if (mounted) {
+      //     setLoading(false);
+      //   }
+      // }
     }
 
     loadScores();
