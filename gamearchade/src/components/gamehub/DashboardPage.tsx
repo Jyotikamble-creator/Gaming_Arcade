@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { DashboardHelpers } from '@/utility/dashboard/helpers';
 import Link from "next/link";
 import Sidebar from "./Sidebar";
 
@@ -25,8 +26,6 @@ interface DashboardPageProps {
   className?: string;
 }
 
-import { DashboardHelpers } from '@/utility/dashboard/helpers';
-
 const helperGames = DashboardHelpers?.Games?.getDefaultGames?.() || [];
 
 const defaultGames: GameConfig[] = helperGames.map(g => ({
@@ -34,8 +33,8 @@ const defaultGames: GameConfig[] = helperGames.map(g => ({
   title: g.name || g.title || g.id,
   description: g.description || '',
   category: g.category || 'uncategorized',
-  difficulty: g.difficulty || 'medium',
-  estimatedTime: g.estimatedTime || '5-10 min',
+  // difficulty: g.difficulty || 'medium',
+  // estimatedTime: g.estimatedTime || '5-10 min',
   image: `/images/${(g.id || g.name || 'game').toString().toLowerCase().replace(/[^a-z0-9-]/g, '-')}.jpg`,
   // Normalize path so it points at the app pages route used in this project
   path: (g.path && g.path.startsWith('/pages')) ? g.path : `/pages${g.path.startsWith('/') ? g.path : '/' + (g.path || g.id)}`,
@@ -56,7 +55,7 @@ function GameCard({ game }: { game: GameConfig }) {
     >
       <div className="flex flex-col h-full">
         <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             {game.isNew && (
               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">NEW</span>
             )}
@@ -66,7 +65,7 @@ function GameCard({ game }: { game: GameConfig }) {
             {game.isComingSoon && (
               <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded-full">COMING SOON</span>
             )}
-          </div>
+          </div> */}
           <div className="text-right">
             <div className="text-xs text-white/60 uppercase tracking-wide">{game.category}</div>
             <div className="text-xs text-white/60">{game.difficulty}</div>
@@ -116,10 +115,10 @@ export default function DashboardPage({
         <main className="flex-1 p-8">
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">
-              Welcome{user?.name ? ` back, ${user.name}` : " to GameArchade"}
+              Welcome{user?.name ? ` back, ${user.name}😊` : " to GameArchade"}
             </h1>
             <p className="text-white/70 text-lg">
-              Choose from our collection of engaging games
+              Choose Games from our collection of engaging games
             </p>
           </div>
 
