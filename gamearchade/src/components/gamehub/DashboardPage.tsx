@@ -71,10 +71,10 @@ function GameCard({ game }: { game: GameConfig }) {
             <div className="text-xs text-white/60">{game.difficulty}</div>
           </div>
         </div>
-        
+
         <h3 className="text-xl font-bold text-white mb-2">{game.title}</h3>
         <p className="text-white/70 text-sm mb-4 flex-grow">{game.description}</p>
-        
+
         <div className="flex items-center justify-between">
           <span className="text-white/60 text-xs">{game.estimatedTime}</span>
           <Link
@@ -89,14 +89,14 @@ function GameCard({ game }: { game: GameConfig }) {
   );
 }
 
-export default function DashboardPage({ 
-  games = defaultGames, 
-  user, 
-  className = "" 
+export default function DashboardPage({
+  games = defaultGames,
+  user,
+  className = ""
 }: DashboardPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [filteredGames, setFilteredGames] = useState<GameConfig[]>(games);
-  
+
   useEffect(() => {
     if (selectedCategory === "all") {
       setFilteredGames(games);
@@ -111,7 +111,7 @@ export default function DashboardPage({
     <div className={`min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 ${className}`}>
       <div className="flex">
         <Sidebar />
-        
+
         <main className="flex-1 p-8">
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">
@@ -129,11 +129,10 @@ export default function DashboardPage({
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
-                    selectedCategory === category
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap ${selectedCategory === category
                       ? "bg-blue-600 text-white"
                       : "bg-white/10 text-white/70 hover:bg-white/20"
-                  }`}
+                    }`}
                 >
                   {category.charAt(0).toUpperCase() + category.slice(1)}
                 </button>
@@ -142,7 +141,7 @@ export default function DashboardPage({
           </div>
 
           {/* Games Grid */}
-          <motion.div 
+          <motion.div
             layout
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           >
