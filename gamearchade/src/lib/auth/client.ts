@@ -96,11 +96,8 @@ const removeStoredToken = (): void => {
 authAPI.interceptors.request.use((config) => {
   try {
     const token = getStoredToken();
-    if (token) {
-      config.headers = { 
-        ...config.headers, 
-        Authorization: `Bearer ${token}` 
-      };
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
       authLogger.debug(
         "Auth token attached to request",
         { url: config.url },
@@ -310,7 +307,7 @@ export class AuthApiClient {
         await this.api.post("/auth/logout");
       } catch (e) {
         // Ignore server logout errors, local logout is sufficient
-        authLogger.debug("Server logout failed, but local logout completed", e, {}, AuthLogTags.LOGOUT);
+        authLogger.debug("Server logout failed, but local logout completed", {}, AuthLogTags.LOGOUT);
       }
 
       authLogger.info("User logout completed", {}, AuthLogTags.LOGOUT);

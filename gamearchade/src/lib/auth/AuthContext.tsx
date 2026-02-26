@@ -77,7 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         displayName: email.split('@')[0],
         email: email
       };
-      
+
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
     } catch (error) {
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         displayName: userData.name,
         email: userData.email
       };
-      
+
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
     } catch (error) {
