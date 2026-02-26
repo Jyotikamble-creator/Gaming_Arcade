@@ -35,7 +35,7 @@ interface LogContext {
 }
 
 const LogTags = {
-  TOKEN_MANAGER: "TOKEN_MANAGER",
+ TOKEN_MANAGER: "TOKEN_MANAGER",
   WORD_GUESS: "WORD_GUESS",
   MEMORY_CARD: "MEMORY_CARD",
   MATH_QUIZ: "MATH_QUIZ",
@@ -132,7 +132,6 @@ API.interceptors.response.use(
 // API Client class
 export class GameApiClient {
   private api: AxiosInstance;
-
   constructor() {
     this.api = API;
   }
