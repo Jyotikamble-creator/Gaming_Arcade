@@ -16,7 +16,7 @@ export interface AuthState {
 /**
  * Authentication action types
  */
-export type AuthAction = 
+export type AuthAction =
   | { type: 'AUTH_LOADING' }
   | { type: 'AUTH_SUCCESS'; payload: { user: IUser; token: string } }
   | { type: 'AUTH_ERROR'; payload: string }
@@ -100,7 +100,7 @@ export interface SignupOptions {
 /**
  * OAuth provider types
  */
-export type OAuthProvider = 'google' | 'github' | 'discord' | 'apple';
+export type OAuthProvider = 'google' | 'github';
 
 /**
  * OAuth login request
@@ -170,7 +170,7 @@ export interface UseAuthReturn {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   login: (credentials: LoginRequest, options?: LoginOptions) => Promise<void>;
   signup: (data: SignupRequest, options?: SignupOptions) => Promise<void>;
@@ -178,7 +178,7 @@ export interface UseAuthReturn {
   updateProfile: (data: ProfileUpdateRequest) => Promise<void>;
   refreshToken: () => Promise<void>;
   clearError: () => void;
-  
+
   // Utils
   checkAuth: () => Promise<void>;
   isTokenValid: () => boolean;
@@ -231,9 +231,9 @@ export interface AuthHeaders {
 /**
  * Authentication events
  */
-export type AuthEvent = 
+export type AuthEvent =
   | 'login'
-  | 'logout' 
+  | 'logout'
   | 'signup'
   | 'profile_update'
   | 'token_refresh'

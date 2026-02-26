@@ -20,7 +20,7 @@ export interface AuthConfig {
     oauth: string;
     twoFactor: string;
   };
-  
+
   // Token Configuration
   token: {
     storageKey: string;
@@ -29,7 +29,7 @@ export interface AuthConfig {
     headerName: string;
     prefix: string;
   };
-  
+
   // Session Configuration
   session: {
     timeout: number; // in milliseconds
@@ -37,7 +37,7 @@ export interface AuthConfig {
     maxRetries: number;
     retryDelay: number;
   };
-  
+
   // Security Configuration
   security: {
     enforceHttps: boolean;
@@ -46,7 +46,7 @@ export interface AuthConfig {
     cookieSecure: boolean;
     cookieSameSite: 'strict' | 'lax' | 'none';
   };
-  
+
   // UI Configuration
   ui: {
     redirectAfterLogin: string;
@@ -55,7 +55,7 @@ export interface AuthConfig {
     showRememberMe: boolean;
     showSocialLogin: boolean;
   };
-  
+
   // Validation Configuration
   validation: {
     password: {
@@ -155,39 +155,39 @@ export const AUTH_ERRORS = {
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
   NETWORK_ERROR: 'NETWORK_ERROR',
   TIMEOUT_ERROR: 'TIMEOUT_ERROR',
-  
+
   // Authentication errors
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
   USER_NOT_FOUND: 'USER_NOT_FOUND',
   ACCOUNT_DISABLED: 'ACCOUNT_DISABLED',
   ACCOUNT_LOCKED: 'ACCOUNT_LOCKED',
   EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
-  
+
   // Token errors
   TOKEN_EXPIRED: 'TOKEN_EXPIRED',
   TOKEN_INVALID: 'TOKEN_INVALID',
   TOKEN_MISSING: 'TOKEN_MISSING',
   REFRESH_TOKEN_EXPIRED: 'REFRESH_TOKEN_EXPIRED',
-  
+
   // Validation errors
   INVALID_EMAIL: 'INVALID_EMAIL',
   INVALID_PASSWORD: 'INVALID_PASSWORD',
   INVALID_USERNAME: 'INVALID_USERNAME',
   PASSWORD_TOO_WEAK: 'PASSWORD_TOO_WEAK',
-  
+
   // Registration errors
   EMAIL_ALREADY_EXISTS: 'EMAIL_ALREADY_EXISTS',
   USERNAME_ALREADY_EXISTS: 'USERNAME_ALREADY_EXISTS',
-  
+
   // Rate limiting
   TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
-  
+
   // Two-factor authentication
   TWO_FACTOR_REQUIRED: 'TWO_FACTOR_REQUIRED',
   INVALID_TWO_FACTOR_CODE: 'INVALID_TWO_FACTOR_CODE',
   TWO_FACTOR_BACKUP_CODE_USED: 'TWO_FACTOR_BACKUP_CODE_USED',
-  
+
   // OAuth errors
   OAUTH_ERROR: 'OAUTH_ERROR',
   OAUTH_CANCELLED: 'OAUTH_CANCELLED',
@@ -233,14 +233,14 @@ export const AUTH_EVENTS = {
  * Storage keys for authentication data
  */
 export const STORAGE_KEYS = {
-  AUTH_TOKEN: 'game_arcade_auth_token',
-  REFRESH_TOKEN: 'game_arcade_refresh_token',
-  USER_DATA: 'game_arcade_user_data',
-  TOKEN_EXPIRY: 'game_arcade_token_expiry',
-  REMEMBER_ME: 'game_arcade_remember_me',
-  LAST_LOGIN: 'game_arcade_last_login',
-  LOGIN_ATTEMPTS: 'game_arcade_login_attempts',
-  DEVICE_ID: 'game_arcade_device_id',
+  AUTH_TOKEN: 'auth_token',
+  REFRESH_TOKEN: 'refresh_token',
+  USER_DATA: 'user_data',
+  TOKEN_EXPIRY: 'token_expiry',
+  REMEMBER_ME: 'remember_me',
+  LAST_LOGIN: 'last_login',
+  LOGIN_ATTEMPTS: 'login_attempts',
+  DEVICE_ID: 'device_id',
 } as const;
 
 /**
@@ -310,14 +310,5 @@ export const OAUTH_PROVIDERS = {
     icon: 'github',
     color: '#333',
   },
-  DISCORD: {
-    name: 'Discord',
-    icon: 'discord',
-    color: '#7289da',
-  },
-  APPLE: {
-    name: 'Apple',
-    icon: 'apple',
-    color: '#000',
-  },
+
 } as const;
