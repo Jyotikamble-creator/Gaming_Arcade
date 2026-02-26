@@ -117,8 +117,8 @@ export async function getScoresFiltered(
   const sort = { [sortField]: sortOrder };
   
   const [scores, total] = await Promise.all([
-    ScoreModel.find(query).sort(sort).skip(skip).limit(limit).lean(),
-    ScoreModel.countDocuments(query),
+    ScoreModel.find(query).sort(sort).skip(skip).limit(limit).lean().exec(),
+    ScoreModel.countDocuments(query).exec(),
   ]);
   
   return { scores, total };
@@ -269,32 +269,4 @@ export async function deleteOldScores(daysOld: number = 90): Promise<number> {
   });
   
   return result.deletedCount;
-}
-
-/**
- * Validate score data
- */
-export function validateScoreData(
-  game: string,
-  score: number,
-  playerName?: string
-): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-  
-  if (!game || typeof game !== 'string' || game.trim().length === 0) {
-    errors.push('Game name is required and must be a non-empty string');
-  }
-  
-  if (typeof score !== 'number' || score < 0) {
-    errors.push('Score must be a non-negative number');
-  }
-  
-  if (playerName && typeof playerName !== 'string') {
-    errors.push('Player name must be a string');
-  }
-  
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
 }

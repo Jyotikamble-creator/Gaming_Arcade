@@ -29,7 +29,7 @@ import type {
 /**
  * Base error class with enhanced properties
  */
-abstract class BaseError extends Error implements IBaseError {
+class BaseError extends Error implements IBaseError {
   public readonly name: string;
   public readonly timestamp: Date;
   public readonly category: ErrorCategory;
@@ -441,7 +441,7 @@ export class ErrorHandlerClient {
     logger.debug('Categorizing Axios error', { error: error.message, code: error.code });
 
     if (!error) {
-      const unknownError = new BaseError('Unknown error', 'unknown', 'medium') as IBaseError;
+      const unknownError = new BaseError('Unknown error', 'unknown', 'medium');
       return {
         originalError: error,
         categorizedError: unknownError,
@@ -507,7 +507,7 @@ export class ErrorHandlerClient {
           'unknown',
           'medium',
           `HTTP_${status}`
-        ) as IBaseError;
+        );
       }
     } 
     // Request made but no response received
@@ -527,7 +527,7 @@ export class ErrorHandlerClient {
         error.message || 'Unknown error',
         'unknown',
         'medium'
-      ) as IBaseError;
+      );
     }
 
     return {
@@ -558,7 +558,7 @@ export class ErrorHandlerClient {
         error.message || 'Unknown error',
         'unknown',
         'medium'
-      ) as IBaseError;
+      );
     }
 
     // Log the error
