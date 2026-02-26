@@ -16,12 +16,12 @@ import type {
   Environment,
   LogMetadata
 } from "@/types/logger/logger";
-import { 
-  ClientRequestError, 
-  ServerResponseError, 
-  ConnectionError, 
-  TimeoutError, 
-  SerializationError 
+import {
+  ClientRequestError,
+  ServerResponseError,
+  ConnectionError,
+  TimeoutError,
+  SerializationError
 } from "@/lib/errors/client";
 
 /**
@@ -79,7 +79,7 @@ class LogBufferImpl implements LogBuffer {
   constructor(
     public maxSize: number = 100,
     public flushInterval: number = 5000
-  ) {}
+  ) { }
 
   add(entry: ILogEntry): void {
     this.entries.push(entry);
@@ -117,7 +117,7 @@ export class ClientLogger implements IClientLogger {
 
   constructor(config?: Partial<LoggerConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config };
-    
+
     this.logApi = axios.create({
       baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
       timeout: this.config.server.timeout,
@@ -139,9 +139,9 @@ export class ClientLogger implements IClientLogger {
    * Send log entry to destinations
    */
   async send(
-    level: LogLevel, 
-    tag: string, 
-    message: string, 
+    level: LogLevel,
+    tag: string,
+    message: string,
     context?: Record<string, any>
   ): Promise<void> {
     try {
@@ -151,7 +151,7 @@ export class ClientLogger implements IClientLogger {
 
       // Create log entry
       const entry = this.createLogEntry(level, message, tag, context);
-      
+
       // Apply filters
       if (!this.shouldLog(entry)) {
         return;
@@ -165,7 +165,7 @@ export class ClientLogger implements IClientLogger {
       // Server logging
       if (this.config.server.enabled && this.config.destinations.includes('server')) {
         this.buffer.add(entry);
-        
+
         if (this.buffer.shouldFlush()) {
           await this.flushToServer();
         }
@@ -217,9 +217,9 @@ export class ClientLogger implements IClientLogger {
    * Create structured log entry
    */
   private createLogEntry(
-    level: LogLevel, 
-    message: string, 
-    tag?: string, 
+    level: LogLevel,
+    message: string,
+    tag?: string,
     context?: Record<string, any>
   ): ILogEntry {
     const maskedContext = this.maskSensitiveData(context);
@@ -243,10 +243,10 @@ export class ClientLogger implements IClientLogger {
    */
   private logToConsole(entry: ILogEntry): void {
     const prefix = entry.tag ? `[${entry.tag}]` : '';
-    const timestamp = this.config.console.timestamps 
-      ? `[${entry.timestamp.toISOString()}]` 
+    const timestamp = this.config.console.timestamps
+      ? `[${entry.timestamp.toISOString()}]`
       : '';
-    
+
     const message = `${timestamp} ${prefix} ${entry.message}`;
     const data = entry.context || {};
 
@@ -273,7 +273,7 @@ export class ClientLogger implements IClientLogger {
   private async flushToServer(): Promise<void> {
     try {
       const entries = await this.buffer.flush();
-      
+
       if (entries.length === 0) {
         return;
       }
@@ -295,7 +295,7 @@ export class ClientLogger implements IClientLogger {
     if (this.config.environment === 'development') {
       console.warn('[Logger] Failed to send logs to server:', error.message);
     }
-    
+
     // Could implement retry logic here
   }
 
@@ -396,11 +396,11 @@ export class ClientLogger implements IClientLogger {
     if (typeof value !== 'string') {
       return '[REDACTED]';
     }
-    
+
     if (value.length <= 4) {
       return '*'.repeat(value.length);
     }
-    
+
     return `${value.slice(0, 2)}${'*'.repeat(value.length - 4)}${value.slice(-2)}`;
   }
 
@@ -412,7 +412,7 @@ export class ClientLogger implements IClientLogger {
     if (!maxLength || message.length <= maxLength) {
       return message;
     }
-    
+
     return `${message.slice(0, maxLength - 3)}...`;
   }
 
@@ -460,7 +460,7 @@ export class ClientLogger implements IClientLogger {
     if (this.flushTimer) {
       clearInterval(this.flushTimer);
     }
-    
+
     // Flush any remaining logs
     if (this.buffer.entries.length > 0) {
       this.flushToServer();
@@ -547,7 +547,7 @@ export class Logger implements ILogger {
   private log(level: LogLevel, message: string, context?: Record<string, any>, tag?: string): void {
     const fullContext = { ...this.globalContext, ...context };
     const logTag = tag || 'GENERAL';
-    
+
     // Use void to handle the promise without awaiting
     void this.clientLogger.send(level, logTag, message, fullContext);
   }
@@ -669,7 +669,7 @@ export class Logger implements ILogger {
  * Authentication Logger Implementation
  */
 class AuthLogger implements IAuthLogger {
-  constructor(private logger: Logger) {}
+  constructor(private logger: Logger) { }
 
   loginAttempt(email: string, context?: Record<string, any>): void {
     this.logger.info('Login attempt', { email: this.maskEmail(email), ...context }, 'LOGIN');
@@ -724,7 +724,7 @@ class AuthLogger implements IAuthLogger {
  * API Logger Implementation
  */
 class ApiLogger implements IApiLogger {
-  constructor(private logger: Logger) {}
+  constructor(private logger: Logger) { }
 
   request(method: string, url: string, duration?: number, context?: Record<string, any>): void {
     this.logger.debug('API request', { method, url, duration, ...context }, 'API_REQUEST');
@@ -752,7 +752,7 @@ class ApiLogger implements IApiLogger {
  * Game Logger Implementation
  */
 class GameLogger implements IGameLogger {
-  constructor(private logger: Logger) {}
+  constructor(private logger: Logger) { }
 
   gameStart(gameType: string, userId?: string, context?: Record<string, any>): void {
     this.logger.info('Game started', { gameType, userId, ...context }, 'GAME_START');
@@ -787,7 +787,7 @@ class GameLogger implements IGameLogger {
  * Performance Logger Implementation
  */
 class PerformanceLogger implements IPerformanceLogger {
-  constructor(private logger: Logger) {}
+  constructor(private logger: Logger) { }
 
   pageLoad(page: string, duration: number, context?: Record<string, any>): void {
     this.logger.info('Page loaded', { page, duration, ...context }, 'PAGE_LOAD');

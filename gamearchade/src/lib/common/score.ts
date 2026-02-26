@@ -114,7 +114,7 @@ export async function getScoresFiltered(
   // Sort
   const sortField = pagination.sortBy || 'score';
   const sortOrder = pagination.sortOrder === 'asc' ? 1 : -1;
-  const sort = { [sortField]: sortOrder };
+  const sort: Record<string, 1 | -1> = { [sortField]: sortOrder as 1 | -1 };
   
   const [scores, total] = await Promise.all([
     ScoreModel.find(query).sort(sort).skip(skip).limit(limit).lean().exec(),

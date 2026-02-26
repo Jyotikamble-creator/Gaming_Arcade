@@ -17,7 +17,7 @@ export default function TowerStackerPage() {
   } = useTowerStacker()
 
   return (
-    <div className="min-h-screen p-8 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text">
+    <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-6">Tower Stacker</h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

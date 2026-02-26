@@ -70,7 +70,7 @@ export default function WhackMolePage(): JSX.Element {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 relative overflow-hidden">
+      <div className="min-h-screen bg-linear-to-br from-gray-900 via-purple-900 to-violet-900 relative overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1),transparent_70%)]"></div>
@@ -96,7 +96,7 @@ export default function WhackMolePage(): JSX.Element {
         <div className="relative z-10 container mx-auto px-4 py-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-linear-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
               🔨 Whack-a-Mole
             </h1>
             <p className="text-gray-300 text-lg max-w-2xl mx-auto">
@@ -175,7 +175,7 @@ export default function WhackMolePage(): JSX.Element {
             <div className="text-center mb-8">
               <button
                 onClick={startGame}
-                className="px-8 py-4 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold text-xl rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                className="px-8 py-4 bg-linear-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold text-xl rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 🔨 Start Whacking!
               </button>

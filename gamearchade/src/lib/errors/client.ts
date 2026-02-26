@@ -32,7 +32,7 @@ import type {
 class BaseError extends Error implements IBaseError {
   public readonly name: string;
   public readonly timestamp: Date;
-  public readonly category: ErrorCategory;
+  public category: ErrorCategory;
   public readonly severity: ErrorSeverity;
   public readonly code?: string;
   public readonly metadata?: Record<string, any>;
@@ -457,9 +457,10 @@ export class ErrorHandlerClient {
     // Handle Axios-specific errors
     if (error.code === 'ECONNABORTED') {
       logger.error('[ERROR] Timeout error:', error.message);
+      const timeout = error.config?.timeout ||  0;
       categorizedError = new TimeoutError(
         error.message || 'Request timed out',
-        parseInt(error.timeout?.toString() || '0', 10),
+        timeout,
         'HTTP request'
       );
       shouldRetry = true;
@@ -471,13 +472,7 @@ export class ErrorHandlerClient {
       const url = error.config?.url;
       const method = error.config?.method?.toUpperCase();
 
-      logger.error('[ERROR] HTTP error:', {
-        status,
-        statusText,
-        method,
-        url,
-        message: error.message,
-      });
+      logger.error('[ERROR] HTTP error:', new Error(`${status}: ${error.message}`));
 
       if (status >= 400 && status < 500) {
         // Client-side error
@@ -621,23 +616,20 @@ export class ErrorHandlerClient {
    * Log error with appropriate level
    */
   private logError(error: IBaseError, context: ErrorContext): void {
-    const logData = {
-      error: error.toJSON(),
-      context,
-    };
+    const errorMessage = `${error.name}: ${error.message} [${error.category}/${error.severity}]`;
 
     switch (error.severity) {
       case 'critical':
-        logger.error(`[CRITICAL] ${error.message}`, logData);
+        logger.error(`[CRITICAL] ${error.message}`, new Error(errorMessage));
         break;
       case 'high':
-        logger.error(`[HIGH] ${error.message}`, logData);
+        logger.error(`[HIGH] ${error.message}`, new Error(errorMessage));
         break;
       case 'medium':
-        logger.warn(`[MEDIUM] ${error.message}`, logData);
+        logger.warn(`[MEDIUM] ${error.message}`);
         break;
       case 'low':
-        logger.info(`[LOW] ${error.message}`, logData);
+        logger.info(`[LOW] ${error.message}`);
         break;
     }
   }
@@ -678,11 +670,7 @@ export class ErrorHandlerClient {
       return userNotification.customMessages[error.category];
     }
     
-    if (this.isBaseError(error) && error.getUserMessage) {
-      return error.getUserMessage();
-    }
-    
-    return userNotification.defaultMessage;
+    return error.getUserMessage();
   }
 
   /**

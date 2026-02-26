@@ -43,6 +43,16 @@ export interface IBaseError {
   code?: string;
   stack?: string;
   metadata?: Record<string, any>;
+  
+  /**
+   * Convert error to JSON for serialization
+   */
+  toJSON(): Record<string, any>;
+  
+  /**
+   * Get user-friendly error message
+   */
+  getUserMessage(): string;
 }
 
 /**

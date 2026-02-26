@@ -110,7 +110,7 @@ export default function WordGuessPage() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden">
+      <div className="min-h-screen bg-linear-to-br from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1),transparent_70%)]"></div>
@@ -136,7 +136,7 @@ export default function WordGuessPage() {
         <div className="relative z-10 container mx-auto px-4 py-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-linear-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               🔤 Word Guess
             </h1>
             <p className="text-gray-300 text-lg max-w-2xl mx-auto">

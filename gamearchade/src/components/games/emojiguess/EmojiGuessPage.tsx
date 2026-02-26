@@ -257,7 +257,7 @@ export default function EmojiGuessPage({ user, className = "" }: EmojiGuessPageP
 
   // Main game UI
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden ${className}`}>
+    <div className={`min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden ${className}`}>
       <AnimatedBackground />
       <Confetti show={showConfetti} />
 
