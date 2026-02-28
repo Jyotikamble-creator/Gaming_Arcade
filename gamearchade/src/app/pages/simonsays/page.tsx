@@ -1,16 +1,18 @@
 // Simon Says Game Page
+"use client";
+
 import React, { useEffect, useState, useCallback } from 'react';
 // API functions
-import { startSimon, submitScore } from '../../../api/Api';
+import { startSimon, submitScore } from '@/lib/api/client';
 // Logger
-import { logger, LogTags } from '../../../lib/logger';
+import { logger } from '@/lib/logger';
 // Components
-import Instructions from '../../../components/shared/Instructions';
-import Leaderboard from '../../../components/leaderboard/Leaderboard';
-import SimonSaysStats from '../../../components/games/simonsays/SimonSaysStats';
-import SimonSaysGrid from '../../../components/games/simonsays/SimonSaysGrid';
-import SimonSaysGameOverModal from '../../../components/games/simonsays/SimonSaysGameOverModal';
-import AnimatedBackground from '../../../components/AnimatedBackground';
+import Instructions from '@/components/shared/Instructions';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
+import SimonSaysStats from '@/components/games/simonsays/SimonSaysStats';
+import SimonSaysGrid from '@/components/games/simonsays/SimonSaysGrid';
+import SimonSaysGameOverModal from '@/components/games/simonsays/SimonSaysGameOverModal';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 // Simon Says Page Component
 export default function SimonSays(): JSX.Element {
@@ -29,7 +31,7 @@ export default function SimonSays(): JSX.Element {
     const initializeGame = async (): Promise<void> => {
       try {
         setIsLoading(true);
-        logger.info('Starting Simon Says game', {}, LogTags.SIMON_SAYS);
+        logger.info('Starting Simon Says game', {});
         const r = await startSimon();
         setColors(r.data.colors || ['red', 'blue', 'green', 'yellow']);
         setSeq([]);
@@ -39,9 +41,9 @@ export default function SimonSays(): JSX.Element {
         setGameWon(false);
         setActiveColor(null);
         nextRound([]);
-        logger.info('Simon Says initialized', { colors: r.data.colors?.length || 4 }, LogTags.SIMON_SAYS);
+        logger.info('Simon Says initialized', { colors: r.data.colors?.length || 4 });
       } catch (error) {
-        logger.error('Failed to start Simon Says', error, {}, LogTags.SIMON_SAYS);
+        logger.error('Failed to start Simon Says', error, {});
         setColors(['red', 'blue', 'green', 'yellow']);
         nextRound([]);
       } finally {
@@ -56,7 +58,7 @@ export default function SimonSays(): JSX.Element {
   const restartGame = async (): Promise<void> => {
     try {
       setIsLoading(true);
-      logger.info('Restarting Simon Says game', {}, LogTags.SIMON_SAYS);
+      logger.info('Restarting Simon Says game', {});
       const r = await startSimon();
       setColors(r.data.colors || ['red', 'blue', 'green', 'yellow']);
       setSeq([]);
@@ -66,9 +68,9 @@ export default function SimonSays(): JSX.Element {
       setGameWon(false);
       setActiveColor(null);
       nextRound([]);
-      logger.info('Simon Says restarted', { colors: r.data.colors?.length || 4 }, LogTags.SIMON_SAYS);
+      logger.info('Simon Says restarted', { colors: r.data.colors?.length || 4 });
     } catch (error) {
-      logger.error('Failed to restart Simon Says', error, {}, LogTags.SIMON_SAYS);
+      logger.error('Failed to restart Simon Says', error, {});
       setColors(['red', 'blue', 'green', 'yellow']);
       nextRound([]);
     } finally {
@@ -118,14 +120,14 @@ export default function SimonSays(): JSX.Element {
       setGameOver(true);
       const score = round - 1;
       submitScore({ game: 'simon-says', score, meta: { roundsCompleted: round - 1 } });
-      logger.info('Simon Says game over - wrong sequence', { score, round }, LogTags.SAVE_SCORE);
+      logger.info('Simon Says game over - wrong sequence', { score, round });
     } else if (newSeq.length === seq.length) {
       // Round completed
       if (newSeq.length === 10) {
         // Game won
         setGameWon(true);
         submitScore({ game: 'simon-says', score: 100, meta: { roundsCompleted: 10 } });
-        logger.info('Simon Says game won', { score: 100 }, LogTags.SAVE_SCORE);
+        logger.info('Simon Says game won', { score: 100 });
       } else {
         // Next round
         setTimeout(() => nextRound(seq), 1000);
