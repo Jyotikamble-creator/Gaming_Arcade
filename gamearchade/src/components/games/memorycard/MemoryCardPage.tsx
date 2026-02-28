@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Instructions from '../shared/Instructions';
-import Leaderboard from '../leaderboard/Leaderboard';
+import Instructions from '@/components/shared/Instructions';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
 import Board from './Board';
 import GameStats from './GameStats';
-import AnimatedBackground from '../AnimatedBackground';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 // TypeScript interfaces
 interface User {

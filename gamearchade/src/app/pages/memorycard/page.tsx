@@ -1,7 +1,7 @@
 // Memory Card game page - Next.js App Router
 "use client";
 
-import MemoryCardPage from "@/components/memorycard/MemoryCardPage";
+import MemoryCardPage from "@/components/games/memorycard/MemoryCardPage";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
