@@ -1,16 +1,18 @@
 // A React component for a Sliding Puzzle game with a 4x4 grid.
+"use client";
+
 import React, { useState, useEffect, useCallback } from 'react';
 // API function to submit score
-import { submitScore } from '../../../api/Api';
+import { submitScore } from '@/lib/api/client';
 // Logger
-import { logger, LogTags } from '../../../lib/logger';
+import { logger } from '@/lib/logger';
 // Components
-import Instructions from '../../../components/shared/Instructions';
-import Leaderboard from '../../../components/leaderboard/Leaderboard';
-import PuzzleGrid from '../../../components/games/slidingpuzzle/PuzzleGrid';
-import PuzzleStats from '../../../components/games/slidingpuzzle/PuzzleStats';
-import PuzzleCompletedModal from '../../../components/games/slidingpuzzle/PuzzleCompletedModal';
-import AnimatedBackground from '../../../components/AnimatedBackground';
+import Instructions from '@/components/shared/Instructions';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
+import PuzzleGrid from '@/components/games/slidingpuzzle/PuzzleGrid';
+import PuzzleStats from '@/components/games/slidingpuzzle/PuzzleStats';
+import PuzzleCompletedModal from '@/components/games/slidingpuzzle/PuzzleCompletedModal';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 // Constants
 const GRID_SIZE = 4;
@@ -85,7 +87,7 @@ export default function SlidingPuzzle(): JSX.Element {
 
     setTimeout(() => setIsShuffling(false), 500);
 
-    logger.info('Sliding Puzzle shuffled', {}, LogTags.WORD_GUESS);
+    logger.info('Sliding Puzzle shuffled', {});
   }, [createSolvedPuzzle]);
 
   // Get valid moves for empty space
@@ -147,9 +149,9 @@ export default function SlidingPuzzle(): JSX.Element {
 
     try {
       await submitScore('sliding-puzzle', finalScore);
-      logger.info('Sliding Puzzle completed', { score: finalScore, moves, time: timeElapsed }, LogTags.WORD_GUESS);
+      logger.info('Sliding Puzzle completed', { score: finalScore, moves, time: timeElapsed });
     } catch (error) {
-      logger.error('Failed to submit score', error, {}, LogTags.WORD_GUESS);
+      logger.error('Failed to submit score', error, {});
     }
   }, [moves, timeElapsed]);
 
