@@ -80,7 +80,7 @@ export default function WordScrambleInput({
               px-6 py-3 rounded-lg font-semibold text-lg transition-all duration-200 transform
               ${!guess.trim() || isGameOver || hasReachedMaxAttempts
                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white hover:scale-105 shadow-lg'
+                : 'bg-linear-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white hover:scale-105 shadow-lg'
               }
             `}
           >
@@ -103,7 +103,7 @@ export default function WordScrambleInput({
           <button
             type="button"
             onClick={onNewWord}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+            className="px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
             🔄 New Word
           </button>

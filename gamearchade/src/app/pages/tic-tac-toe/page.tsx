@@ -4,7 +4,7 @@ import { TicTacToeBoard, TicTacToeControls, TicTacToeGameStatus } from '@/compon
 
 export default function TicTacToePage() {
   return (
-    <div className="min-h-screen p-8 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text">
+    <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-6">Tic Tac Toe</h1>
 

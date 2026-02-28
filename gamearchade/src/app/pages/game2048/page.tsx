@@ -15,7 +15,7 @@ export default function Game2048() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-yellow-900 via-orange-900 to-red-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-yellow-900 via-orange-900 to-red-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );

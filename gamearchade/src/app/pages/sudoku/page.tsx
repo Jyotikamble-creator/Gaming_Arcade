@@ -1,31 +1,33 @@
 // Main page component for the Sudoku game
+"use client";
+
 import React, { useState, useEffect } from 'react';
 // API and logging imports
-import { submitScore } from '../../../api/Api';
+import { submitScore } from '@/lib/api/client';
 // Logger
-import { logger, LogTags } from '../../../lib/logger';
+import { logger } from '@/lib/logger';
 // Component imports
-import Instructions from '../../../components/shared/Instructions';
-import Leaderboard from '../../../components/leaderboard/Leaderboard';
-import SudokuBoard from '../../../components/sudoku/SudokuBoard';
-import SudokuControls from '../../../components/sudoku/SudokuControls';
-import SudokuStats from '../../../components/sudoku/SudokuStats';
-import SudokuCompletedModal from '../../../components/sudoku/SudokuCompletedModal';
-import AnimatedBackground from '../../../components/AnimatedBackground';
+import Instructions from '@/components/shared/Instructions';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
+import SudokuBoard from '@/components/games/sudoku/SudokuBoard';
+import SudokuControls from '@/components/games/sudoku/SudokuControls';
+import SudokuStats from '@/components/games/sudoku/SudokuStats';
+import SudokuCompletedModal from '@/components/games/sudoku/SudokuCompletedModal';
+import AnimatedBackground from '@/components/AnimatedBackground';
 // Types
 import type {
   SudokuDifficulty,
-  SudokuBoard,
+  SudokuBoard as BoardGrid,
   SudokuCellPosition,
   SudokuNotes,
   SudokuGameState
 } from '../types/games/sudoku';
 
 // Generate a complete valid Sudoku board
-function generateCompleteBoard(): SudokuBoard {
-  const board: SudokuBoard = Array(9).fill(null).map(() => Array(9).fill(0));
+function generateCompleteBoard(): BoardGrid {
+  const board: BoardGrid = Array(9).fill(null).map(() => Array(9).fill(0));
 
-  function isValid(board: SudokuBoard, row: number, col: number, num: number): boolean {
+  function isValid(board: BoardGrid, row: number, col: number, num: number): boolean {
     // Check row
     for (let x = 0; x < 9; x++) {
       if (board[row][x] === num) return false;
@@ -49,7 +51,7 @@ function generateCompleteBoard(): SudokuBoard {
   }
 
   // Backtracking function to fill the board
-  function fillBoard(board: SudokuBoard): boolean {
+  function fillBoard(board: BoardGrid): boolean {
     for (let row = 0; row < 9; row++) {
       for (let col = 0; col < 9; col++) {
         if (board[row][col] === 0) {
@@ -73,9 +75,9 @@ function generateCompleteBoard(): SudokuBoard {
 }
 
 // Create a puzzle by removing numbers from a complete board
-function createPuzzle(difficulty: SudokuDifficulty = 'medium'): { puzzle: SudokuBoard, solution: SudokuBoard } {
+function createPuzzle(difficulty: SudokuDifficulty = 'medium'): { puzzle: BoardGrid, solution: BoardGrid } {
   const completeBoard = generateCompleteBoard();
-  const puzzle: SudokuBoard = completeBoard.map(row => [...row]);
+  const puzzle: BoardGrid = completeBoard.map(row => [...row]);
 
   // Difficulty settings: number of cells to remove
   const cellsToRemove: Record<SudokuDifficulty, number> = {
@@ -103,10 +105,10 @@ function createPuzzle(difficulty: SudokuDifficulty = 'medium'): { puzzle: Sudoku
 // Main component
 export default function Sudoku(): JSX.Element {
   const [difficulty, setDifficulty] = useState<SudokuDifficulty>('medium');
-  const [puzzle, setPuzzle] = useState<SudokuBoard | null>(null);
-  const [solution, setSolution] = useState<SudokuBoard | null>(null);
-  const [board, setBoard] = useState<SudokuBoard | null>(null);
-  const [initialBoard, setInitialBoard] = useState<SudokuBoard | null>(null);
+  const [puzzle, setPuzzle] = useState<BoardGrid | null>(null);
+  const [solution, setSolution] = useState<BoardGrid | null>(null);
+  const [board, setBoard] = useState<BoardGrid | null>(null);
+  const [initialBoard, setInitialBoard] = useState<BoardGrid | null>(null);
   const [selectedCell, setSelectedCell] = useState<SudokuCellPosition | null>(null);
   const [mistakes, setMistakes] = useState<number>(0);
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -133,7 +135,7 @@ export default function Sudoku(): JSX.Element {
 
   // Start a new game
   function startNewGame(diff: SudokuDifficulty): void {
-    logger.info('Starting new Sudoku game', { difficulty: diff }, LogTags.GAME_LOAD);
+    logger.info('Starting new Sudoku game', { difficulty: diff });
     const { puzzle: newPuzzle, solution: newSolution } = createPuzzle(diff);
     setPuzzle(newPuzzle);
     setSolution(newSolution);
@@ -198,7 +200,7 @@ export default function Sudoku(): JSX.Element {
       // Check if correct
       if (solution && solution[row][col] !== num) {
         setMistakes(prev => prev + 1);
-        logger.debug('Incorrect number placed', { row, col, num, correct: solution[row][col] }, LogTags.GAME_COMPLETE);
+        logger.debug('Incorrect number placed', { row, col, num, correct: solution[row][col] });
       }
 
       setBoard(newBoard);
@@ -251,13 +253,13 @@ export default function Sudoku(): JSX.Element {
       setNotes(newNotes);
     }
 
-    logger.info('Hint used', { row, col, hintsUsed: hintsUsed + 1 }, LogTags.GAME_COMPLETE);
+    logger.info('Hint used', { row, col, hintsUsed: hintsUsed + 1 });
 
     checkCompletion(newBoard);
   }
 
   // Check if puzzle is completed
-  function checkCompletion(currentBoard: SudokuBoard): void {
+  function checkCompletion(currentBoard: BoardGrid): void {
     // Check if all cells are filled
     const isFilled = currentBoard.every(row => row.every(cell => cell !== 0));
 
@@ -290,7 +292,7 @@ export default function Sudoku(): JSX.Element {
           }
         });
 
-        logger.info('Sudoku completed', { score: finalScore, time: finalTime, mistakes, hintsUsed, difficulty }, LogTags.SAVE_SCORE);
+        logger.info('Sudoku completed', { score: finalScore, time: finalTime, mistakes, hintsUsed, difficulty });
       }
     }
   }
@@ -334,7 +336,7 @@ export default function Sudoku(): JSX.Element {
       <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent mb-2">
+          <h1 className="text-5xl font-bold bg-linear-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent mb-2">
             ≡ƒº⌐ Sudoku
           </h1>
           <p className="text-subtle-text text-lg">Fill the 9├ù9 grid with numbers 1-9</p>

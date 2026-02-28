@@ -93,7 +93,7 @@ export default function GameStats({
           </div>
           <div className="w-full bg-gray-700 rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+              className="bg-linear-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
               style={{ width: `${(hintsUsed / maxHints) * 100}%` }}
             ></div>
           </div>

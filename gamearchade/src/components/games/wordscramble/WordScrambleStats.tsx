@@ -80,10 +80,10 @@ export default function WordScrambleStats({
         <div className="w-full bg-gray-700 rounded-full h-3">
           <div
             className={`h-3 rounded-full transition-all duration-300 ${
-              correct ? 'bg-gradient-to-r from-green-500 to-blue-500' :
-              showAnswer ? 'bg-gradient-to-r from-orange-500 to-red-500' :
+              correct ? 'bg-linear-to-r from-green-500 to-blue-500' :
+              showAnswer ? 'bg-linear-to-r from-orange-500 to-red-500' :
               attempts >= maxAttempts ? 'bg-red-500' :
-              'bg-gradient-to-r from-blue-500 to-purple-500'
+              'bg-linear-to-r from-blue-500 to-purple-500'
             }`}
             style={{ width: `${getProgressPercentage()}%` }}
           ></div>

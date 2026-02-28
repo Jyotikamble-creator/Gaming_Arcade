@@ -56,7 +56,7 @@ export default function PuzzleGrid({
                 relative rounded-lg border-2 transition-all duration-200 cursor-pointer
                 ${tile === null
                   ? 'bg-gray-900 border-gray-600'
-                  : 'bg-gradient-to-br from-blue-600 to-purple-600 border-blue-400 hover:border-blue-300 hover:scale-105'
+                  : 'bg-linear-to-br from-blue-600 to-purple-600 border-blue-400 hover:border-blue-300 hover:scale-105'
                 }
                 ${isShuffling ? 'animate-pulse' : ''}
                 ${gameCompleted ? 'cursor-default' : ''}

@@ -176,7 +176,7 @@ export default function WordScrambleCompletedModal({
         <div className="space-y-3">
           <button
             onClick={onNewGame}
-            className="w-full py-3 px-6 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+            className="w-full py-3 px-6 bg-linear-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             🔄 New Word
           </button>

@@ -214,7 +214,7 @@ const MemoryCardPage: React.FC<MemoryCardPageProps> = ({
   // Render loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <AnimatedBackground />
         <div className="text-center relative z-10">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -227,7 +227,7 @@ const MemoryCardPage: React.FC<MemoryCardPageProps> = ({
   // Render error state if no cards
   if (!cards.length) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center px-4">
         <AnimatedBackground />
         <div className="bg-slate-800/90 backdrop-blur-lg rounded-xl p-8 border border-slate-700 max-w-md w-full text-center relative z-10 shadow-2xl">
           <h2 className="text-xl font-bold text-white mb-4">Failed to Load Cards</h2>
@@ -254,7 +254,7 @@ const MemoryCardPage: React.FC<MemoryCardPageProps> = ({
   // Render the game
   return (
     <div className={`min-h-screen text-white relative overflow-hidden ${className || ''}`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
+      <div className="absolute inset-0 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
       <AnimatedBackground />
       
       <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">

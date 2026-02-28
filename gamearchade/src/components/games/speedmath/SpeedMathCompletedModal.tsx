@@ -38,14 +38,14 @@ const SpeedMathCompletedModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 max-w-md w-full border-2 border-purple-500/50 shadow-2xl">
+      <div className="bg-linear-to-br from-gray-800 to-gray-900 rounded-2xl p-8 max-w-md w-full border-2 border-purple-500/50 shadow-2xl">
         <div className="text-center mb-6">
           <div className="text-6xl mb-4">⏱️</div>
           <h2 className="text-3xl font-bold text-white mb-2">Time's Up!</h2>
           <p className="text-gray-400">Great job solving problems!</p>
         </div>
 
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6 mb-6 text-center">
+        <div className="bg-linear-to-r from-purple-600 to-blue-600 rounded-xl p-6 mb-6 text-center">
           <div className="text-gray-200 text-sm font-medium mb-1">FINAL SCORE</div>
           <div className="text-5xl font-bold text-white">{score}</div>
         </div>
@@ -100,7 +100,7 @@ const SpeedMathCompletedModal: React.FC<Props> = ({
         <div className="space-y-3">
           <button
             onClick={onRestart}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
+            className="w-full bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
           >
             Play Again 🎮
           </button>

@@ -63,7 +63,7 @@ export default function LetterSelector({
       <div className="mt-4">
         <div className="w-full bg-gray-700 rounded-full h-1">
           <div
-            className="bg-gradient-to-r from-blue-500 to-purple-500 h-1 rounded-full transition-all duration-300"
+            className="bg-linear-to-r from-blue-500 to-purple-500 h-1 rounded-full transition-all duration-300"
             style={{ 
               width: `${(chosenLetters.length / WORD_GUESS_CONSTANTS.ALPHABET.length) * 100}%` 
             }}

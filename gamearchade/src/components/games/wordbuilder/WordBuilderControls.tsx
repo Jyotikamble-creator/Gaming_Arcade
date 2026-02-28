@@ -27,7 +27,7 @@ export default function WordBuilderControls({
           className={`
             w-full py-3 px-4 rounded-lg font-semibold text-lg transition-all duration-200 transform
             ${canSubmit && !isCompleted
-              ? 'bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white hover:scale-105 shadow-lg'
+              ? 'bg-linear-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white hover:scale-105 shadow-lg'
               : 'bg-gray-600 text-gray-400 cursor-not-allowed'
             }
           `}
@@ -100,7 +100,7 @@ export default function WordBuilderControls({
       {/* New Game Button */}
       <button
         onClick={onNewGame}
-        className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+        className="w-full py-3 px-4 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
       >
         🎮 New Game
       </button>

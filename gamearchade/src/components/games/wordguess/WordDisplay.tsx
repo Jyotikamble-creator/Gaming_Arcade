@@ -56,7 +56,7 @@ export default function WordDisplay({
             
             <div className="w-full max-w-xs mx-auto bg-gray-700 rounded-full h-2">
               <div
-                className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-300"
+                className="bg-linear-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${completionPercentage}%` }}
               ></div>
             </div>

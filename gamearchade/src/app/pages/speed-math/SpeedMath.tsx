@@ -295,7 +295,7 @@ export default function SpeedMath(): JSX.Element {
               <button
                 onClick={startGame}
                 disabled={!difficulty}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg shadow-purple-500/50 hover:scale-105 disabled:hover:scale-100"
+                className="w-full bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg shadow-purple-500/50 hover:scale-105 disabled:hover:scale-100"
               >
                 {difficulty ? 'Start Game Γû╢' : 'Select a Difficulty First'}
               </button>

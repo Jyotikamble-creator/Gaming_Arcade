@@ -79,7 +79,7 @@ export default function WordBuilderStats({
         
         <div className="w-full bg-gray-700 rounded-full h-3">
           <div
-            className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
+            className="bg-linear-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
             style={{ width: `${getProgressPercentage()}%` }}
           ></div>
         </div>
