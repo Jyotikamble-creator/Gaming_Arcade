@@ -1,9 +1,9 @@
 // Speed Math Game Page
 import React, { useEffect, useState, useCallback } from 'react';
 // API and Logger Imports
-import { submitScore } from '@src/api/Api';
+import { submitScore } from '@/lib/api/client';
 // Logger Imports
-import { logger, LogTags } from '@src/lib/logger';
+import { logger } from '@/lib/logger';
 // Component Imports
 import Instructions from '../../../components/shared/Instructions';
 import Leaderboard from '../../../components/leaderboard/Leaderboard';
@@ -105,7 +105,7 @@ export default function SpeedMath(): JSX.Element {
     setUserAnswer('');
     setFeedback('');
     setCurrentProblem(generateProblem());
-    logger.info('Speed Math game started', { difficulty }, LogTags.MATH_QUIZ);
+    logger.info('Speed Math game started', { difficulty });
   }, [generateProblem, difficulty]);
 
   // Timer countdown
@@ -140,9 +140,9 @@ export default function SpeedMath(): JSX.Element {
         problemsSolved,
         totalProblems,
         difficulty
-      }, LogTags.SAVE_SCORE);
+      });
     } catch (error) {
-      logger.error('Failed to submit Speed Math score', error, {}, LogTags.SAVE_SCORE);
+      logger.error('Failed to submit Speed Math score', error, {});
     }
   }, [score, problemsSolved, totalProblems, difficulty, bestStreak]);
 

@@ -281,7 +281,7 @@ export namespace DashboardHelpers {
         {
           id: 'speedmath',
           name: 'Speed Math',
-          path: '/speedmath',
+          path: '/speed-math',
           icon: '⚡',
           color: 'red',
           category: 'math',
@@ -467,7 +467,7 @@ export namespace DashboardHelpers {
         {
           id: 'reactiontime',
           name: 'Reaction Time',
-          path: '/reactiontime',
+          path: '/reaction-time',
           icon: '⚡',
           color: 'lime',
           category: 'action',
@@ -498,7 +498,7 @@ export namespace DashboardHelpers {
         {
           id: 'typetesting',
           name: 'Type Testing',
-          path: '/typetesting',
+          path: '/typing-test',
           icon: '⌨️',
           color: 'amber',
           category: 'typing',
@@ -560,7 +560,7 @@ export namespace DashboardHelpers {
         {
           id: 'towerstacker',
           name: 'Tower Stacker',
-          path: '/towerstacker',
+          path: '/tower-stacker',
           icon: '🏗️',
           color: 'emerald',
           category: 'action',
@@ -591,7 +591,7 @@ export namespace DashboardHelpers {
         {
           id: 'emojiguess',
           name: 'Emoji Guess',
-          path: '/emojiguess',
+          path: '/emoji',
           icon: '😄',
           color: 'slate',
           category: 'word',
@@ -684,7 +684,7 @@ export namespace DashboardHelpers {
         {
           id: 'tictactoe',
           name: 'Tic-Tac-Toe',
-          path: '/tictactoe',
+          path: '/tic-tac-toe',
           icon: '⭕',
           color: 'purple',
           category: 'strategy',
@@ -746,7 +746,7 @@ export namespace DashboardHelpers {
         {
           id: 'pixelartcreator',
           name: 'Pixel Art Creator',
-          path: '/pixelartcreator',
+          path: '/pixel-art-creator',
           icon: '🎨',
           color: 'indigo',
           category: 'creative',
