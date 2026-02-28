@@ -1,7 +1,7 @@
 // Number Maze game page - Next.js App Router
 "use client";
 
-import NumberMazePage from "@/components/numbermaze/NumberMazePage";
+import NumberMazePage from "@/components/games/numbermaze/NumberMazePage";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

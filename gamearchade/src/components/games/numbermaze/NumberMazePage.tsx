@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import Instructions from '../shared/Instructions';
-import Leaderboard from '../leaderboard/Leaderboard';
+import Instructions from '@/components/shared/Instructions';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
 import MazeGrid from './MazeGrid';
 import MazeStats from './MazeStats';
 import MazeCompletedModal from './MazeCompletedModal';
-import AnimatedBackground from '../AnimatedBackground';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 // TypeScript interfaces
 interface User {
