@@ -196,52 +196,6 @@ export function validateDrop(
     message: isPerfect ? 'Perfect drop!' : isValid ? 'Good drop!' : 'Block fell!'
   };
 }
-    return {
-      isValidDrop: true,
-      accuracy: 1.0,
-      newWidth: currentBlock.width,
-      isPerfect: true,
-      blocksLost: 0,
-      canContinue: true
-    };
-  }
-  
-  const blockLeft = dropPosition - currentBlock.width / 2;
-  const blockRight = dropPosition + currentBlock.width / 2;
-  const targetLeft = previousBlock.position - previousBlock.width / 2;
-  const targetRight = previousBlock.position + previousBlock.width / 2;
-  
-  // Calculate overlap
-  const overlapLeft = Math.max(blockLeft, targetLeft);
-  const overlapRight = Math.min(blockRight, targetRight);
-  const overlapWidth = Math.max(0, overlapRight - overlapLeft);
-  
-  // Calculate accuracy based on overlap
-  const maxPossibleOverlap = Math.min(currentBlock.width, previousBlock.width);
-  const accuracy = maxPossibleOverlap > 0 ? overlapWidth / maxPossibleOverlap : 0;
-  
-  // Calculate how much of the block is lost
-  const blocksLost = currentBlock.width - overlapWidth;
-  
-  // New width is the overlap width
-  const newWidth = overlapWidth;
-  
-  // Perfect drop threshold
-  const isPerfect = accuracy >= 0.95; // 95% accuracy is considered perfect
-  
-  // Can continue if there's enough overlap
-  const minWidth = 10; // Minimum width to continue
-  const canContinue = newWidth >= minWidth;
-  
-  return {
-    isValidDrop: overlapWidth > 0,
-    accuracy,
-    newWidth,
-    isPerfect,
-    blocksLost,
-    canContinue
-  };
-}
 
 /**
  * Calculate distance between two positions
