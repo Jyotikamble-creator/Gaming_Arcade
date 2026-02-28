@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyToken } from '@/lib/auth/auth';
 import { getUserReactionStats } from '@/lib/games/reaction-time';
 import { getImprovementMessage } from '@/utility/games/reaction-time';
 

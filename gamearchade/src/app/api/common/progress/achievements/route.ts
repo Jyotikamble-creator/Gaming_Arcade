@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyToken } from '@/lib/auth/auth';
 import { getUserProgress, getStreakInfo } from '@/lib/progress';
 import { checkAchievements } from '@/utility/progress';
 

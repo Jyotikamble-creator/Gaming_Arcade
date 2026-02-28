@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyToken } from '@/lib/auth/auth';
 import { getProgressOverTime } from '@/lib/progress';
 import { formatTimePeriod } from '@/utility/progress';
 import type { TimePeriod } from '@/types/progress';

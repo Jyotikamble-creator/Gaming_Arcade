@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyToken } from '@/lib/auth/auth';
 import { getSummaryStats, calculateUserRank } from '@/lib/progress';
 
 export async function GET(request: NextRequest) {

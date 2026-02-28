@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState, useCallback } from 'react'
-import QuestionCard from '@/components/quiz/QuestionCard'
-import QuizStats from '@/components/quiz/QuizStats'
+import QuestionCard from '@/components/games/quiz/QuestionCard'
+import QuizStats from '@/components/games/quiz/QuizStats'
 
 interface QuizQuestion {
   id: number

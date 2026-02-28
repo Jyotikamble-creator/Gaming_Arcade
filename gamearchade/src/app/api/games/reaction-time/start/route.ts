@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyToken } from '@/lib/auth/auth';
 import { createReactionSession } from '@/lib/games/reaction-time';
 import type { StartReactionRequest, ReactionDifficulty } from '@/types/games/reaction-time';
 import { v4 as uuidv4 } from 'uuid';
