@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import AnimatedBackground from '../AnimatedBackground';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 export default function EmojiGuessLoading() {
   const emojis = ['🎯', '🎲', '🎮', '🤔', '🚀'];
