@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import HangmanPage from "@/components/hangman/HangmanPage";
+import HangmanPage from "@/components/games/hangman/HangmanPage";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from 'next/navigation';
 
