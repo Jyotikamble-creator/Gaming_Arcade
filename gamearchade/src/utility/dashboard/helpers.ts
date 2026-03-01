@@ -777,7 +777,7 @@ export namespace DashboardHelpers {
         {
           id: 'musictiles',
           name: 'Music Tiles',
-          path: '/musictiles',
+          path: '/pages/musictiles',
           icon: '🎶',
           color: 'yellow',
           category: 'music',
@@ -787,7 +787,7 @@ export namespace DashboardHelpers {
           estimatedTime: '3-10 min',
           isNew: false,
           isFeatured: false,
-          isComingSoon: false,
+          isComingSoon: true,
           minPlayers: 1,
           maxPlayers: 1,
           ageRating: 'all',
