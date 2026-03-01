@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import Instructions from "../shared/Instructions";
-import Leaderboard from "../leaderboard/Leaderboard";
+import Instructions from "@/components/shared/Instructions";
+import Leaderboard from "@/components/leaderboard/Leaderboard";
 import PuzzleDisplay from "./PuzzleDisplay";
 import PuzzleInput from "./PuzzleInput";
 import PuzzleStats from "./PuzzleStats";
 import PuzzleHint from "./PuzzleHint";
 import PuzzleCompletedModal from "./PuzzleCompletedModal";
-import AnimatedBackground from "../AnimatedBackground";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 type CodingPuzzlePageProps = {
   initialPuzzle?: any;
