@@ -5,9 +5,9 @@ import GameBoard from './GameBoard';
 import ScoreDisplay from './ScoreDisplay';
 import GameControls from './GameControls';
 import GameStatus from './GameStatus';
-import Instructions from '../shared/Instructions';
-import Leaderboard from '../leaderboard/Leaderboard';
-import AnimatedBackground from '../AnimatedBackground';
+import Instructions from '@/components/shared/Instructions';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 // TypeScript interfaces
 interface User {
