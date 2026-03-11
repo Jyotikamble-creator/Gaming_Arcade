@@ -14,6 +14,7 @@ import SudokuControls from '@/components/games/sudoku/SudokuControls';
 import SudokuStats from '@/components/games/sudoku/SudokuStats';
 import SudokuCompletedModal from '@/components/games/sudoku/SudokuCompletedModal';
 import AnimatedBackground from '@/components/AnimatedBackground';
+import DashboardLayout from '@/components/shared/DashboardLayout';
 // Types
 import type {
   SudokuDifficulty,
@@ -331,9 +332,10 @@ export default function Sudoku(): JSX.Element {
 
   // Render the Sudoku game
   return (
-    <div className="min-h-screen text-light-text relative overflow-hidden">
-      <AnimatedBackground />
-      <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
+    <DashboardLayout>
+      <div className="min-h-screen text-light-text relative overflow-hidden">
+        <AnimatedBackground />
+        <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold bg-linear-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent mb-2">
@@ -415,7 +417,8 @@ export default function Sudoku(): JSX.Element {
         <div className="mt-12">
           <Leaderboard game="sudoku" />
         </div>
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

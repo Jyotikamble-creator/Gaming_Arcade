@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import PixelGrid from '@/components/games/pixelartcreator/PixelGrid'
 import ColorPicker from '@/components/games/pixelartcreator/ColorPicker'
 import Tools from '@/components/games/pixelartcreator/Tools'
+import DashboardLayout from '@/components/shared/DashboardLayout'
 
 const GRID_SIZE = 16
 
@@ -52,21 +53,23 @@ export default function PixelArtCreatorPage() {
   }, [grid])
 
   return (
-    <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <h1 className="text-3xl font-bold mb-4">Pixel Art Creator</h1>
-          <div className="bg-gray-900/60 p-6 rounded">
-            <PixelGrid grid={grid} onPixelClick={onPixelClick} />
+    <DashboardLayout>
+      <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2">
+            <h1 className="text-3xl font-bold mb-4">Pixel Art Creator</h1>
+            <div className="bg-gray-900/60 p-6 rounded">
+              <PixelGrid grid={grid} onPixelClick={onPixelClick} />
+            </div>
+          </div>
+
+          <div>
+            <ColorPicker selectedColor={selectedColor} onColorChange={setSelectedColor} />
+            <div className="my-4" />
+            <Tools tool={tool} onToolChange={setTool} onClear={clearCanvas} onSave={saveArt} />
           </div>
         </div>
-
-        <div>
-          <ColorPicker selectedColor={selectedColor} onColorChange={setSelectedColor} />
-          <div className="my-4" />
-          <Tools tool={tool} onToolChange={setTool} onClear={clearCanvas} onSave={saveArt} />
-        </div>
       </div>
-    </div>
+    </DashboardLayout>
   )
 }

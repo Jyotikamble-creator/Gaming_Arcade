@@ -5,6 +5,7 @@ import NumberMazePage from "@/components/games/numbermaze/NumberMazePage";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function NumberMaze() {
   const { user, loading } = useAuth();
@@ -31,5 +32,9 @@ export default function NumberMaze() {
     return null;
   }
 
-  return <NumberMazePage user={user} />;
+  return (
+    <DashboardLayout>
+      <NumberMazePage user={user} />
+    </DashboardLayout>
+  );
 }

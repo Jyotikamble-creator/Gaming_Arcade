@@ -5,6 +5,7 @@ import CodingPuzzlePage from "@/components/games/codingpuzzle/CodingPuzzlePage";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function CodingPuzzle() {
   const { user, loading } = useAuth();
@@ -31,5 +32,9 @@ export default function CodingPuzzle() {
     return null;
   }
 
-  return <CodingPuzzlePage user={user} />;
+  return (
+    <DashboardLayout>
+      <CodingPuzzlePage user={user} />
+    </DashboardLayout>
+  );
 }

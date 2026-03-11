@@ -2,12 +2,14 @@
 import React from 'react'
 import { TicTacToeBoard, TicTacToeControls, TicTacToeGameStatus } from '@/components/games/tictactoe'
 import { useTicTacToe } from '@/hooks/useTicTacToe'
+import DashboardLayout from '@/components/shared/DashboardLayout'
 
 export default function TicTacToePage() {
   const { board, isXNext, winner, scores, gamesPlayed, handleClick, resetGame, resetScores } = useTicTacToe()
 
   return (
-    <div className="min-h-screen p-8 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text">
+    <DashboardLayout>
+      <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-6 text-center">Tic Tac Toe</h1>
 
@@ -47,6 +49,7 @@ export default function TicTacToePage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </DashboardLayout>
   )
 }

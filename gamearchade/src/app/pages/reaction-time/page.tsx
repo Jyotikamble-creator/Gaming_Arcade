@@ -1,13 +1,16 @@
 "use client"
 import React from 'react'
 import ReactionTime from '@/components/games/reactiontime/ReactionTime'
+import DashboardLayout from '@/components/shared/DashboardLayout'
 
 export default function ReactionTimePage() {
   return (
-    <div className="min-h-screen p-8 bg-slate-900 text-white">
-      <div className="max-w-4xl mx-auto">
-        <ReactionTime />
+    <DashboardLayout>
+      <div className="min-h-screen p-8 bg-slate-900 text-white">
+        <div className="max-w-4xl mx-auto">
+          <ReactionTime />
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   )
 }

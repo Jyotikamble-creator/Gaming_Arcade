@@ -4,6 +4,7 @@ import React from "react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function MusicTiles() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -34,8 +35,9 @@ export default function MusicTiles() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900 p-8">
-      <div className="max-w-4xl mx-auto">
+    <DashboardLayout>
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900 p-8">
+        <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <button
@@ -110,7 +112,8 @@ export default function MusicTiles() {
             Playing as: <span className="text-white font-semibold">{user.name || user.email}</span>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

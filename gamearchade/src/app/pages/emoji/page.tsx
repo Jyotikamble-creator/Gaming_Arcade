@@ -5,6 +5,7 @@ import EmojiGuessPage from "@/components/games/emojiguess/EmojiGuessPage";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function EmojiGuess() {
   const { user, isLoading } = useAuth();
@@ -31,5 +32,9 @@ export default function EmojiGuess() {
     return null;
   }
 
-  return <EmojiGuessPage user={user} />;
+  return (
+    <DashboardLayout>
+      <EmojiGuessPage user={user} />
+    </DashboardLayout>
+  );
 }

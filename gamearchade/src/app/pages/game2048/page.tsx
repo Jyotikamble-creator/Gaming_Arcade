@@ -4,6 +4,7 @@ import React from 'react';
 import Game2048Page from "@/components/games/game2048/Game2048Page";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from 'next/navigation';
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function Game2048() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -27,9 +28,11 @@ export default function Game2048() {
   }
 
   return (
-    <Game2048Page 
-      user={user} 
-      onBackToDashboard={handleBackToDashboard}
-    />
+    <DashboardLayout>
+      <Game2048Page 
+        user={user} 
+        onBackToDashboard={handleBackToDashboard}
+      />
+    </DashboardLayout>
   );
 }

@@ -5,6 +5,7 @@ import MathQuizPage from "@/components/games/mathsquiz/MathQuizPage";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function MathQuiz() {
   const { user, loading } = useAuth();
@@ -31,5 +32,9 @@ export default function MathQuiz() {
     return null;
   }
 
-  return <MathQuizPage user={user} />;
+  return (
+    <DashboardLayout>
+      <MathQuizPage user={user} />
+    </DashboardLayout>
+  );
 }

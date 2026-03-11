@@ -13,6 +13,7 @@ import SimonSaysStats from '@/components/games/simonsays/SimonSaysStats';
 import SimonSaysGrid from '@/components/games/simonsays/SimonSaysGrid';
 import SimonSaysGameOverModal from '@/components/games/simonsays/SimonSaysGameOverModal';
 import AnimatedBackground from '@/components/AnimatedBackground';
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 // Simon Says Page Component
 export default function SimonSays(): JSX.Element {
@@ -149,9 +150,10 @@ export default function SimonSays(): JSX.Element {
 
   // Main render
   return (
-    <div className="min-h-screen text-light-text relative overflow-hidden">
-      <AnimatedBackground />
-      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
+    <DashboardLayout>
+      <div className="min-h-screen text-light-text relative overflow-hidden">
+        <AnimatedBackground />
+        <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">≡ƒÄ» Simon Says</h1>
@@ -193,7 +195,8 @@ export default function SimonSays(): JSX.Element {
         <div className="mt-12">
           <Leaderboard game="simon-says" />
         </div>
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

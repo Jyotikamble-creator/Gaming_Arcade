@@ -8,6 +8,7 @@ import WordScrambleDisplay from '@/components/games/wordscramble/WordScrambleDis
 import WordScrambleInput from '@/components/games/wordscramble/WordScrambleInput';
 import WordScrambleAnswer from '@/components/games/wordscramble/WordScrambleAnswer';
 import WordScrambleCompletedModal from '@/components/games/wordscramble/WordScrambleCompletedModal';
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function WordScramblePage() {
   const {
@@ -58,8 +59,9 @@ export default function WordScramblePage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
-      <div className="container mx-auto px-4 py-8">
+    <DashboardLayout>
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
+        <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold mb-4 bg-linear-to-r from-yellow-400 to-pink-500 bg-clip-text text-transparent">
@@ -240,7 +242,8 @@ export default function WordScramblePage() {
           onClose={handleModalClose}
           onNewGame={handleNewGame}
         />
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

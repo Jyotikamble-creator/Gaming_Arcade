@@ -4,6 +4,7 @@ import React from 'react';
 import HangmanPage from "@/components/games/hangman/HangmanPage";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from 'next/navigation';
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function Hangman() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -27,9 +28,11 @@ export default function Hangman() {
   }
 
   return (
-    <HangmanPage 
-      user={user} 
-      onBackToDashboard={handleBackToDashboard}
-    />
+    <DashboardLayout>
+      <HangmanPage 
+        user={user} 
+        onBackToDashboard={handleBackToDashboard}
+      />
+    </DashboardLayout>
   );
 }

@@ -5,6 +5,7 @@ import MemoryCardPage from "@/components/games/memorycard/MemoryCardPage";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function MemoryCard() {
   const { user, loading } = useAuth();
@@ -31,5 +32,9 @@ export default function MemoryCard() {
     return null;
   }
 
-  return <MemoryCardPage user={user} />;
+  return (
+    <DashboardLayout>
+      <MemoryCardPage user={user} />
+    </DashboardLayout>
+  );
 }

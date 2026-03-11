@@ -13,6 +13,7 @@ import PuzzleGrid from '@/components/games/slidingpuzzle/PuzzleGrid';
 import PuzzleStats from '@/components/games/slidingpuzzle/PuzzleStats';
 import PuzzleCompletedModal from '@/components/games/slidingpuzzle/PuzzleCompletedModal';
 import AnimatedBackground from '@/components/AnimatedBackground';
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 // Constants
 const GRID_SIZE = 4;
@@ -172,9 +173,10 @@ export default function SlidingPuzzle(): JSX.Element {
 
   // Render
   return (
-    <div className="min-h-screen text-light-text relative overflow-hidden">
-      <AnimatedBackground />
-      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
+    <DashboardLayout>
+      <div className="min-h-screen text-light-text relative overflow-hidden">
+        <AnimatedBackground />
+        <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Sliding Puzzle</h1>
@@ -218,7 +220,8 @@ export default function SlidingPuzzle(): JSX.Element {
         <div className="mt-12">
           <Leaderboard game="sliding-puzzle" />
         </div>
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

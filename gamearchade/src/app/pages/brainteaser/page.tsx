@@ -5,6 +5,7 @@ import BrainTeaserPage from "@/components/games/brainteaser/BrainTeaserPage";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function BrainTeaser() {
   const { user, loading } = useAuth();
@@ -31,5 +32,9 @@ export default function BrainTeaser() {
     return null;
   }
 
-  return <BrainTeaserPage user={user} />;
+  return (
+    <DashboardLayout>
+      <BrainTeaserPage user={user} />
+    </DashboardLayout>
+  );
 }

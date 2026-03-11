@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import QuestionCard from '@/components/games/quiz/QuestionCard'
 import QuizStats from '@/components/games/quiz/QuizStats'
+import DashboardLayout from '@/components/shared/DashboardLayout'
 
 interface QuizQuestion {
   id: number
@@ -61,21 +62,23 @@ export default function QuizPage() {
   const current = questions[currentIndex]
 
   return (
-    <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-6">Quiz</h1>
+    <DashboardLayout>
+      <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold mb-6">Quiz</h1>
 
-        <QuizStats current={currentIndex + 1} total={questions.length} score={score} progress={Math.round(((currentIndex+1)/questions.length)*100)} />
+          <QuizStats current={currentIndex + 1} total={questions.length} score={score} progress={Math.round(((currentIndex+1)/questions.length)*100)} />
 
-        <QuestionCard
-          question={current.q}
-          options={current.options}
-          onAnswer={handleAnswer}
-          showResult={showResult}
-          selectedAnswer={selectedAnswer}
-          correctAnswer={current.ans}
-        />
+          <QuestionCard
+            question={current.q}
+            options={current.options}
+            onAnswer={handleAnswer}
+            showResult={showResult}
+            selectedAnswer={selectedAnswer}
+            correctAnswer={current.ans}
+          />
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   )
 }
