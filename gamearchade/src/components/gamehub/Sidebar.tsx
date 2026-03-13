@@ -3,14 +3,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 import {
   Home,
   Trophy,
   User,
   Settings,
-  HelpCircle,
   LogOut,
-  Gamepad2
+  Gamepad2,
+  X
 } from 'lucide-react';
 
 interface SidebarItem {
@@ -19,6 +20,11 @@ interface SidebarItem {
   icon: React.ComponentType<{ className?: string }>;
   path: string;
   badge?: string;
+}
+
+interface SidebarProps {
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 const sidebarItems: SidebarItem[] = [
@@ -55,12 +61,46 @@ const sidebarItems: SidebarItem[] = [
 
 ];
 
-export default function Sidebar() {
-  const [activeItem, setActiveItem] = React.useState('dashboard');
+export default function Sidebar({
+  isMobileOpen = false,
+  onCloseMobile
+}: SidebarProps) {
+  const pathname = usePathname();
+
+  const isItemActive = (path: string): boolean => {
+    if (!pathname) return false;
+    if (path === '/dashboard') return pathname === '/dashboard';
+    return pathname.startsWith(path);
+  };
 
   return (
-    <div className="w-64 bg-gray-900/80 backdrop-blur-xl border-r border-gray-700/50 min-h-screen">
+    <>
+      {isMobileOpen && (
+        <button
+          type="button"
+          aria-label="Close menu"
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={onCloseMobile}
+        />
+      )}
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 h-dvh w-72 overflow-y-auto bg-gray-900/90 backdrop-blur-xl border-r border-gray-700/50 transform transition-transform duration-300 md:static md:z-auto md:h-auto md:w-64 md:translate-x-0 ${
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
       <div className="p-6">
+        <div className="mb-4 flex items-center justify-end md:hidden">
+          <button
+            type="button"
+            aria-label="Close navigation"
+            onClick={onCloseMobile}
+            className="rounded-lg p-2 text-gray-300 hover:bg-gray-800/50 hover:text-white"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
         {/* Logo/Brand */}
         <div className="flex items-center space-x-3 mb-8">
           <div>
@@ -79,8 +119,8 @@ export default function Sidebar() {
             >
               <Link
                 href={item.path}
-                onClick={() => setActiveItem(item.id)}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${activeItem === item.id
+                onClick={onCloseMobile}
+                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${isItemActive(item.path)
                     ? 'bg-blue-600 text-white shadow-lg'
                     : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
                   }`}
@@ -109,6 +149,7 @@ export default function Sidebar() {
         </div>
 
       </div>
-    </div>
+      </aside>
+    </>
   );
 }
