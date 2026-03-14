@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import DashboardPage from "@/components/gamehub/DashboardPage";
+import DashboardPage from "@/components/gamehub/Dashboard";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

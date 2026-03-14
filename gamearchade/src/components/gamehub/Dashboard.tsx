@@ -55,29 +55,10 @@ function GameCard({ game }: { game: GameConfig }) {
       className="min-w-0 rounded-lg border border-white/20 bg-white/10 p-4 shadow-lg backdrop-blur-lg transition-all duration-300 hover:border-white/40 sm:rounded-xl sm:p-5 lg:p-6"
     >
       <div className="flex h-full min-w-0 flex-col">
-        <div className="mb-3 flex items-start justify-between sm:mb-4">
-          {/* <div className="flex items-center space-x-2">
-            {game.isNew && (
-              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">NEW</span>
-            )}
-            {game.isFeatured && (
-              <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">FEATURED</span>
-            )}
-            {game.isComingSoon && (
-              <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded-full">COMING SOON</span>
-            )}
-          </div> */}
-          <div className="max-w-[55%] text-right">
-            <div className="text-xs uppercase tracking-wide text-white/60 wrap-break-word">{game.category}</div>
-            <div className="text-xs text-white/60">{game.difficulty}</div>
-          </div>
-        </div>
-
         <h3 className="mb-2 text-lg font-bold text-white wrap-break-word sm:text-xl">{game.title}</h3>
         <p className="mb-4 grow text-xs text-white/70 wrap-break-word sm:text-sm">{game.description}</p>
 
         <div className="mt-auto flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-          <span className="text-xs text-white/60">{game.estimatedTime || '5-10 min'}</span>
           <Link
             href={game.path}
             className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-700 sm:w-auto"
@@ -85,6 +66,7 @@ function GameCard({ game }: { game: GameConfig }) {
             Play Now
           </Link>
         </div>
+
       </div>
     </motion.div>
   );
@@ -139,23 +121,6 @@ export default function DashboardPage({
             </p>
           </div>
 
-          {/* Category Filter */}
-          <div className="mb-6 md:mb-8">
-            <div className="flex space-x-2 overflow-x-auto pb-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`rounded-lg px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors duration-200 sm:px-4 sm:text-sm ${selectedCategory === category
-                      ? "bg-blue-600 text-white"
-                      : "bg-white/10 text-white/70 hover:bg-white/20"
-                    }`}
-                >
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Games Grid */}
           <motion.div
