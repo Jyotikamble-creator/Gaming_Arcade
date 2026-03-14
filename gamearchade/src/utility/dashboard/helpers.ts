@@ -18,12 +18,12 @@ import type {
  * Dashboard Configuration Utilities
  */
 export namespace DashboardHelpers {
-  
+
   /**
    * Configuration Management
    */
   export namespace Config {
-    
+
     /**
      * Create default dashboard configuration
      */
@@ -34,6 +34,9 @@ export namespace DashboardHelpers {
         showCategories: true,
         showSearch: true,
         showStats: true,
+        showFilters: true,
+        showRecentlyPlayed: true,
+        showFavorites: false,
         enableAnimations: true,
         enableSounds: false,
         theme: 'dark',
@@ -48,6 +51,12 @@ export namespace DashboardHelpers {
         cacheTimeout: 300000, // 5 minutes
         maxRecentGames: 10,
         enableOfflineMode: false,
+        gridColumns: {
+          mobile: 1,
+          tablet: 2,
+          desktop: 3,
+          large: 4
+        },
         accessibilityOptions: {
           highContrast: false,
           reducedMotion: false,
@@ -86,7 +95,7 @@ export namespace DashboardHelpers {
    * Game Management Utilities
    */
   export namespace Games {
-    
+
     /**
      * Get default game configurations
      */
@@ -102,7 +111,6 @@ export namespace DashboardHelpers {
           difficulty: 'medium',
           description: 'Guess the hidden word with letter clues',
           tags: ['word', 'puzzle', 'vocabulary'],
-          estimatedTime: '5-10 min',
           isNew: false,
           isFeatured: true,
           isComingSoon: false,
@@ -123,99 +131,7 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
-        {
-          id: 'hangman',
-          name: 'Hangman',
-          path: '/hangman',
-          icon: '🎯',
-          color: 'purple',
-          category: 'word',
-          difficulty: 'easy',
-          description: 'Classic word guessing game',
-          tags: ['word', 'classic', 'guessing'],
-          estimatedTime: '5-15 min',
-          isNew: false,
-          isFeatured: false,
-          isComingSoon: false,
-          minPlayers: 1,
-          maxPlayers: 1,
-          ageRating: 'all',
-          platforms: ['web'],
-          controls: ['keyboard', 'mouse'],
-          features: ['singleplayer', 'scoring', 'categories'],
-          lastUpdated: new Date().toISOString(),
-          stats: {
-            totalPlays: 0,
-            averageScore: 0,
-            bestScore: 0,
-            completionRate: 0,
-            averageTime: 0,
-            rating: 0,
-            reviews: 0
-          }
-        },
-        {
-          id: 'wordscramble',
-          name: 'Word Scramble',
-          path: '/wordscramble',
-          icon: '🔀',
-          color: 'green',
-          category: 'word',
-          difficulty: 'medium',
-          description: 'Unscramble letters to form words',
-          tags: ['word', 'scramble', 'anagram'],
-          estimatedTime: '3-8 min',
-          isNew: false,
-          isFeatured: false,
-          isComingSoon: false,
-          minPlayers: 1,
-          maxPlayers: 1,
-          ageRating: 'all',
-          platforms: ['web'],
-          controls: ['keyboard', 'mouse'],
-          features: ['singleplayer', 'timer', 'scoring'],
-          lastUpdated: new Date().toISOString(),
-          stats: {
-            totalPlays: 0,
-            averageScore: 0,
-            bestScore: 0,
-            completionRate: 0,
-            averageTime: 0,
-            rating: 0,
-            reviews: 0
-          }
-        },
-        {
-          id: 'wordbuilder',
-          name: 'Word Builder',
-          path: '/wordbuilder',
-          icon: '🧱',
-          color: 'indigo',
-          category: 'word',
-          difficulty: 'hard',
-          description: 'Build words from letter tiles',
-          tags: ['word', 'building', 'tiles'],
-          estimatedTime: '10-20 min',
-          isNew: true,
-          isFeatured: false,
-          isComingSoon: false,
-          minPlayers: 1,
-          maxPlayers: 1,
-          ageRating: 'all',
-          platforms: ['web'],
-          controls: ['mouse', 'touch'],
-          features: ['singleplayer', 'scoring', 'powerups'],
-          lastUpdated: new Date().toISOString(),
-          stats: {
-            totalPlays: 0,
-            averageScore: 0,
-            bestScore: 0,
-            completionRate: 0,
-            averageTime: 0,
-            rating: 0,
-            reviews: 0
-          }
-        },
+
         {
           id: 'quiz',
           name: 'Quiz Master',
@@ -226,7 +142,6 @@ export namespace DashboardHelpers {
           difficulty: 'medium',
           description: 'Test your knowledge with trivia questions',
           tags: ['trivia', 'knowledge', 'questions'],
-          estimatedTime: '10-30 min',
           isNew: false,
           isFeatured: true,
           isComingSoon: false,
@@ -247,68 +162,7 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
-        {
-          id: 'mathquiz',
-          name: 'Math Quiz',
-          path: '/mathquiz',
-          icon: '➕',
-          color: 'pink',
-          category: 'math',
-          difficulty: 'easy',
-          description: 'Practice math with fun quizzes',
-          tags: ['math', 'arithmetic', 'education'],
-          estimatedTime: '5-15 min',
-          isNew: false,
-          isFeatured: false,
-          isComingSoon: false,
-          minPlayers: 1,
-          maxPlayers: 1,
-          ageRating: 'all',
-          platforms: ['web'],
-          controls: ['keyboard', 'mouse'],
-          features: ['singleplayer', 'levels', 'progress'],
-          lastUpdated: new Date().toISOString(),
-          stats: {
-            totalPlays: 0,
-            averageScore: 0,
-            bestScore: 0,
-            completionRate: 0,
-            averageTime: 0,
-            rating: 0,
-            reviews: 0
-          }
-        },
-        {
-          id: 'speedmath',
-          name: 'Speed Math',
-          path: '/speed-math',
-          icon: '⚡',
-          color: 'red',
-          category: 'math',
-          difficulty: 'hard',
-          description: 'Solve math problems as fast as you can',
-          tags: ['math', 'speed', 'challenge'],
-          estimatedTime: '3-10 min',
-          isNew: false,
-          isFeatured: false,
-          isComingSoon: false,
-          minPlayers: 1,
-          maxPlayers: 1,
-          ageRating: 'all',
-          platforms: ['web'],
-          controls: ['keyboard'],
-          features: ['singleplayer', 'timer', 'leaderboard'],
-          lastUpdated: new Date().toISOString(),
-          stats: {
-            totalPlays: 0,
-            averageScore: 0,
-            bestScore: 0,
-            completionRate: 0,
-            averageTime: 0,
-            rating: 0,
-            reviews: 0
-          }
-        },
+
         {
           id: 'memorycard',
           name: 'Memory Cards',
@@ -319,7 +173,6 @@ export namespace DashboardHelpers {
           difficulty: 'medium',
           description: 'Match pairs of cards to test your memory',
           tags: ['memory', 'cards', 'matching'],
-          estimatedTime: '5-15 min',
           isNew: false,
           isFeatured: false,
           isComingSoon: false,
@@ -340,88 +193,26 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
-        {
-          id: 'simonsays',
-          name: 'Simon Says',
-          path: '/simonsays',
-          icon: '🎵',
-          color: 'brown',
-          category: 'memory',
+
+         {
+          id: 'wordscramble',
+          name: 'Word Scramble',
+          path: '/wordscramble',
+          icon: '🔀',
+          color: 'green',
+          category: 'word',
           difficulty: 'medium',
-          description: 'Remember and repeat the sequence',
-          tags: ['memory', 'sequence', 'pattern'],
-          estimatedTime: '5-20 min',
+          description: 'Unscramble letters to form words',
+          tags: ['word', 'scramble', 'anagram'],
           isNew: false,
           isFeatured: false,
-          isComingSoon: false,
-          minPlayers: 1,
-          maxPlayers: 1,
-          ageRating: 'all',
-          platforms: ['web'],
-          controls: ['mouse', 'touch'],
-          features: ['singleplayer', 'sound', 'progression'],
-          lastUpdated: new Date().toISOString(),
-          stats: {
-            totalPlays: 0,
-            averageScore: 0,
-            bestScore: 0,
-            completionRate: 0,
-            averageTime: 0,
-            rating: 0,
-            reviews: 0
-          }
-        },
-        {
-          id: 'slidingpuzzle',
-          name: 'Sliding Puzzle',
-          path: '/slidingpuzzle',
-          icon: '🧩',
-          color: 'cyan',
-          category: 'puzzle',
-          difficulty: 'medium',
-          description: 'Slide tiles to complete the picture',
-          tags: ['puzzle', 'tiles', 'sliding'],
-          estimatedTime: '10-30 min',
-          isNew: false,
-          isFeatured: false,
-          isComingSoon: false,
-          minPlayers: 1,
-          maxPlayers: 1,
-          ageRating: 'all',
-          platforms: ['web'],
-          controls: ['mouse', 'touch'],
-          features: ['singleplayer', 'images', 'timer'],
-          lastUpdated: new Date().toISOString(),
-          stats: {
-            totalPlays: 0,
-            averageScore: 0,
-            bestScore: 0,
-            completionRate: 0,
-            averageTime: 0,
-            rating: 0,
-            reviews: 0
-          }
-        },
-        {
-          id: 'sudoku',
-          name: 'Sudoku',
-          path: '/sudoku',
-          icon: '🔢',
-          color: 'teal',
-          category: 'puzzle',
-          difficulty: 'hard',
-          description: 'Fill the grid with numbers 1-9',
-          tags: ['puzzle', 'numbers', 'logic'],
-          estimatedTime: '15-60 min',
-          isNew: false,
-          isFeatured: true,
           isComingSoon: false,
           minPlayers: 1,
           maxPlayers: 1,
           ageRating: 'all',
           platforms: ['web'],
           controls: ['keyboard', 'mouse'],
-          features: ['singleplayer', 'difficulty', 'hints'],
+          features: ['singleplayer', 'timer', 'scoring'],
           lastUpdated: new Date().toISOString(),
           stats: {
             totalPlays: 0,
@@ -433,6 +224,7 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
+
         {
           id: 'brainteaser',
           name: 'Brain Teaser',
@@ -443,7 +235,6 @@ export namespace DashboardHelpers {
           difficulty: 'hard',
           description: 'Challenge your mind with brain teasers',
           tags: ['puzzle', 'brain', 'logic'],
-          estimatedTime: '5-20 min',
           isNew: true,
           isFeatured: false,
           isComingSoon: false,
@@ -464,6 +255,38 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
+
+         {
+          id: 'speedmath',
+          name: 'Speed Math',
+          path: '/speed-math',
+          icon: '⚡',
+          color: 'red',
+          category: 'math',
+          difficulty: 'hard',
+          description: 'Solve math problems as fast as you can',
+          tags: ['math', 'speed', 'challenge'],
+          isNew: false,
+          isFeatured: false,
+          isComingSoon: false,
+          minPlayers: 1,
+          maxPlayers: 1,
+          ageRating: 'all',
+          platforms: ['web'],
+          controls: ['keyboard'],
+          features: ['singleplayer', 'timer', 'leaderboard'],
+          lastUpdated: new Date().toISOString(),
+          stats: {
+            totalPlays: 0,
+            averageScore: 0,
+            bestScore: 0,
+            completionRate: 0,
+            averageTime: 0,
+            rating: 0,
+            reviews: 0
+          }
+        },
+
         {
           id: 'reactiontime',
           name: 'Reaction Time',
@@ -474,7 +297,6 @@ export namespace DashboardHelpers {
           difficulty: 'easy',
           description: 'Test your reflexes and reaction speed',
           tags: ['action', 'reflexes', 'speed'],
-          estimatedTime: '2-5 min',
           isNew: false,
           isFeatured: false,
           isComingSoon: false,
@@ -495,26 +317,26 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
-        {
-          id: 'typetesting',
-          name: 'Type Testing',
-          path: '/typing-test',
-          icon: '⌨️',
-          color: 'amber',
-          category: 'typing',
-          difficulty: 'medium',
-          description: 'Improve your typing speed and accuracy',
-          tags: ['typing', 'speed', 'accuracy'],
-          estimatedTime: '5-15 min',
-          isNew: false,
+
+          {
+          id: 'wordbuilder',
+          name: 'Word Builder',
+          path: '/wordbuilder',
+          icon: '🧱',
+          color: 'indigo',
+          category: 'word',
+          difficulty: 'hard',
+          description: 'Build words from letter tiles',
+          tags: ['word', 'building', 'tiles'],
+          isNew: true,
           isFeatured: false,
           isComingSoon: false,
           minPlayers: 1,
           maxPlayers: 1,
           ageRating: 'all',
           platforms: ['web'],
-          controls: ['keyboard'],
-          features: ['singleplayer', 'wpm', 'accuracy'],
+          controls: ['mouse', 'touch'],
+          features: ['singleplayer', 'scoring', 'powerups'],
           lastUpdated: new Date().toISOString(),
           stats: {
             totalPlays: 0,
@@ -526,17 +348,17 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
-        {
-          id: 'whackmole',
-          name: 'Whack-a-Mole',
-          path: '/whackmole',
-          icon: '🔨',
-          color: 'rose',
-          category: 'action',
-          difficulty: 'easy',
-          description: 'Whack the moles as they pop up',
-          tags: ['action', 'arcade', 'timing'],
-          estimatedTime: '3-10 min',
+
+         {
+          id: 'slidingpuzzle',
+          name: 'Sliding Puzzle',
+          path: '/slidingpuzzle',
+          icon: '🧩',
+          color: 'cyan',
+          category: 'puzzle',
+          difficulty: 'medium',
+          description: 'Slide tiles to complete the picture',
+          tags: ['puzzle', 'tiles', 'sliding'],
           isNew: false,
           isFeatured: false,
           isComingSoon: false,
@@ -545,7 +367,7 @@ export namespace DashboardHelpers {
           ageRating: 'all',
           platforms: ['web'],
           controls: ['mouse', 'touch'],
-          features: ['singleplayer', 'score', 'timer'],
+          features: ['singleplayer', 'images', 'timer'],
           lastUpdated: new Date().toISOString(),
           stats: {
             totalPlays: 0,
@@ -557,17 +379,17 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
+
         {
-          id: 'towerstacker',
-          name: 'Tower Stacker',
-          path: '/tower-stacker',
-          icon: '🏗️',
-          color: 'emerald',
-          category: 'action',
-          difficulty: 'medium',
-          description: 'Stack blocks to build the tallest tower',
-          tags: ['action', 'stacking', 'precision'],
-          estimatedTime: '5-15 min',
+          id: 'mathquiz',
+          name: 'Math Quiz',
+          path: '/mathquiz',
+          icon: '➕',
+          color: 'pink',
+          category: 'math',
+          difficulty: 'easy',
+          description: 'Practice math with fun quizzes',
+          tags: ['math', 'arithmetic', 'education'],
           isNew: false,
           isFeatured: false,
           isComingSoon: false,
@@ -575,8 +397,8 @@ export namespace DashboardHelpers {
           maxPlayers: 1,
           ageRating: 'all',
           platforms: ['web'],
-          controls: ['mouse', 'keyboard'],
-          features: ['singleplayer', 'physics', 'highscore'],
+          controls: ['keyboard', 'mouse'],
+          features: ['singleplayer', 'levels', 'progress'],
           lastUpdated: new Date().toISOString(),
           stats: {
             totalPlays: 0,
@@ -588,6 +410,69 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
+
+        {
+          id: 'sudoku',
+          name: 'Sudoku',
+          path: '/sudoku',
+          icon: '🔢',
+          color: 'teal',
+          category: 'puzzle',
+          difficulty: 'hard',
+          description: 'Fill the grid with numbers 1-9',
+          tags: ['puzzle', 'numbers', 'logic'],
+          isNew: false,
+          isFeatured: true,
+          isComingSoon: false,
+          minPlayers: 1,
+          maxPlayers: 1,
+          ageRating: 'all',
+          platforms: ['web'],
+          controls: ['keyboard', 'mouse'],
+          features: ['singleplayer', 'difficulty', 'hints'],
+          lastUpdated: new Date().toISOString(),
+          stats: {
+            totalPlays: 0,
+            averageScore: 0,
+            bestScore: 0,
+            completionRate: 0,
+            averageTime: 0,
+            rating: 0,
+            reviews: 0
+          }
+        },
+
+         {
+          id: 'simonsays',
+          name: 'Simon Says',
+          path: '/simonsays',
+          icon: '🎵',
+          color: 'brown',
+          category: 'memory',
+          difficulty: 'medium',
+          description: 'Remember and repeat the sequence',
+          tags: ['memory', 'sequence', 'pattern'],
+          isNew: false,
+          isFeatured: false,
+          isComingSoon: false,
+          minPlayers: 1,
+          maxPlayers: 1,
+          ageRating: 'all',
+          platforms: ['web'],
+          controls: ['mouse', 'touch'],
+          features: ['singleplayer', 'sound', 'progression'],
+          lastUpdated: new Date().toISOString(),
+          stats: {
+            totalPlays: 0,
+            averageScore: 0,
+            bestScore: 0,
+            completionRate: 0,
+            averageTime: 0,
+            rating: 0,
+            reviews: 0
+          }
+        },
+
         {
           id: 'emojiguess',
           name: 'Emoji Guess',
@@ -598,7 +483,6 @@ export namespace DashboardHelpers {
           difficulty: 'easy',
           description: 'Guess the word from emoji clues',
           tags: ['emoji', 'word', 'guessing'],
-          estimatedTime: '5-10 min',
           isNew: false,
           isFeatured: false,
           isComingSoon: false,
@@ -619,6 +503,100 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
+
+        {
+          id: 'typetesting',
+          name: 'Type Testing',
+          path: '/typing-test',
+          icon: '⌨️',
+          color: 'amber',
+          category: 'typing',
+          difficulty: 'medium',
+          description: 'Improve your typing speed and accuracy',
+          tags: ['typing', 'speed', 'accuracy'],
+          isNew: false,
+          isFeatured: false,
+          isComingSoon: false,
+          minPlayers: 1,
+          maxPlayers: 1,
+          ageRating: 'all',
+          platforms: ['web'],
+          controls: ['keyboard'],
+          features: ['singleplayer', 'wpm', 'accuracy'],
+          lastUpdated: new Date().toISOString(),
+          stats: {
+            totalPlays: 0,
+            averageScore: 0,
+            bestScore: 0,
+            completionRate: 0,
+            averageTime: 0,
+            rating: 0,
+            reviews: 0
+          }
+        },
+
+        {
+          id: 'whackmole',
+          name: 'Whack-a-Mole',
+          path: '/whackmole',
+          icon: '🔨',
+          color: 'rose',
+          category: 'action',
+          difficulty: 'easy',
+          description: 'Whack the moles as they pop up',
+          tags: ['action', 'arcade', 'timing'],
+          isNew: false,
+          isFeatured: false,
+          isComingSoon: false,
+          minPlayers: 1,
+          maxPlayers: 1,
+          ageRating: 'all',
+          platforms: ['web'],
+          controls: ['mouse', 'touch'],
+          features: ['singleplayer', 'score', 'timer'],
+          lastUpdated: new Date().toISOString(),
+          stats: {
+            totalPlays: 0,
+            averageScore: 0,
+            bestScore: 0,
+            completionRate: 0,
+            averageTime: 0,
+            rating: 0,
+            reviews: 0
+          }
+        },
+
+        {
+          id: 'towerstacker',
+          name: 'Tower Stacker',
+          path: '/tower-stacker',
+          icon: '🏗️',
+          color: 'emerald',
+          category: 'action',
+          difficulty: 'medium',
+          description: 'Stack blocks to build the tallest tower',
+          tags: ['action', 'stacking', 'precision'],
+          isNew: false,
+          isFeatured: false,
+          isComingSoon: false,
+          minPlayers: 1,
+          maxPlayers: 1,
+          ageRating: 'all',
+          platforms: ['web'],
+          controls: ['mouse', 'keyboard'],
+          features: ['singleplayer', 'physics', 'highscore'],
+          lastUpdated: new Date().toISOString(),
+          stats: {
+            totalPlays: 0,
+            averageScore: 0,
+            bestScore: 0,
+            completionRate: 0,
+            averageTime: 0,
+            rating: 0,
+            reviews: 0
+          }
+        },
+
         {
           id: 'numbermaze',
           name: 'Number Maze',
@@ -629,7 +607,6 @@ export namespace DashboardHelpers {
           difficulty: 'medium',
           description: 'Navigate through the number maze',
           tags: ['puzzle', 'numbers', 'maze'],
-          estimatedTime: '10-25 min',
           isNew: false,
           isFeatured: false,
           isComingSoon: false,
@@ -650,6 +627,7 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
+
         {
           id: 'codingpuzzle',
           name: 'Coding Puzzle',
@@ -660,7 +638,6 @@ export namespace DashboardHelpers {
           difficulty: 'hard',
           description: 'Solve programming challenges',
           tags: ['coding', 'programming', 'challenge'],
-          estimatedTime: '15-45 min',
           isNew: true,
           isFeatured: true,
           isComingSoon: false,
@@ -681,6 +658,7 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
+
         {
           id: 'tictactoe',
           name: 'Tic-Tac-Toe',
@@ -691,7 +669,6 @@ export namespace DashboardHelpers {
           difficulty: 'easy',
           description: 'Classic three-in-a-row game',
           tags: ['strategy', 'classic', 'turn-based'],
-          estimatedTime: '2-5 min',
           isNew: false,
           isFeatured: false,
           isComingSoon: false,
@@ -712,9 +689,10 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
+
         {
           id: 'game2048',
-          name: '2048',
+          name: 'Game2048',
           path: '/game2048',
           icon: '🎯',
           color: 'green',
@@ -722,7 +700,6 @@ export namespace DashboardHelpers {
           difficulty: 'medium',
           description: 'Combine tiles to reach 2048',
           tags: ['puzzle', 'numbers', 'strategy'],
-          estimatedTime: '10-30 min',
           isNew: false,
           isFeatured: false,
           isComingSoon: false,
@@ -753,7 +730,6 @@ export namespace DashboardHelpers {
           difficulty: 'easy',
           description: 'Create pixel art masterpieces',
           tags: ['creative', 'art', 'pixels'],
-          estimatedTime: '15-60 min',
           isNew: true,
           isFeatured: false,
           isComingSoon: false,
@@ -774,6 +750,7 @@ export namespace DashboardHelpers {
             reviews: 0
           }
         },
+
         {
           id: 'musictiles',
           name: 'Music Tiles',
@@ -784,7 +761,6 @@ export namespace DashboardHelpers {
           difficulty: 'medium',
           description: 'Tap the tiles to the rhythm',
           tags: ['music', 'rhythm', 'tiles'],
-          estimatedTime: '3-10 min',
           isNew: false,
           isFeatured: false,
           isComingSoon: true,
@@ -804,7 +780,39 @@ export namespace DashboardHelpers {
             rating: 0,
             reviews: 0
           }
-        }
+        },
+
+        {
+          id: 'hangman',
+          name: 'Hangman',
+          path: '/hangman',
+          icon: '🎯',
+          color: 'purple',
+          category: 'word',
+          difficulty: 'easy',
+          description: 'Classic word guessing game',
+          tags: ['word', 'classic', 'guessing'],
+          isNew: false,
+          isFeatured: false,
+          isComingSoon: false,
+          minPlayers: 1,
+          maxPlayers: 1,
+          ageRating: 'all',
+          platforms: ['web'],
+          controls: ['keyboard', 'mouse'],
+          features: ['singleplayer', 'scoring', 'categories'],
+          lastUpdated: new Date().toISOString(),
+          stats: {
+            totalPlays: 0,
+            averageScore: 0,
+            bestScore: 0,
+            completionRate: 0,
+            averageTime: 0,
+            rating: 0,
+            reviews: 0
+          }
+        },
+
       ];
     }
 
@@ -812,7 +820,7 @@ export namespace DashboardHelpers {
      * Filter games by category
      */
     export function filterByCategory(
-      games: GameConfig[], 
+      games: GameConfig[],
       category: GameCategory | null
     ): GameConfig[] {
       if (!category) return games;
@@ -823,7 +831,7 @@ export namespace DashboardHelpers {
      * Filter games by difficulty
      */
     export function filterByDifficulty(
-      games: GameConfig[], 
+      games: GameConfig[],
       difficulty: GameDifficulty | null
     ): GameConfig[] {
       if (!difficulty) return games;
@@ -835,7 +843,7 @@ export namespace DashboardHelpers {
      */
     export function searchGames(games: GameConfig[], query: string): GameConfig[] {
       if (!query.trim()) return games;
-      
+
       const searchTerm = query.toLowerCase();
       return games.filter(game =>
         game.name.toLowerCase().includes(searchTerm) ||
@@ -849,13 +857,13 @@ export namespace DashboardHelpers {
      * Sort games
      */
     export function sortGames(
-      games: GameConfig[], 
+      games: GameConfig[],
       sortBy: 'name' | 'category' | 'difficulty' | 'lastPlayed' | 'rating',
       order: 'asc' | 'desc' = 'asc'
     ): GameConfig[] {
       const sorted = [...games].sort((a, b) => {
         let comparison = 0;
-        
+
         switch (sortBy) {
           case 'name':
             comparison = a.name.localeCompare(b.name);
@@ -864,22 +872,22 @@ export namespace DashboardHelpers {
             comparison = a.category.localeCompare(b.category);
             break;
           case 'difficulty':
-            const difficultyOrder = { easy: 1, medium: 2, hard: 3 };
+            const difficultyOrder: Record<GameDifficulty, number> = { easy: 1, medium: 2, hard: 3, expert: 4 };
             comparison = difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
             break;
           case 'rating':
-            comparison = (a.stats.rating || 0) - (b.stats.rating || 0);
+            comparison = (a.stats?.rating || 0) - (b.stats?.rating || 0);
             break;
           case 'lastPlayed':
-            const aTime = new Date(a.lastUpdated || 0).getTime();
-            const bTime = new Date(b.lastUpdated || 0).getTime();
+            const aTime = new Date(a.lastUpdated || a.lastPlayed || 0).getTime();
+            const bTime = new Date(b.lastUpdated || b.lastPlayed || 0).getTime();
             comparison = aTime - bTime;
             break;
         }
-        
+
         return order === 'desc' ? -comparison : comparison;
       });
-      
+
       return sorted;
     }
 
@@ -929,7 +937,7 @@ export namespace DashboardHelpers {
    * Filter Management Utilities
    */
   export namespace Filters {
-    
+
     /**
      * Apply filters to games
      */
@@ -942,13 +950,13 @@ export namespace DashboardHelpers {
       }
 
       // Category filter
-      if (filters.category) {
-        filtered = Games.filterByCategory(filtered, filters.category);
+      if (filters.category && filters.category.length > 0) {
+        filtered = filtered.filter(game => filters.category!.includes(game.category));
       }
 
       // Difficulty filter
-      if (filters.difficulty) {
-        filtered = Games.filterByDifficulty(filtered, filters.difficulty);
+      if (filters.difficulty && filters.difficulty.length > 0) {
+        filtered = filtered.filter(game => filters.difficulty!.includes(game.difficulty));
       }
 
       // Featured filter
@@ -968,12 +976,12 @@ export namespace DashboardHelpers {
 
       // Minimum rating
       if (filters.minRating !== undefined) {
-        filtered = filtered.filter(game => (game.stats.rating || 0) >= filters.minRating!);
+        filtered = filtered.filter(game => (game.stats?.rating || 0) >= filters.minRating!);
       }
 
       // Tags filter
       if (filters.tags && filters.tags.length > 0) {
-        filtered = filtered.filter(game => 
+        filtered = filtered.filter(game =>
           filters.tags!.some(tag => game.tags.includes(tag))
         );
       }
@@ -987,8 +995,8 @@ export namespace DashboardHelpers {
     export function createDefaultFilters(): DashboardFilters {
       return {
         search: '',
-        category: null,
-        difficulty: null,
+        category: [],
+        difficulty: [],
         showFeatured: false,
         showNew: false,
         hideComingSoon: true,
@@ -1002,15 +1010,15 @@ export namespace DashboardHelpers {
    * Analytics Utilities
    */
   export namespace Analytics {
-    
+
     /**
      * Generate analytics data
      */
     export function generateAnalytics(games: GameConfig[]): DashboardAnalytics {
       const totalGames = games.length;
       const categories = Games.getCategories(games);
-      const avgRating = games.reduce((sum, game) => sum + (game.stats.rating || 0), 0) / totalGames;
-      
+      const avgRating = games.reduce((sum, game) => sum + (game.stats?.rating || 0), 0) / totalGames;
+
       const gamesByCategory = categories.reduce((acc, category) => {
         acc[category] = games.filter(game => game.category === category).length;
         return acc;
@@ -1019,7 +1027,8 @@ export namespace DashboardHelpers {
       const gamesByDifficulty = {
         easy: games.filter(game => game.difficulty === 'easy').length,
         medium: games.filter(game => game.difficulty === 'medium').length,
-        hard: games.filter(game => game.difficulty === 'hard').length
+        hard: games.filter(game => game.difficulty === 'hard').length,
+        expert: games.filter(game => game.difficulty === 'expert').length
       };
 
       return {
@@ -1040,7 +1049,7 @@ export namespace DashboardHelpers {
    * Error Handling Utilities
    */
   export namespace Errors {
-    
+
     /**
      * Create dashboard error
      */
@@ -1075,7 +1084,7 @@ export namespace DashboardHelpers {
      */
     export function handleLoadingError(error: any): DashboardError {
       return createError(
-        'DASHBOARD_LOAD_FAILED',
+        'LOAD_GAMES_FAILED',
         'Failed to load dashboard data',
         'LOADING_ERROR',
         { error }
@@ -1087,7 +1096,7 @@ export namespace DashboardHelpers {
    * Storage Utilities
    */
   export namespace Storage {
-    
+
     /**
      * Get recent games from localStorage
      */
@@ -1140,7 +1149,7 @@ export namespace DashboardHelpers {
    * Utility Functions
    */
   export namespace Utils {
-    
+
     /**
      * Debounce function
      */

@@ -21,9 +21,25 @@ export interface GameConfig {
   minPlayers?: number;
   maxPlayers?: number;
   estimatedTime?: string; // e.g., "5-10 min"
+  ageRating?: 'all' | 'teen' | 'mature';
+  platforms?: string[];
+  controls?: string[];
+  features?: string[];
+  lastUpdated?: string;
+  stats?: GameStats;
   lastPlayed?: Date;
   personalBest?: number;
   totalPlays?: number;
+}
+
+export interface GameStats {
+  totalPlays: number;
+  averageScore: number;
+  bestScore: number;
+  completionRate: number;
+  averageTime: number;
+  rating: number;
+  reviews: number;
 }
 
 /**
@@ -39,7 +55,8 @@ export type GameColor =
  */
 export type GameCategory = 
   | 'word' | 'puzzle' | 'math' | 'memory' | 'action' | 'strategy' 
-  | 'trivia' | 'skill' | 'arcade' | 'creative' | 'brain' | 'typing';
+  | 'trivia' | 'skill' | 'arcade' | 'creative' | 'brain' | 'typing'
+  | 'coding' | 'music';
 
 /**
  * Game difficulty levels
@@ -59,6 +76,26 @@ export interface DashboardConfig {
   showRecentlyPlayed: boolean;
   showFavorites: boolean;
   enableAnimations: boolean;
+  enableSounds?: boolean;
+  theme?: 'light' | 'dark' | 'gaming';
+  sortBy?: 'name' | 'category' | 'difficulty' | 'lastPlayed' | 'rating';
+  sortOrder?: 'asc' | 'desc';
+  allowCustomGames?: boolean;
+  enableAnalytics?: boolean;
+  autoSaveProgress?: boolean;
+  showTutorials?: boolean;
+  enableNotifications?: boolean;
+  defaultCategory?: GameCategory | null;
+  cacheTimeout?: number;
+  maxRecentGames?: number;
+  enableOfflineMode?: boolean;
+  accessibilityOptions?: {
+    highContrast: boolean;
+    reducedMotion: boolean;
+    screenReader: boolean;
+    largeText: boolean;
+    keyboardNavigation: boolean;
+  };
   gridColumns: {
     mobile: number;
     tablet: number;
@@ -116,6 +153,11 @@ export interface DashboardFilters {
   isFeatured?: boolean;
   recentlyPlayed?: boolean;
   favorites?: boolean;
+  showFeatured?: boolean;
+  showNew?: boolean;
+  hideComingSoon?: boolean;
+  minRating?: number;
+  tags?: string[];
 }
 
 /**
@@ -184,22 +226,31 @@ export interface DashboardUserStats {
  * Dashboard analytics
  */
 export interface DashboardAnalytics {
-  popularGames: Array<{
+  totalGames?: number;
+  totalCategories?: number;
+  averageRating?: number;
+  gamesByCategory?: Record<GameCategory, number>;
+  gamesByDifficulty?: Record<'easy' | 'medium' | 'hard' | 'expert', number>;
+  featuredGames?: number;
+  newGames?: number;
+  comingSoonGames?: number;
+  lastUpdated?: string;
+  popularGames?: Array<{
     game: GameConfig;
     playCount: number;
     averageTime: number;
   }>;
-  categoryStats: Record<GameCategory, {
+  categoryStats?: Record<GameCategory, {
     gamesCount: number;
     totalPlays: number;
     averageRating: number;
   }>;
-  userEngagement: {
+  userEngagement?: {
     dailyActiveUsers: number;
     averageSessionTime: number;
     returnRate: number;
   };
-  gamePerformance: Record<string, {
+  gamePerformance?: Record<string, {
     gameId: string;
     loadTime: number;
     errorRate: number;
