@@ -11,6 +11,13 @@ export interface IUser {
   avatar?: string;
   favoriteGame?: string;
   profileCompleted?: boolean;
+  role?: string;
+  stats?: {
+    followerCount: number;
+    followingCount: number;
+    totalScore: number;
+    gamesPlayed: number;
+  };
   meta?: Record<string, any>;
   createdAt: Date;
   lastLogin?: Date;
@@ -61,6 +68,13 @@ export interface UserResponse {
     avatar?: string;
     favoriteGame?: string;
     profileCompleted?: boolean;
+    role?: string;
+    stats?: {
+      followerCount: number;
+      followingCount: number;
+      totalScore: number;
+      gamesPlayed: number;
+    };
     createdAt: Date;
   };
 }

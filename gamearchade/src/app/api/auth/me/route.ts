@@ -57,6 +57,13 @@ export async function GET(request: NextRequest) {
         avatar: user.avatar,
         favoriteGame: user.favoriteGame,
         profileCompleted: user.profileCompleted,
+        role: user.role,
+        stats: user.stats ?? {
+          followerCount: 0,
+          followingCount: 0,
+          totalScore: 0,
+          gamesPlayed: 0,
+        },
         createdAt: user.createdAt,
       },
     };

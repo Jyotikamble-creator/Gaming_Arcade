@@ -13,6 +13,13 @@ interface IUser {
   avatar?: string;
   favoriteGame?: string;
   profileCompleted?: boolean;
+  role?: string;
+  stats?: {
+    followerCount: number;
+    followingCount: number;
+    totalScore: number;
+    gamesPlayed: number;
+  };
   meta?: Record<string, any>;
   createdAt: Date;
   lastLogin?: Date;
@@ -27,6 +34,13 @@ const UserSchema = new Schema<IUser>({
   avatar: { type: String, default: '' },
   favoriteGame: { type: String, default: '' },
   profileCompleted: { type: Boolean, default: false },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  stats: {
+    followerCount: { type: Number, default: 0 },
+    followingCount: { type: Number, default: 0 },
+    totalScore: { type: Number, default: 0 },
+    gamesPlayed: { type: Number, default: 0 },
+  },
   meta: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now },
   lastLogin: { type: Date, default: Date.now },

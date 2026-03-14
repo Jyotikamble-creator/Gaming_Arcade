@@ -58,7 +58,15 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    return NextResponse.json(response, { status: 201 });
+    const nextResponse = NextResponse.json(response, { status: 201 });
+    // Set HttpOnly session cookie for middleware-based page protection
+    const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
+    const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+    nextResponse.headers.set(
+      'Set-Cookie',
+      `session-token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`
+    );
+    return nextResponse;
   } catch (err) {
     console.error('[AUTH] Signup error:', err);
     return NextResponse.json(

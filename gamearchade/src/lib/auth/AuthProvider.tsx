@@ -4,11 +4,22 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 export interface User {
   id: string;
-  name: string;
   email: string;
+  name: string;
   displayName?: string;
+  username?: string;
   avatar?: string;
-  createdAt?: Date;
+  bio?: string;
+  favoriteGame?: string;
+  profileCompleted?: boolean;
+  role?: string;
+  stats?: {
+    followerCount: number;
+    followingCount: number;
+    totalScore: number;
+    gamesPlayed: number;
+  };
+  createdAt?: string;
 }
 
 export interface AuthContextType {
@@ -35,25 +46,52 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+function mapApiUser(u: any, fallbackName?: string): User {
+  return {
+    id: u.id ?? u._id?.toString(),
+    email: u.email,
+    name: u.displayName || u.username || fallbackName || u.email.split('@')[0],
+    displayName: u.displayName,
+    username: u.username,
+    avatar: u.avatar,
+    bio: u.bio,
+    favoriteGame: u.favoriteGame,
+    profileCompleted: u.profileCompleted,
+    role: u.role,
+    stats: u.stats ?? { followerCount: 0, followingCount: 0, totalScore: 0, gamesPlayed: 0 },
+    createdAt: u.createdAt,
+  };
+}
+
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize auth state on mount
+  // On mount — validate stored token with /api/auth/me
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const storedUser = localStorage.getItem('user');
         const storedToken = localStorage.getItem('token');
+        if (!storedToken) return;
 
-        if (storedUser && storedToken) {
-          const userData = JSON.parse(storedUser);
+        const res = await fetch('/api/auth/me', {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const userData = mapApiUser(data.user);
           setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
+        } else {
+          // Token expired or invalid — clear storage
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
-        localStorage.removeItem('user');
+        console.error('[AUTH] Initialization error:', error);
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
       } finally {
         setLoading(false);
       }
@@ -66,25 +104,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setLoading(true);
 
-      // Simulate network delay / mock API
-      await new Promise((res) => setTimeout(res, 800));
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-      const userData: User = {
-        id: email === 'demo@gamearchade.com' ? '1' : Date.now().toString(),
-        name: email.split('@')[0],
-        email,
-        displayName: email.split('@')[0],
-        createdAt: new Date()
-      };
+      const data = await res.json();
 
-      // Persist using the keys expected by the API client
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Login failed' };
+      }
+
+      const { token } = data;
+      localStorage.setItem('token', token);
+
+      // Fetch full user profile
+      const meRes = await fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const meData = meRes.ok ? await meRes.json() : null;
+      const userData = mapApiUser(meData?.user ?? data.user, email.split('@')[0]);
+
       localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', 'demo-jwt-token');
-
       setUser(userData);
       return { success: true };
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('[AUTH] Login error:', err);
       return { success: false, error: 'Login failed. Please try again.' };
     } finally {
       setLoading(false);
@@ -95,41 +141,88 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setLoading(true);
 
-      await new Promise((res) => setTimeout(res, 800));
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Signup failed' };
+      }
+
+      const { token } = data;
+      localStorage.setItem('token', token);
+
+      // Set display name if provided
+      if (name) {
+        try {
+          await fetch('/api/auth/profile', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ displayName: name }),
+          });
+        } catch { /* non-critical */ }
+      }
 
       const userData: User = {
-        id: Date.now().toString(),
+        id: data.user.id,
+        email: data.user.email,
         name,
-        email,
         displayName: name,
-        createdAt: new Date()
+        stats: { followerCount: 0, followingCount: 0, totalScore: 0, gamesPlayed: 0 },
       };
 
       localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', 'demo-jwt-token');
-      localStorage.setItem(`user_${email}`, 'registered');
-
       setUser(userData);
       return { success: true };
     } catch (err) {
-      console.error('Signup error:', err);
+      console.error('[AUTH] Signup error:', err);
       return { success: false, error: 'Signup failed. Please try again.' };
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = () => {
+  const logout = (): void => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     setUser(null);
+    // Clear server-side session cookie
+    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
   };
 
   const updateProfile = async (data: Partial<User>): Promise<void> => {
     if (!user) return;
-    const updatedUser = { ...user, ...data };
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    setUser(updatedUser);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        const responseData = await res.json();
+        const updatedUser = { ...user, ...mapApiUser(responseData.user, user.name) };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+      }
+    } catch (err) {
+      console.error('[AUTH] Profile update error:', err);
+      // Optimistic local update as fallback
+      const updatedUser = { ...user, ...data };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    }
   };
 
   const value: AuthContextType = {
@@ -139,7 +232,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     signup,
     logout,
-    updateProfile
+    updateProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

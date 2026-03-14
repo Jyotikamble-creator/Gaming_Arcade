@@ -1,6 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+// Delegate to the central AuthProvider — single source of truth.
+export { useAuth } from '@/lib/auth/AuthProvider';
+export type { User, AuthContextType } from '@/lib/auth/AuthProvider';
+
 
 interface User {
   id: string;
