@@ -5,6 +5,7 @@ import type { NextRequest } from 'next/server';
 const PROTECTED_PAGE_PREFIXES = [
   '/dashboard',
   '/pages/profile',
+  '/pages/settings',
   '/pages/progress',
   '/pages/scores',
 ];
@@ -52,6 +53,7 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/pages/profile/:path*',
+    '/pages/settings/:path*',
     '/pages/progress/:path*',
     '/pages/scores/:path*',
     '/api/auth/me',
