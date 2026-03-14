@@ -28,7 +28,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
@@ -189,12 +189,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const logout = (): void => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    setUser(null);
-    // Clear server-side session cookie
-    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+  const logout = async (): Promise<void> => {
+    try {
+      // Clear server-side session cookie first so middleware sees logged-out state.
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+        cache: 'no-store',
+      });
+    } catch (err) {
+      console.error('[AUTH] Logout API error:', err);
+    } finally {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      setUser(null);
+    }
   };
 
   const updateProfile = async (data: Partial<User>): Promise<void> => {

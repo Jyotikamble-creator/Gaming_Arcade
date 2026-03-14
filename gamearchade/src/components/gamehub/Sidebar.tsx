@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth/AuthProvider';
 import {
   Home,
   Trophy,
@@ -35,12 +36,6 @@ const sidebarItems: SidebarItem[] = [
     path: '/dashboard'
   },
   {
-    id: 'games',
-    label: 'Games',
-    icon: Gamepad2,
-    path: '/dashboard'
-  },
-  {
     id: 'leaderboard',
     label: 'Leaderboard',
     icon: Trophy,
@@ -66,11 +61,20 @@ export default function Sidebar({
   onCloseMobile
 }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
 
   const isItemActive = (path: string): boolean => {
     if (!pathname) return false;
     if (path === '/dashboard') return pathname === '/dashboard';
     return pathname.startsWith(path);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    onCloseMobile?.();
+    router.replace('/pages/auth');
+    router.refresh();
   };
 
   return (
@@ -139,13 +143,14 @@ export default function Sidebar({
 
         {/* User Actions */}
         <div className="mt-8 pt-6 border-t border-gray-700/50">
-          <Link
-            href="/pages/auth"
-            className="flex items-center space-x-3 px-4 py-2 text-gray-300 hover:text-red-400 transition-colors duration-200"
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center space-x-3 px-4 py-2 text-gray-300 hover:text-red-400 transition-colors duration-200"
           >
             <LogOut className="w-4 h-4" />
             <span className="text-sm">Sign Out</span>
-          </Link>
+          </button>
         </div>
 
       </div>
