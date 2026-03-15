@@ -104,7 +104,7 @@ export namespace DashboardHelpers {
         {
           id: 'wordguess',
           name: 'Word Guess',
-          path: '/wordguess',
+          path: '/games/wordguess',
           icon: '🔤',
           color: 'blue',
           category: 'word',
@@ -135,7 +135,7 @@ export namespace DashboardHelpers {
         {
           id: 'quiz',
           name: 'Quiz Master',
-          path: '/quiz',
+          path: '/games/quiz',
           icon: '🧠',
           color: 'yellow',
           category: 'trivia',
@@ -166,7 +166,7 @@ export namespace DashboardHelpers {
         {
           id: 'memorycard',
           name: 'Memory Cards',
-          path: '/memorycard',
+          path: '/games/memorycard',
           icon: '🃏',
           color: 'orange',
           category: 'memory',
@@ -197,7 +197,7 @@ export namespace DashboardHelpers {
          {
           id: 'wordscramble',
           name: 'Word Scramble',
-          path: '/wordscramble',
+          path: '/games/wordscramble',
           icon: '🔀',
           color: 'green',
           category: 'word',
@@ -228,7 +228,7 @@ export namespace DashboardHelpers {
         {
           id: 'brainteaser',
           name: 'Brain Teaser',
-          path: '/brainteaser',
+          path: '/games/brainteaser',
           icon: '🤔',
           color: 'violet',
           category: 'puzzle',
@@ -259,7 +259,7 @@ export namespace DashboardHelpers {
          {
           id: 'speedmath',
           name: 'Speed Math',
-          path: '/speed-math',
+          path: '/games/speed-math',
           icon: '⚡',
           color: 'red',
           category: 'math',
@@ -290,7 +290,7 @@ export namespace DashboardHelpers {
         {
           id: 'reactiontime',
           name: 'Reaction Time',
-          path: '/reaction-time',
+          path: '/games/reaction-time',
           icon: '⚡',
           color: 'lime',
           category: 'action',
@@ -321,7 +321,7 @@ export namespace DashboardHelpers {
           {
           id: 'wordbuilder',
           name: 'Word Builder',
-          path: '/wordbuilder',
+          path: '/games/wordbuilder',
           icon: '🧱',
           color: 'indigo',
           category: 'word',
@@ -352,7 +352,7 @@ export namespace DashboardHelpers {
          {
           id: 'slidingpuzzle',
           name: 'Sliding Puzzle',
-          path: '/slidingpuzzle',
+          path: '/games/slidingpuzzle',
           icon: '🧩',
           color: 'cyan',
           category: 'puzzle',
@@ -383,7 +383,7 @@ export namespace DashboardHelpers {
         {
           id: 'mathquiz',
           name: 'Math Quiz',
-          path: '/mathquiz',
+          path: '/games/mathquiz',
           icon: '➕',
           color: 'pink',
           category: 'math',
@@ -414,7 +414,7 @@ export namespace DashboardHelpers {
         {
           id: 'sudoku',
           name: 'Sudoku',
-          path: '/sudoku',
+          path: '/games/sudoku',
           icon: '🔢',
           color: 'teal',
           category: 'puzzle',
@@ -445,7 +445,7 @@ export namespace DashboardHelpers {
          {
           id: 'simonsays',
           name: 'Simon Says',
-          path: '/simonsays',
+          path: '/games/simonsays',
           icon: '🎵',
           color: 'brown',
           category: 'memory',
@@ -476,7 +476,7 @@ export namespace DashboardHelpers {
         {
           id: 'emojiguess',
           name: 'Emoji Guess',
-          path: '/emoji',
+          path: '/games/emoji',
           icon: '😄',
           color: 'slate',
           category: 'word',
@@ -507,7 +507,7 @@ export namespace DashboardHelpers {
         {
           id: 'typetesting',
           name: 'Type Testing',
-          path: '/typing-test',
+          path: '/games/typing-test',
           icon: '⌨️',
           color: 'amber',
           category: 'typing',
@@ -538,7 +538,7 @@ export namespace DashboardHelpers {
         {
           id: 'whackmole',
           name: 'Whack-a-Mole',
-          path: '/whackmole',
+          path: '/games/whackmole',
           icon: '🔨',
           color: 'rose',
           category: 'action',
@@ -569,7 +569,7 @@ export namespace DashboardHelpers {
         {
           id: 'towerstacker',
           name: 'Tower Stacker',
-          path: '/tower-stacker',
+          path: '/games/tower-stacker',
           icon: '🏗️',
           color: 'emerald',
           category: 'action',
@@ -600,7 +600,7 @@ export namespace DashboardHelpers {
         {
           id: 'numbermaze',
           name: 'Number Maze',
-          path: '/numbermaze',
+          path: '/games/numbermaze',
           icon: '🔢',
           color: 'gray',
           category: 'puzzle',
@@ -631,7 +631,7 @@ export namespace DashboardHelpers {
         {
           id: 'codingpuzzle',
           name: 'Coding Puzzle',
-          path: '/codingpuzzle',
+          path: '/games/codingpuzzle',
           icon: '💻',
           color: 'blue',
           category: 'coding',
@@ -662,7 +662,7 @@ export namespace DashboardHelpers {
         {
           id: 'tictactoe',
           name: 'Tic-Tac-Toe',
-          path: '/tic-tac-toe',
+          path: '/games/tic-tac-toe',
           icon: '⭕',
           color: 'purple',
           category: 'strategy',
@@ -693,7 +693,7 @@ export namespace DashboardHelpers {
         {
           id: 'game2048',
           name: 'Game2048',
-          path: '/game2048',
+          path: '/games/game2048',
           icon: '🎯',
           color: 'green',
           category: 'puzzle',
@@ -723,7 +723,7 @@ export namespace DashboardHelpers {
         {
           id: 'pixelartcreator',
           name: 'Pixel Art Creator',
-          path: '/pixel-art-creator',
+          path: '/games/pixel-art-creator',
           icon: '🎨',
           color: 'indigo',
           category: 'creative',
@@ -754,7 +754,7 @@ export namespace DashboardHelpers {
         {
           id: 'musictiles',
           name: 'Music Tiles',
-          path: '/pages/musictiles',
+          path: '/games/musictiles',
           icon: '🎶',
           color: 'yellow',
           category: 'music',
@@ -785,7 +785,7 @@ export namespace DashboardHelpers {
         {
           id: 'hangman',
           name: 'Hangman',
-          path: '/hangman',
+          path: '/games/hangman',
           icon: '🎯',
           color: 'purple',
           category: 'word',
@@ -816,7 +816,7 @@ export namespace DashboardHelpers {
         {
           id: 'minesweeper',
           name: 'Minesweeper',
-          path: '/minesweeper',
+          path: '/games/minesweeper',
           icon: '💣',
           color: 'red',
           category: 'puzzle',
