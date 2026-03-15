@@ -313,11 +313,11 @@ export interface WordScrambleStats {
   achievementsUnlocked: number;
 }
 
-export interface WordScrambleWordBank {
+export type WordScrambleWordBank = {
   [key in WordScrambleDifficulty]: {
     [category in WordScrambleCategory]: string[];
   };
-}
+};
 
 // Default Word Banks by Difficulty and Category
 export const defaultWordBank: WordScrambleWordBank = {

@@ -813,6 +813,37 @@ export namespace DashboardHelpers {
           }
         },
 
+        {
+          id: 'minesweeper',
+          name: 'Minesweeper',
+          path: '/minesweeper',
+          icon: '💣',
+          color: 'red',
+          category: 'puzzle',
+          difficulty: 'medium',
+          description: 'Find all mines without detonating any',
+          tags: ['puzzle', 'logic', 'mines', 'classic'],
+          isNew: true,
+          isFeatured: true,
+          isComingSoon: false,
+          minPlayers: 1,
+          maxPlayers: 1,
+          ageRating: 'all',
+          platforms: ['web'],
+          controls: ['mouse', 'keyboard'],
+          features: ['singleplayer', 'difficulty', 'timer', 'scoring'],
+          lastUpdated: new Date().toISOString(),
+          stats: {
+            totalPlays: 0,
+            averageScore: 0,
+            bestScore: 0,
+            completionRate: 0,
+            averageTime: 0,
+            rating: 0,
+            reviews: 0
+          }
+        },
+
       ];
     }
 
