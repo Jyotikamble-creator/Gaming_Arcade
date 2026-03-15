@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import { useWordBuilder } from '@/hooks/useWordBuilder';
+import { useWordBuilder } from '@/hooks/games/useWordBuilder';
 import { WordBuilderDifficulty } from '@/types/games/word-builder';
 import DashboardLayout from '@/components/shared/DashboardLayout';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';

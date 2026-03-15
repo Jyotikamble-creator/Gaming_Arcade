@@ -2,7 +2,7 @@
 import React from 'react'
 import TowerDisplay from '@/components/games/towerstacker/TowerDisplay'
 import TowerStats from '@/components/games/towerstacker/TowerStats'
-import { useTowerStacker } from '@/hooks/useTowerStacker'
+import { useTowerStacker } from '@/hooks/games/useTowerStacker'
 import DashboardLayout from '@/components/shared/DashboardLayout'
 
 export default function TowerStackerPage() {

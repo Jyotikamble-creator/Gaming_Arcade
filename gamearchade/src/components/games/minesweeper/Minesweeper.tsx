@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMinesweeper } from '@/hooks/useMinesweeper';
+import { useMinesweeper } from '@/hooks/games/useMinesweeper';
 import type { MinesweeperDifficulty, MinesweeperMoveData } from '@/types/games/minesweeper';
 import MinesweeperBoard from './MinesweeperBoard';
 import MinesweeperControls from './MinesweeperControls';

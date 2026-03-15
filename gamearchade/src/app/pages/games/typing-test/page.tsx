@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { useTypingTest } from '@/hooks/useTypingTest'
+import { useTypingTest } from '@/hooks/games/useTypingTest'
 import DashboardLayout from '@/components/shared/DashboardLayout'
 
 export default function TypingTestPage() {

@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { useMusicTiles } from '@/hooks/useMusicTiles';
+import { useMusicTiles } from '@/hooks/games/useMusicTiles';
 import { MusicTilesDifficulty } from '@/types/games/music-tiles';
 import MusicTilesGame from './MusicTilesGame';
 import MusicTilesStats from './MusicTilesStats';

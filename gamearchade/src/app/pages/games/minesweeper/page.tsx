@@ -1,4 +1,4 @@
-import Minesweeper from '@/components/minesweeper/Minesweeper';
+import Minesweeper from '@/components/games/minesweeper/Minesweeper';
 
 export default function MinesweeperPage() {
   return <Minesweeper />;

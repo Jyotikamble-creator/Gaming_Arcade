@@ -2,7 +2,7 @@
 
 // Main WordScramble page component
 import React from 'react';
-import { useWordScramble } from '@/hooks/useWordScramble';
+import { useWordScramble } from '@/hooks/games/useWordScramble';
 import WordScrambleStats from '@/components/games/wordscramble/WordScrambleStats';
 import WordScrambleDisplay from '@/components/games/wordscramble/WordScrambleDisplay';
 import WordScrambleInput from '@/components/games/wordscramble/WordScrambleInput';

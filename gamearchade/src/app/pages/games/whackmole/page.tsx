@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import { useWhackMole } from '@/hooks/useWhackMole';
+import { useWhackMole } from '@/hooks/games/useWhackMole';
 import { WhackMoleSettings } from '@/types/games/whack-a-mole';
 import DashboardLayout from '@/components/shared/DashboardLayout';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';

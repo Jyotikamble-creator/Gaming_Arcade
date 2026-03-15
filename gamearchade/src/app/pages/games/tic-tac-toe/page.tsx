@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 import { TicTacToeBoard, TicTacToeControls, TicTacToeGameStatus } from '@/components/games/tictactoe'
-import { useTicTacToe } from '@/hooks/useTicTacToe'
+import { useTicTacToe } from '@/hooks/games/useTicTacToe'
 import DashboardLayout from '@/components/shared/DashboardLayout'
 
 export default function TicTacToePage() {
