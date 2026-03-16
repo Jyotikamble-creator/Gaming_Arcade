@@ -54,6 +54,9 @@ export const getEmptySquares = (board: (Player | null)[]): number[] => {
               .filter(index => index !== null) as number[];
 };
 
+// Alias for backward compatibility
+export const getAvailableMoves = getEmptySquares;
+
 export const isValidMove = (board: (Player | null)[], index: number): boolean => {
   return index >= 0 && index < GAME_CONFIG.BOARD_SIZE && board[index] === null;
 };
@@ -99,4 +102,9 @@ export const getBestMove = (board: (Player | null)[], player: Player): number =>
   
   // Random move
   return emptySquares[Math.floor(Math.random() * emptySquares.length)];
+};
+
+// Alias for backward compatibility
+export const makeAIMove = (board: (Player | null)[]): number => {
+  return getBestMove(board, 'O');
 };
