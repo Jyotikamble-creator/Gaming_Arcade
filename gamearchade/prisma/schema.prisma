@@ -1,0 +1,93 @@
+// Prisma schema for PostgreSQL database
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and profile management
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String
+  username          String?  @unique
+  displayName       String   @default("")
+  bio               String   @default("") @db.VarChar(500)
+  avatar            String   @default("")
+  favoriteGame      String   @default("")
+  profileCompleted  Boolean  @default(false)
+  role              String   @default("user") // 'user' or 'admin'
+  
+  // Stats
+  stats             UserStats?
+  
+  // Relationships
+  scores            Score[]
+  followers         Follow[]  @relation("Followers")
+  following         Follow[]  @relation("Following")
+  
+  // Metadata
+  meta              Json      @default("{}")
+  createdAt         DateTime  @default(now())
+  lastLogin         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([email])
+  @@index([username])
+  @@index([createdAt])
+}
+
+// User statistics
+model UserStats {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  followerCount     Int      @default(0)
+  followingCount    Int      @default(0)
+  totalScore        Int      @default(0)
+  gamesPlayed       Int      @default(0)
+  
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// Score model for game scores and leaderboard
+model Score {
+  id                String   @id @default(cuid())
+  game              String   // Game type identifier
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  playerName        String   @default("guest")
+  score             Int
+  meta              Json     @default("{}")
+  
+  createdAt         DateTime @default(now())
+
+  @@index([game])
+  @@index([userId])
+  @@index([game, score(sort: Desc)])
+  @@index([playerName])
+  @@index([createdAt])
+}
+
+// Follow relationship for social features
+model Follow {
+  id                String   @id @default(cuid())
+  followerId        String
+  follower          User     @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  
+  followingId       String
+  following         User     @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}

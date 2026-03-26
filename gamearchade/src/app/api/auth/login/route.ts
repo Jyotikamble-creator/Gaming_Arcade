@@ -8,11 +8,18 @@ import { LoginRequest, AuthResponse, ErrorResponse } from '@/types/auth/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // Connect to database
-    await connectDB();
+    // Parse request body first (before DB connection)
+    let body: LoginRequest;
+    try {
+      body = await request.json();
+    } catch (e) {
+      console.warn('[AUTH] Login failed: invalid JSON');
+      return NextResponse.json(
+        { error: 'invalid request body' } as ErrorResponse,
+        { status: 400 }
+      );
+    }
 
-    // Parse request body
-    const body: LoginRequest = await request.json();
     const { email, password } = body;
 
     console.log('[AUTH] Login attempt for email:', email);
@@ -21,13 +28,34 @@ export async function POST(request: NextRequest) {
     if (!email || !password) {
       console.warn('[AUTH] Login failed: missing email or password');
       return NextResponse.json(
-        { error: 'email,password required' } as ErrorResponse,
+        { error: 'email and password required' } as ErrorResponse,
         { status: 400 }
       );
     }
 
+    // Connect to database
+    try {
+      await connectDB();
+    } catch (dbError) {
+      console.error('[AUTH] Database connection failed:', dbError);
+      return NextResponse.json(
+        { error: 'service temporarily unavailable' } as ErrorResponse,
+        { status: 503 }
+      );
+    }
+
     // Find user by email
-    const user = await User.findOne({ email });
+    let user;
+    try {
+      user = await User.findOne({ email });
+    } catch (queryError) {
+      console.error('[AUTH] User query failed:', queryError);
+      return NextResponse.json(
+        { error: 'service temporarily unavailable' } as ErrorResponse,
+        { status: 503 }
+      );
+    }
+
     if (!user) {
       console.warn('[AUTH] Login failed: user not found:', email);
       return NextResponse.json(
@@ -37,7 +65,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Compare password with stored hash
-    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    let isValidPassword = false;
+    try {
+      isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    } catch (cryptoError) {
+      console.error('[AUTH] Password comparison failed:', cryptoError);
+      return NextResponse.json(
+        { error: 'authentication failed' } as ErrorResponse,
+        { status: 500 }
+      );
+    }
+
     if (!isValidPassword) {
       console.warn('[AUTH] Login failed: invalid password for:', email);
       return NextResponse.json(
@@ -47,7 +85,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token
-    const token = generateToken(user._id.toString(), user.email);
+    let token: string;
+    try {
+      token = generateToken(user._id.toString(), user.email);
+    } catch (tokenError) {
+      console.error('[AUTH] Token generation failed:', tokenError);
+      return NextResponse.json(
+        { error: 'authentication failed' } as ErrorResponse,
+        { status: 500 }
+      );
+    }
 
     console.log('[AUTH] Login successful for user:', user.email);
 

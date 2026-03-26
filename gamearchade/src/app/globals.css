@@ -18,6 +18,31 @@ body {
   --color-dark-bg: #0d1117;
 }
 
+/* Custom utility classes for components */
+.text-light-text {
+  @apply text-slate-100;
+}
+
+.text-primary-blue {
+  @apply text-blue-500;
+}
+
+.text-subtle-text {
+  @apply text-slate-400;
+}
+
+.bg-card-bg {
+  @apply bg-slate-800;
+}
+
+.bg-primary-blue {
+  @apply bg-blue-500;
+}
+
+.bg-dark-bg {
+  @apply bg-slate-950;
+}
+
 /* 3D Card Flip Animation */
 .preserve-3d {
   transform-style: preserve-3d;

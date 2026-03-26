@@ -8,11 +8,18 @@ import { SignupRequest, AuthResponse, ErrorResponse } from '@/types/auth/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // Connect to database
-    await connectDB();
+    // Parse request body first (before DB connection)
+    let body: SignupRequest;
+    try {
+      body = await request.json();
+    } catch (e) {
+      console.warn('[AUTH] Signup failed: invalid JSON');
+      return NextResponse.json(
+        { error: 'invalid request body' } as ErrorResponse,
+        { status: 400 }
+      );
+    }
 
-    // Parse request body
-    const body: SignupRequest = await request.json();
     const { email, password } = body;
 
     console.log('[AUTH] Signup attempt for email:', email);
@@ -21,13 +28,33 @@ export async function POST(request: NextRequest) {
     if (!email || !password) {
       console.warn('[AUTH] Signup failed: missing email or password');
       return NextResponse.json(
-        { error: 'email,password required' } as ErrorResponse,
+        { error: 'email and password required' } as ErrorResponse,
         { status: 400 }
       );
     }
 
+    // Connect to database
+    try {
+      await connectDB();
+    } catch (dbError) {
+      console.error('[AUTH] Database connection failed:', dbError);
+      return NextResponse.json(
+        { error: 'service temporarily unavailable' } as ErrorResponse,
+        { status: 503 }
+      );
+    }
+
     // Check if email is already in use
-    const existing = await User.findOne({ email });
+    let existing;
+    try {
+      existing = await User.findOne({ email });
+    } catch (queryError) {
+      console.error('[AUTH] User query failed:', queryError);
+      return NextResponse.json(
+        { error: 'service temporarily unavailable' } as ErrorResponse,
+        { status: 503 }
+      );
+    }
 
     if (existing) {
       console.warn('[AUTH] Signup failed: email already in use:', email);
@@ -38,14 +65,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
-
-    // Create new user
-    const user = await User.create({ email, passwordHash: hash });
-
-    // Generate JWT token
-    const token = generateToken(user._id.toString(), user.email);
+    let salt, hash, user, token;
+    try {
+      salt = await bcrypt.genSalt(10);
+      hash = await bcrypt.hash(password, salt);
+      user = await User.create({ email, passwordHash: hash });
+      token = generateToken(user._id.toString(), user.email);
+    } catch (cryptoError) {
+      console.error('[AUTH] Encryption/user creation failed:', cryptoError);
+      return NextResponse.json(
+        { error: 'signup failed' } as ErrorResponse,
+        { status: 500 }
+      );
+    }
 
     console.log('[AUTH] Signup successful for user:', user.email);
 

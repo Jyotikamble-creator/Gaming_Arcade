@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { requireSessionAuth } from '@/lib/auth/middleware';
 
-// Page-level routes that require authentication (checked via HttpOnly session cookie)
-const PROTECTED_PAGE_PREFIXES = [
+/**
+ * Next.js 16+ Middleware
+ * Handles page-level authentication only
+ * API route authentication is handled in route handlers using middleware helpers
+ */
+
+const PROTECTED_PAGES = [
   '/dashboard',
   '/pages/profile',
   '/pages/settings',
@@ -10,55 +16,30 @@ const PROTECTED_PAGE_PREFIXES = [
   '/pages/scores',
 ];
 
-// API routes that require a Bearer token
-const PROTECTED_API_PREFIXES = [
-  '/api/auth/me',
-  '/api/auth/profile',
-  '/api/auth/user-stats',
-  '/api/follows',
-];
-
 const AUTH_PAGE = '/pages/auth';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // ── Protected API routes: require Authorization: Bearer <token> ──────────
-  if (PROTECTED_API_PREFIXES.some((p) => pathname.startsWith(p))) {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'authentication required' },
-        { status: 401 }
-      );
-    }
-    return NextResponse.next();
-  }
-
-  // ── Protected page routes: require session-token cookie ──────────────────
-  if (PROTECTED_PAGE_PREFIXES.some((p) => pathname.startsWith(p))) {
-    const sessionToken = request.cookies.get('session-token')?.value;
-    if (!sessionToken) {
+  // Redirect to auth page if user tries to access protected pages without session
+  if (PROTECTED_PAGES.some((p) => pathname.startsWith(p))) {
+    const auth = requireSessionAuth(request);
+    
+    if (!auth.valid) {
       const url = request.nextUrl.clone();
       url.pathname = AUTH_PAGE;
       return NextResponse.redirect(url);
     }
-    return NextResponse.next();
   }
 
   return NextResponse.next();
 }
 
+// Configure matcher for page routes only
+// API routes should handle auth in their route handlers
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/pages/profile/:path*',
-    '/pages/settings/:path*',
-    '/pages/progress/:path*',
-    '/pages/scores/:path*',
-    '/api/auth/me',
-    '/api/auth/profile',
-    '/api/auth/user-stats',
-    '/api/follows/:path*',
+    '/dashboard',
+    '/pages/:path*',
   ],
 };

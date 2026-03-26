@@ -1,3 +1,5 @@
+"use client";
+
 // Footer component for the home page
 // Displays copyright information and site links.
 

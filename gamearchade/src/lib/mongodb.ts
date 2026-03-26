@@ -1,55 +1,34 @@
 /**
- * MongoDB Database Connection
- * Manages connection to MongoDB using Mongoose
+ * PostgreSQL Database Connection
+ * Connects to PostgreSQL using Prisma ORM
  */
 
-import mongoose from 'mongoose';
+import { PrismaClient } from '@prisma/client';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gamearchade';
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-if (!MONGODB_URI) {
-  throw new Error(
-    'Please define the MONGODB_URI environment variable inside .env.local'
-  );
-}
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  });
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 /**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route usage.
+ * Connect to PostgreSQL database
+ * Prisma automatically manages connection pooling
  */
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
-
 export async function connectToDatabase() {
-  if (cached.conn) {
-    return cached.conn;
+  try {
+    await prisma.$connect();
+    console.log('✅ Connected to PostgreSQL via Prisma');
+    return prisma;
+  } catch (error) {
+    console.error('❌ Failed to connect to PostgreSQL:', error);
+    throw error;
   }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('✅ Connected to MongoDB');
-      return mongoose;
-    });
-  }
-  cached.conn = await cached.promise;
-  return cached.conn;
 }
 
 // Default export for compatibility
 export default connectToDatabase;
-
-// Global type declaration for mongoose caching
-declare global {
-  var mongoose: {
-    conn: typeof mongoose | null;
-    promise: Promise<typeof mongoose> | null;
-  };
-}

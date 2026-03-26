@@ -1,3 +1,5 @@
+"use client";
+
 // This component represents the main content section of the home page.
 // It provides an overview of available games and navigation options.
 

@@ -1,51 +1,47 @@
-// Database connection utility for Next.js
-import mongoose from 'mongoose';
+/**
+ * PostgreSQL Database Connection — Prisma
+ * This file provides database connection utilities for the gamearchade application
+ * Automatic connection pooling handled by Prisma
+ */
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/gaming_arcade';
+import { PrismaClient } from '@prisma/client';
 
-// Global is used here to maintain a cached connection across hot reloads in development
-interface MongooseCache {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
-}
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-declare global {
-  var mongoose: MongooseCache | undefined;
-}
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  });
 
-let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
-if (!global.mongoose) {
-  global.mongoose = cached;
+/**
+ * Initialize database connection
+ * Prisma handles connection pooling automatically
+ */
+export async function connectDB() {
+  try {
+    await prisma.$connect();
+    console.log('✅ PostgreSQL connected via Prisma');
+    return prisma;
+  } catch (error) {
+    console.error('❌ Failed to connect to PostgreSQL:', error);
+    throw error;
+  }
 }
 
 /**
- * Connect to MongoDB database
- * Uses cached connection in development to prevent multiple connections
+ * Disconnect from database
+ * Should be called on app shutdown
  */
-export async function connectDB(): Promise<typeof mongoose> {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('MongoDB connected');
-      return mongoose;
-    });
-  }
-
+export async function disconnectDB() {
   try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    console.error('DB connect error', e);
-    throw e;
+    await prisma.$disconnect();
+    console.log('✅ PostgreSQL disconnected');
+  } catch (error) {
+    console.error('❌ Failed to disconnect from PostgreSQL:', error);
   }
-
-  return cached.conn;
 }
+
+export default { connectDB, disconnectDB, prisma };
