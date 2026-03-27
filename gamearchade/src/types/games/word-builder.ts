@@ -21,10 +21,14 @@ export interface WordBuilderCurrentWordLetter {
 }
 
 export interface WordBuilderChallenge {
+  id?: number;
   difficulty: WordBuilderDifficulty;
   letters: string[];
   targetWords: string[];
   minWords: number;
+  maxScore?: number;
+  timeLimit?: number;
+  category?: string;
 }
 
 export interface WordBuilderGameState {

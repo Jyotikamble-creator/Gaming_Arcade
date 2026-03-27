@@ -1,6 +1,6 @@
 // Word Scramble Game Type Definitions
 
-export type WordScrambleDifficulty = 'easy' | 'medium' | 'hard';
+export type WordScrambleDifficulty = 'easy' | 'medium' | 'hard' | 'expert' | 'insane';
 
 export type WordScrambleGameMode = 'classic' | 'timed' | 'streak' | 'marathon' | 'blitz' | 'zen';
 

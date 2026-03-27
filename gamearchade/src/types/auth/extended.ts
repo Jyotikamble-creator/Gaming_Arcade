@@ -3,6 +3,41 @@
 import type { IUser, AuthResponse, UserResponse } from "@/types/auth/auth";
 
 /**
+ * Login request types
+ */
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+/**
+ * Signup request types
+ */
+export interface SignupRequest {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+}
+
+/**
+ * Profile update request types
+ */
+export interface ProfileUpdateRequest {
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  email?: string;
+  avatar?: string;
+  bio?: string;
+  phone?: string;
+  dateOfBirth?: Date;
+  preferences?: Record<string, any>;
+}
+
+/**
  * Authentication state management types
  */
 export interface AuthState {

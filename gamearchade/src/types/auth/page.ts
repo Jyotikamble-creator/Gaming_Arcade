@@ -197,38 +197,3 @@ export interface AuthLayoutProps {
   showFooter?: boolean;
   className?: string;
 }
-
-/**
- * Export all page-specific types
- */
-export type {
-  // Core interfaces
-  AuthPageConfig,
-  AuthPageProps,
-  AuthComponentProps,
-  AuthLayoutProps,
-  
-  // Form data
-  LoginFormData,
-  SignupFormData,
-  ForgotPasswordFormData,
-  ResetPasswordFormData,
-  
-  // Auth data
-  AuthPageError,
-  AuthPageErrorType,
-  AuthMode,
-  
-  // Validation
-  AuthValidationRules,
-  AuthFormValidation,
-  UseAuthFormReturn,
-  
-  // Social auth
-  SocialProvider,
-  SocialAuthData,
-  
-  // Next.js specific
-  AuthPageParams,
-  AuthPageSearchParams
-};
