@@ -1,15 +1,72 @@
 // Word Builder Game MongoDB Model
 import mongoose, { Schema, Document } from 'mongoose';
-import {
-  WordBuilderGameSession as IWordBuilderGameSession,
-  WordBuilderAttempt,
-  WordBuilderPowerUp,
-  WordBuilderDifficulty,
-  WordBuilderGameMode
-} from '@/types/games/word-builder';
+
+// Local type definitions
+type WordBuilderAttempt = {
+  word: string;
+  isValid: boolean;
+  score: number;
+  reactionTime: number;
+  timestamp: Date;
+  bonusMultiplier: number;
+  letterCount: number;
+};
+
+type WordBuilderPowerUp = {
+  id: string;
+  type: 'hint' | 'extra-time' | 'score-boost' | 'reveal-word' | 'shuffle-letters';
+  name: string;
+  description: string;
+  duration?: number;
+  effect: number;
+  cost: number;
+  isActive: boolean;
+};
+
+type WordBuilderDifficulty = 'easy' | 'medium' | 'hard' | 'expert' | 'master';
+type WordBuilderGameMode = 'classic' | 'timed' | 'endless' | 'puzzle' | 'challenge';
+
+interface IWordBuilderGameSession extends Document {
+  sessionId: string;
+  userId: string;
+  challengeId: number;
+  difficulty: WordBuilderDifficulty;
+  gameMode: WordBuilderGameMode;
+  letters: string[];
+  foundWords: string[];
+  currentScore: number;
+  wordsFound: number;
+  targetWordsCount: number;
+  startTime: Date;
+  endTime?: Date;
+  timeRemaining?: number;
+  totalDuration: number;
+  isPaused: boolean;
+  pausedAt?: Date;
+  averageWordTime: number;
+  longestWord: string;
+  shortestWord: string;
+  wordsPerMinute: number;
+  accuracy: number;
+  perfectWords: number;
+  activePowerUps: WordBuilderPowerUp[];
+  hintsUsed: number;
+  maxHints: number;
+  comboStreak: number;
+  maxComboStreak: number;
+  isCompleted: boolean;
+  completionPercentage: number;
+  finalRating: string;
+  achievements: string[];
+  letterUsageStats: Map<string, number>;
+  wordLengthDistribution: Map<string, number>;
+  categoryBonus: number;
+  consistencyRating: number;
+  attempts: WordBuilderAttempt[];
+}
 
 // Attempt Schema
-const attemptSchema = new Schema<WordBuilderAttempt>({
+const attemptSchema = new Schema({
   word: { type: String, required: true },
   isValid: { type: Boolean, required: true },
   score: { type: Number, required: true },
@@ -20,7 +77,7 @@ const attemptSchema = new Schema<WordBuilderAttempt>({
 });
 
 // Power-up Schema
-const powerUpSchema = new Schema<WordBuilderPowerUp>({
+const powerUpSchema = new Schema({
   id: { type: String, required: true },
   type: { 
     type: String, 
@@ -36,7 +93,7 @@ const powerUpSchema = new Schema<WordBuilderPowerUp>({
 });
 
 // Main Game Session Schema
-const wordBuilderGameSessionSchema = new Schema<IWordBuilderGameSession>({
+const wordBuilderGameSessionSchema = new Schema({
   sessionId: { 
     type: String, 
     required: true, 
@@ -54,13 +111,13 @@ const wordBuilderGameSessionSchema = new Schema<IWordBuilderGameSession>({
   },
   difficulty: { 
     type: String, 
-    enum: ['easy', 'medium', 'hard', 'expert', 'master'] as WordBuilderDifficulty[],
+    enum: ['easy', 'medium', 'hard', 'expert', 'master'],
     required: true,
     index: true
   },
   gameMode: { 
     type: String, 
-    enum: ['classic', 'timed', 'endless', 'puzzle', 'challenge'] as WordBuilderGameMode[],
+    enum: ['classic', 'timed', 'endless', 'puzzle', 'challenge'],
     required: true,
     index: true
   },
@@ -76,7 +133,7 @@ const wordBuilderGameSessionSchema = new Schema<IWordBuilderGameSession>({
   startTime: { type: Date, required: true },
   endTime: { type: Date },
   timeRemaining: { type: Number },
-  totalDuration: { type: Number, default: 0 }, // in seconds, 0 = unlimited
+  totalDuration: { type: Number, default: 0 },
   isPaused: { type: Boolean, default: false },
   pausedAt: { type: Date },
   
@@ -129,24 +186,24 @@ wordBuilderGameSessionSchema.index({ isCompleted: 1, currentScore: -1 });
 wordBuilderGameSessionSchema.index({ sessionId: 1, isCompleted: 1 });
 
 // Virtual for game duration
-wordBuilderGameSessionSchema.virtual('actualDuration').get(function() {
+wordBuilderGameSessionSchema.virtual('actualDuration').get(function(this: any) {
   if (this.endTime && this.startTime) {
-    return Math.round((this.endTime.getTime() - this.startTime.getTime()) / 1000);
+    return Math.round(((this.endTime as Date).getTime() - (this.startTime as Date).getTime()) / 1000);
   }
   return 0;
 });
 
 // Virtual for completion status
-wordBuilderGameSessionSchema.virtual('isTimeExpired').get(function() {
+wordBuilderGameSessionSchema.virtual('isTimeExpired').get(function(this: any) {
   if (this.totalDuration <= 0) return false;
-  const elapsed = (Date.now() - this.startTime.getTime()) / 1000;
+  const elapsed = (Date.now() - (this.startTime as Date).getTime()) / 1000;
   return !this.isPaused && elapsed >= this.totalDuration;
 });
 
 // Virtual for words per minute calculation
-wordBuilderGameSessionSchema.virtual('currentWordsPerMinute').get(function() {
+wordBuilderGameSessionSchema.virtual('currentWordsPerMinute').get(function(this: any) {
   if (this.startTime && this.wordsFound > 0) {
-    const elapsed = (Date.now() - this.startTime.getTime()) / 1000 / 60;
+    const elapsed = (Date.now() - (this.startTime as Date).getTime()) / 1000 / 60;
     return Math.round((this.wordsFound / elapsed) * 10) / 10;
   }
   return 0;
@@ -202,7 +259,7 @@ wordBuilderGameSessionSchema.methods.resumeGame = function() {
 
 wordBuilderGameSessionSchema.methods.calculateCurrentAccuracy = function() {
   if (this.attempts && this.attempts.length > 0) {
-    const validAttempts = this.attempts.filter(a => a.isValid).length;
+    const validAttempts = this.attempts.filter((a: WordBuilderAttempt) => a.isValid).length;
     this.accuracy = validAttempts / this.attempts.length;
   }
   return this.accuracy;
@@ -226,18 +283,14 @@ wordBuilderGameSessionSchema.methods.getPerformanceRating = function() {
 };
 
 // Static methods
-wordBuilderGameSessionSchema.statics.findActiveByUser = function(userId: string) {
+wordBuilderGameSessionSchema.statics.findActiveByUser = function(this: any, userId: string) {
   return this.find({ 
     userId, 
     isCompleted: false 
   }).sort({ startTime: -1 });
 };
 
-wordBuilderGameSessionSchema.statics.getLeaderboard = function(
-  difficulty?: WordBuilderDifficulty,
-  gameMode?: WordBuilderGameMode,
-  limit: number = 10
-) {
+wordBuilderGameSessionSchema.statics.getLeaderboard = function(this: any, difficulty?: WordBuilderDifficulty, gameMode?: WordBuilderGameMode, limit: number = 10) {
   const query: any = { isCompleted: true };
   if (difficulty) query.difficulty = difficulty;
   if (gameMode) query.gameMode = gameMode;
@@ -248,7 +301,7 @@ wordBuilderGameSessionSchema.statics.getLeaderboard = function(
     .select('userId currentScore wordsFound accuracy completionPercentage finalRating difficulty gameMode createdAt');
 };
 
-wordBuilderGameSessionSchema.statics.getUserStats = function(userId: string) {
+wordBuilderGameSessionSchema.statics.getUserStats = function(this: any, userId: string) {
   return this.aggregate([
     { $match: { userId, isCompleted: true } },
     {
@@ -268,7 +321,7 @@ wordBuilderGameSessionSchema.statics.getUserStats = function(userId: string) {
 };
 
 // Pre-save middleware
-wordBuilderGameSessionSchema.pre('save', function(next) {
+wordBuilderGameSessionSchema.pre('save', function(this: any, next: any) {
   // Update completion percentage
   if (this.targetWordsCount > 0) {
     this.completionPercentage = Math.round((this.wordsFound / this.targetWordsCount) * 100);
@@ -289,4 +342,4 @@ wordBuilderGameSessionSchema.pre('save', function(next) {
 // Ensure model is only compiled once
 export const WordBuilderGameSession = 
   mongoose.models.WordBuilderGameSession || 
-  mongoose.model<IWordBuilderGameSession>('WordBuilderGameSession', wordBuilderGameSessionSchema);
+  mongoose.model('WordBuilderGameSession', wordBuilderGameSessionSchema);

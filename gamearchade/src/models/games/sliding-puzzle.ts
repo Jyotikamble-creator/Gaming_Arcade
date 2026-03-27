@@ -163,7 +163,7 @@ slidingPuzzleSessionSchema.index({ score: -1, timeElapsed: 1 });
 slidingPuzzleSessionSchema.index({ moves: 1, timeElapsed: 1 });
 
 // Virtual for calculated duration
-slidingPuzzleSessionSchema.virtual('calculatedTimeElapsed').get(function() {
+slidingPuzzleSessionSchema.virtual('calculatedTimeElapsed').get(function(this: any) {
   if (this.endTime && this.startTime) {
     return Math.round((this.endTime.getTime() - this.startTime.getTime()) / 1000);
   }
@@ -171,7 +171,7 @@ slidingPuzzleSessionSchema.virtual('calculatedTimeElapsed').get(function() {
 });
 
 // Pre-save middleware to calculate metrics
-slidingPuzzleSessionSchema.pre('save', function(next) {
+slidingPuzzleSessionSchema.pre('save', function(this: any, next: any) {
   // Calculate time elapsed if endTime is set
   if (this.endTime && this.startTime && !this.timeElapsed) {
     this.timeElapsed = Math.round((this.endTime.getTime() - this.startTime.getTime()) / 1000);
@@ -186,7 +186,7 @@ slidingPuzzleSessionSchema.pre('save', function(next) {
 });
 
 // Static methods
-slidingPuzzleSessionSchema.statics.findByUser = function(userId: string, limit: number = 20) {
+slidingPuzzleSessionSchema.statics.findByUser = function(this: any, userId: string, limit: number = 20) {
   return this.find({ userId })
     .sort({ createdAt: -1 })
     .limit(limit)
@@ -194,7 +194,8 @@ slidingPuzzleSessionSchema.statics.findByUser = function(userId: string, limit: 
 };
 
 slidingPuzzleSessionSchema.statics.getLeaderboard = function(
-  difficulty?: SlidingPuzzleDifficulty,
+  this: any,
+  difficulty?: any,
   puzzleSize?: number,
   limit: number = 10
 ) {
@@ -215,14 +216,14 @@ slidingPuzzleSessionSchema.statics.getLeaderboard = function(
     .select('score moves timeElapsed difficulty puzzleSize rating playerName userId createdAt');
 };
 
-slidingPuzzleSessionSchema.statics.getTopScores = function(limit: number = 100) {
+slidingPuzzleSessionSchema.statics.getTopScores = function(this: any, limit: number = 100) {
   return this.find({ isCompleted: true, isSolved: true })
     .sort({ score: -1 })
     .limit(limit)
     .select('score moves timeElapsed difficulty puzzleSize playerName userId createdAt');
 };
 
-slidingPuzzleSessionSchema.statics.getUserStats = function(userId: string) {
+slidingPuzzleSessionSchema.statics.getUserStats = function(this: any, userId: string) {
   return this.aggregate([
     { 
       $match: { 
@@ -270,7 +271,7 @@ slidingPuzzleSessionSchema.statics.getUserStats = function(userId: string) {
   ]);
 };
 
-slidingPuzzleSessionSchema.statics.getDifficultyStats = function() {
+slidingPuzzleSessionSchema.statics.getDifficultyStats = function(this: any) {
   return this.aggregate([
     { $match: { isCompleted: true } },
     {
@@ -307,6 +308,7 @@ slidingPuzzleSessionSchema.statics.getDifficultyStats = function() {
 
 // Instance methods
 slidingPuzzleSessionSchema.methods.addMove = function(
+  this: any,
   fromPosition: number,
   toPosition: number,
   tileNumber: number,
@@ -328,8 +330,9 @@ slidingPuzzleSessionSchema.methods.addMove = function(
 };
 
 slidingPuzzleSessionSchema.methods.completeGame = function(
+  this: any,
   finalScore?: number,
-  rating?: SlidingPuzzleRating,
+  rating?: any,
   isSolved: boolean = false
 ) {
   this.isCompleted = true;
@@ -347,7 +350,7 @@ slidingPuzzleSessionSchema.methods.completeGame = function(
   return this.save();
 };
 
-slidingPuzzleSessionSchema.methods.useHint = function() {
+slidingPuzzleSessionSchema.methods.useHint = function(this: any) {
   this.hintsUsed += 1;
   return this.save();
 };

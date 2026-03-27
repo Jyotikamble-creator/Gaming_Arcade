@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
-// import type { SimonColor } from '@/types/games/simon';\n\n// Local type definitions to avoid import issues\ntype SimonColor = 'red' | 'green' | 'blue' | 'yellow';
+// import type { SimonColor } from '@/types/games/simon';
+
+// Local type definitions to avoid import issues
+type SimonColor = 'red' | 'green' | 'blue' | 'yellow' | 'purple' | 'orange' | 'pink' | 'cyan';
 
 /**
  * Simon Game Session Schema
@@ -145,7 +148,7 @@ simonSessionSchema.index({ isCompleted: 1, score: -1 });
 simonSessionSchema.index({ gameStartTime: 1 });
 
 // Virtual for game duration calculation
-simonSessionSchema.virtual('calculatedDuration').get(function() {
+simonSessionSchema.virtual('calculatedDuration').get(function(this: any) {
   if (this.gameEndTime && this.gameStartTime) {
     return this.gameEndTime.getTime() - this.gameStartTime.getTime();
   }
@@ -153,7 +156,7 @@ simonSessionSchema.virtual('calculatedDuration').get(function() {
 });
 
 // Pre-save middleware to calculate metrics
-simonSessionSchema.pre('save', function(next) {
+simonSessionSchema.pre('save', function(this: any, next: any) {
   // Calculate accuracy
   if (this.totalMoves > 0) {
     this.accuracy = Math.round((this.correctMoves / this.totalMoves) * 100);
@@ -176,14 +179,14 @@ simonSessionSchema.pre('save', function(next) {
 });
 
 // Static methods
-simonSessionSchema.statics.findByUser = function(userId: string, limit: number = 20) {
+simonSessionSchema.statics.findByUser = function(this: any, userId: string, limit: number = 20) {
   return this.find({ userId })
     .sort({ createdAt: -1 })
     .limit(limit)
     .populate('userId', 'username email');
 };
 
-simonSessionSchema.statics.getLeaderboard = function(difficulty?: string, limit: number = 10) {
+simonSessionSchema.statics.getLeaderboard = function(this: any, difficulty?: string, limit: number = 10) {
   const filter: any = { isCompleted: true };
   if (difficulty) {
     filter.difficulty = difficulty;
@@ -196,14 +199,14 @@ simonSessionSchema.statics.getLeaderboard = function(difficulty?: string, limit:
     .select('score level difficulty gameDuration playerName userId createdAt');
 };
 
-simonSessionSchema.statics.getTopScores = function(limit: number = 100) {
+simonSessionSchema.statics.getTopScores = function(this: any, limit: number = 100) {
   return this.find({ isCompleted: true })
     .sort({ score: -1 })
     .limit(limit)
     .select('score level difficulty playerName userId createdAt');
 };
 
-simonSessionSchema.statics.getUserStats = function(userId: string) {
+simonSessionSchema.statics.getUserStats = function(this: any, userId: string) {
   return this.aggregate([
     { $match: { userId: new mongoose.Types.ObjectId(userId), isCompleted: true } },
     {
@@ -223,7 +226,7 @@ simonSessionSchema.statics.getUserStats = function(userId: string) {
 };
 
 // Instance methods
-simonSessionSchema.methods.addMove = function(color: SimonColor, isCorrect: boolean) {
+simonSessionSchema.methods.addMove = function(this: any, color: SimonColor, isCorrect: boolean) {
   this.playerSequence.push(color);
   this.totalMoves += 1;
   
@@ -238,7 +241,7 @@ simonSessionSchema.methods.addMove = function(color: SimonColor, isCorrect: bool
   return this.save();
 };
 
-simonSessionSchema.methods.completeLevel = function() {
+simonSessionSchema.methods.completeLevel = function(this: any) {
   this.level += 1;
   this.currentStep = 0;
   this.playerSequence = [];
@@ -247,7 +250,7 @@ simonSessionSchema.methods.completeLevel = function() {
   return this.save();
 };
 
-simonSessionSchema.methods.endGame = function(finalScore?: number) {
+simonSessionSchema.methods.endGame = function(this: any, finalScore?: number) {
   this.isGameActive = false;
   this.isCompleted = true;
   this.gameEndTime = new Date();

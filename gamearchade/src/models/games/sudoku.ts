@@ -1,9 +1,22 @@
 import mongoose from 'mongoose';
-import type { 
-  SudokuDifficulty,
-  SudokuBoard,
-  ISudokuMove
-} from '@/types/games/sudoku';
+// import type { 
+//   SudokuDifficulty,
+//   SudokuBoard,
+//   ISudokuMove
+// } from '@/types/games/sudoku';
+
+// Local type definitions to avoid import issues
+type SudokuDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
+type SudokuBoard = number[][];
+type ISudokuMove = {
+  row: number;
+  col: number;
+  oldValue: number;
+  newValue: number;
+  timestamp?: Date;
+  moveType: 'fill' | 'clear' | 'note' | 'hint';
+  isCorrect: boolean;
+};
 
 /**
  * Sudoku Session Schema
@@ -212,7 +225,7 @@ sudokuSessionSchema.index({ timeElapsed: 1, difficulty: 1 });
 sudokuSessionSchema.index({ puzzleId: 1 });
 
 // Virtual for calculated completion percentage
-sudokuSessionSchema.virtual('calculatedCompletion').get(function() {
+sudokuSessionSchema.virtual('calculatedCompletion').get(function(this: any) {
   let filledCells = 0;
   for (let row = 0; row < 9; row++) {
     for (let col = 0; col < 9; col++) {
@@ -225,14 +238,14 @@ sudokuSessionSchema.virtual('calculatedCompletion').get(function() {
 });
 
 // Virtual for calculated accuracy
-sudokuSessionSchema.virtual('accuracy').get(function() {
+sudokuSessionSchema.virtual('accuracy').get(function(this: any) {
   const correctMoves = this.moves.filter((move: any) => move.isCorrect).length;
   const totalMoves = this.moves.length;
   return totalMoves > 0 ? Math.round((correctMoves / totalMoves) * 100) : 100;
 });
 
 // Pre-save middleware to calculate metrics
-sudokuSessionSchema.pre('save', function(next) {
+sudokuSessionSchema.pre('save', function(this: any, next: any) {
   // Calculate time elapsed if endTime is set
   if (this.endTime && this.startTime && !this.timeElapsed) {
     this.timeElapsed = Math.round((this.endTime.getTime() - this.startTime.getTime()) / 1000);
@@ -276,7 +289,7 @@ sudokuSessionSchema.pre('save', function(next) {
 });
 
 // Static methods
-sudokuSessionSchema.statics.findByUser = function(userId: string, limit: number = 20) {
+sudokuSessionSchema.statics.findByUser = function(this: any, userId: string, limit: number = 20) {
   return this.find({ userId })
     .sort({ createdAt: -1 })
     .limit(limit)
@@ -284,7 +297,8 @@ sudokuSessionSchema.statics.findByUser = function(userId: string, limit: number 
 };
 
 sudokuSessionSchema.statics.getLeaderboard = function(
-  difficulty?: SudokuDifficulty,
+  this: any,
+  difficulty?: any,
   limit: number = 10
 ) {
   const filter: any = { isCompleted: true, isSolved: true };
@@ -300,14 +314,14 @@ sudokuSessionSchema.statics.getLeaderboard = function(
     .select('score timeElapsed difficulty hintsUsed mistakes completion playerName userId createdAt');
 };
 
-sudokuSessionSchema.statics.getTopScores = function(limit: number = 100) {
+sudokuSessionSchema.statics.getTopScores = function(this: any, limit: number = 100) {
   return this.find({ isCompleted: true, isSolved: true })
     .sort({ score: -1 })
     .limit(limit)
     .select('score timeElapsed difficulty hintsUsed mistakes playerName userId createdAt');
 };
 
-sudokuSessionSchema.statics.getUserStats = function(userId: string) {
+sudokuSessionSchema.statics.getUserStats = function(this: any, userId: string) {
   return this.aggregate([
     { 
       $match: { 
@@ -353,7 +367,7 @@ sudokuSessionSchema.statics.getUserStats = function(userId: string) {
   ]);
 };
 
-sudokuSessionSchema.statics.getDifficultyStats = function() {
+sudokuSessionSchema.statics.getDifficultyStats = function(this: any) {
   return this.aggregate([
     { $match: { isCompleted: true } },
     {
@@ -391,7 +405,7 @@ sudokuSessionSchema.statics.getDifficultyStats = function() {
 };
 
 // Instance methods
-sudokuSessionSchema.methods.addMove = function(move: ISudokuMove) {
+sudokuSessionSchema.methods.addMove = function(this: any, move: ISudokuMove) {
   this.moves.push(move);
   
   // Update current board
@@ -410,7 +424,7 @@ sudokuSessionSchema.methods.addMove = function(move: ISudokuMove) {
   return this.save();
 };
 
-sudokuSessionSchema.methods.useHint = function(row: number, col: number) {
+sudokuSessionSchema.methods.useHint = function(this: any, row: number, col: number) {
   if (this.hints <= 0) {
     throw new Error('No hints remaining');
   }
@@ -432,6 +446,7 @@ sudokuSessionSchema.methods.useHint = function(row: number, col: number) {
 };
 
 sudokuSessionSchema.methods.completeGame = function(
+  this: any,
   isSolved: boolean = false,
   finalScore?: number
 ) {
@@ -446,12 +461,12 @@ sudokuSessionSchema.methods.completeGame = function(
   return this.save();
 };
 
-sudokuSessionSchema.methods.calculateScore = function(): number {
+sudokuSessionSchema.methods.calculateScore = function(this: any): number {
   if (!this.isCompleted || !this.isSolved) {
     return 0;
   }
   
-  const difficultyMultiplier = {
+  const difficultyMultiplier: Record<string, number> = {
     easy: 1,
     medium: 1.5,
     hard: 2,
@@ -465,7 +480,7 @@ sudokuSessionSchema.methods.calculateScore = function(): number {
   
   const score = Math.round(
     (baseScore + timeBonus - hintPenalty - mistakePenalty) * 
-    difficultyMultiplier[this.difficulty as keyof typeof difficultyMultiplier]
+    difficultyMultiplier[this.difficulty]
   );
   
   return Math.max(score, 50); // Minimum score

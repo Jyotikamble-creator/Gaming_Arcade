@@ -6,18 +6,44 @@ import mongoose, { Schema, Document } from 'mongoose';
 // import type { ReactionSession, ReactionAttempt, ReactionDifficulty, ReactionPerformance } from '@/types/games/reaction-time';
 
 // Local type definitions to avoid import issues
-type ReactionSession = any;
-type ReactionAttempt = any;
-type ReactionDifficulty = 'easy' | 'medium' | 'hard';
-type ReactionPerformance = any;
+type ReactionAttempt = {
+  attemptNumber: number;
+  reactionTime: number;
+  timestamp?: Date;
+  valid: boolean;
+  tooEarly: boolean;
+};
+
+type ReactionDifficulty = 'easy' | 'medium' | 'hard' | 'extreme';
+
+type ReactionPerformance = 'elite' | 'excellent' | 'good' | 'average' | 'belowAverage' | 'slow';
+
+type ReactionSession = {
+  sessionId: string;
+  userId?: string;
+  attempts: ReactionAttempt[];
+  currentAttempt: number;
+  totalAttempts: number;
+  startTime: Date;
+  endTime?: Date;
+  averageTime?: number;
+  bestTime?: number;
+  worstTime?: number;
+  consistency?: number;
+  score?: number;
+  performance?: ReactionPerformance;
+  difficulty: ReactionDifficulty;
+  completed: boolean;
+  falseStarts: number;
+  calculateStats(): void;
+  calculateScore(): number;
+};
 
 /**
  * Reaction session document interface
  */
-export interface ReactionSessionDocument extends Omit<ReactionSession, 'sessionId'>, Document {
+export interface ReactionSessionDocument extends ReactionSession, Document {
   sessionId: string;
-  calculateStats(): void;
-  calculateScore(): number;
 }
 
 /**
@@ -87,7 +113,7 @@ const reactionSessionSchema = new Schema<ReactionSessionDocument>({
 /**
  * Calculate statistics from attempts
  */
-reactionSessionSchema.methods.calculateStats = function(): void {
+reactionSessionSchema.methods.calculateStats = function(this: any): void {
   if (this.attempts.length === 0) return;
 
   // Filter valid attempts only
@@ -114,7 +140,7 @@ reactionSessionSchema.methods.calculateStats = function(): void {
 /**
  * Calculate score based on performance
  */
-reactionSessionSchema.methods.calculateScore = function(): number {
+reactionSessionSchema.methods.calculateScore = function(this: any): number {
   if (!this.averageTime || !this.bestTime) {
     this.calculateStats();
   }
@@ -134,13 +160,13 @@ reactionSessionSchema.methods.calculateScore = function(): number {
   else if (this.bestTime < 300) bestTimeBonus = 10;
 
   // Difficulty multiplier
-  const difficultyMultipliers: Record<ReactionDifficulty, number> = {
+  const difficultyMultipliers: Record<string, number> = {
     easy: 1.0,
     medium: 1.25,
     hard: 1.5,
     extreme: 2.0
   };
-  const multiplier = difficultyMultipliers[this.difficulty as ReactionDifficulty] || 1.0;
+  const multiplier = difficultyMultipliers[this.difficulty] || 1.0;
 
   // False start penalty (10 points per false start)
   const penalty = this.falseStarts * 10;

@@ -10,7 +10,25 @@ import mongoose, { Document, Schema } from "mongoose";
 //   TypingAchievement
 // } from '@/types/games/typing'; */
 
-// Local type definitions to avoid import issues
+// Local type definitions
+type TypingCharacterType = {
+  char: string;
+  status: 'untyped' | 'correct' | 'incorrect' | 'extra';
+  timestamp?: Date;
+  timeTaken?: number;
+};
+
+type TypingWordType = {
+  word: string;
+  characters: TypingCharacterType[];
+  isCorrect: boolean;
+  hasErrors: boolean;
+  errorCount: number;
+  timeTaken: number;
+  startTime: Date;
+  endTime?: Date;
+};
+
 type TypingGameSession = any;
 type TypingPassage = any;
 type TypingWord = any;
@@ -22,7 +40,7 @@ type TypingAchievement = any;
 
 
 export interface ITypingSession extends TypingGameSession, Document {
-  _id: string;
+  _id: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -467,16 +485,16 @@ TypingSessionSchema.methods.updateStatistics = function() {
   
   // Calculate basic statistics
   const totalCharacters = typedText.length;
-  const correctCharacters = this.characters.filter(c => c.status === 'correct').length;
-  const incorrectCharacters = this.characters.filter(c => c.status === 'incorrect').length;
-  const extraCharacters = this.characters.filter(c => c.status === 'extra').length;
+  const correctCharacters = this.characters.filter((c: TypingCharacterType) => c.status === 'correct').length;
+  const incorrectCharacters = this.characters.filter((c: TypingCharacterType) => c.status === 'incorrect').length;
+  const extraCharacters = this.characters.filter((c: TypingCharacterType) => c.status === 'extra').length;
   
   const accuracy = totalCharacters > 0 ? correctCharacters / totalCharacters : 0;
   const timeElapsed = this.endTime ? this.endTime.getTime() - this.startTime.getTime() : Date.now() - this.startTime.getTime();
   const timeInMinutes = timeElapsed / 1000 / 60;
   
   // Calculate WPM
-  const wordsTyped = typedText.trim().split(' ').filter(word => word.length > 0).length;
+  const wordsTyped = typedText.trim().split(' ').filter((word: string) => word.length > 0).length;
   const grossWpm = timeInMinutes > 0 ? wordsTyped / timeInMinutes : 0;
   const netWpm = Math.max(0, grossWpm - (incorrectCharacters / timeInMinutes / 5)); // Standard WPM calculation
   
@@ -490,8 +508,8 @@ TypingSessionSchema.methods.updateStatistics = function() {
     correctCharacters,
     incorrectCharacters,
     totalWords: wordsTyped,
-    correctWords: this.words.filter(w => w.isCorrect).length,
-    incorrectWords: this.words.filter(w => !w.isCorrect).length,
+    correctWords: this.words.filter((w: TypingWordType) => w.isCorrect).length,
+    incorrectWords: this.words.filter((w: TypingWordType) => !w.isCorrect).length,
     extraCharacters,
     missedCharacters: Math.max(0, passageText.length - totalCharacters),
     totalKeystrokes: totalCharacters + this.statistics.backspaces || 0,
@@ -595,7 +613,7 @@ TypingSessionSchema.statics.getLeaderboard = function(timeframe: 'daily' | 'week
 };
 
 // Pre-save middleware
-TypingSessionSchema.pre('save', function(next) {
+TypingSessionSchema.pre('save', function(this: any, next: any) {
   if (this.isNew) {
     // Generate session ID if not provided
     if (!this.sessionId) {

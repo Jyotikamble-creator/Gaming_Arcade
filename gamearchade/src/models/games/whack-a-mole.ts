@@ -11,7 +11,7 @@ import {
 } from "@/types/games/whack-a-mole";
 
 export interface IWhackSession extends WhackGameSession, Document {
-  _id: string;
+  _id: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -745,7 +745,7 @@ WhackSessionSchema.statics.getLeaderboard = function(
 };
 
 // Pre-save middleware
-WhackSessionSchema.pre('save', function(next) {
+WhackSessionSchema.pre('save', function(this: any, next: any) {
   if (this.isNew) {
     // Generate session ID if not provided
     if (!this.sessionId) {

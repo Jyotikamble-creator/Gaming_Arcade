@@ -1,13 +1,56 @@
 import mongoose, { Document, Schema } from "mongoose";
-import {
-  TowerStackerGameSession,
-  TowerStackerMove,
-  TowerStackerBlock,
-  TowerStackerAchievement
-} from "@/types/games/tower-stacker";
 
-export interface ITowerStackerSession extends TowerStackerGameSession, Document {
-  _id: string;
+// Local type definitions to avoid import issues
+type TowerStackerBlock = {
+  id: string;
+  width: number;
+  position: number;
+  speed: number;
+  direction: 'left' | 'right';
+  color: string;
+};
+
+type TowerStackerMove = {
+  level: number;
+  dropPosition: number;
+  targetPosition: number;
+  accuracy: number;
+  perfectDrop?: boolean;
+  blockWidth: number;
+  timestamp?: Date;
+  timeTaken: number;
+};
+
+type TowerStackerAchievement = {
+  id: string;
+  name: string;
+  description: string;
+  condition: string;
+  unlocked?: boolean;
+  unlockedAt?: Date;
+};
+
+type TowerStackerGameSession = {
+  sessionId: string;
+  userId: string;
+  currentLevel: number;
+  maxLevel: number;
+  perfectDrops: number;
+  totalDrops: number;
+  score: number;
+  gameState: 'playing' | 'completed' | 'failed';
+  tower: TowerStackerBlock[];
+  moves: TowerStackerMove[];
+  startTime: Date;
+  endTime?: Date;
+  totalTime: number;
+  averageAccuracy: number;
+  bestStreak: number;
+  currentStreak: number;
+};
+
+export interface ITowerStackerSession extends Omit<TowerStackerGameSession, '_id'>, Document {
+  _id: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -197,31 +240,31 @@ TowerStackerSessionSchema.index({ maxLevel: -1, perfectDrops: -1 });
 TowerStackerSessionSchema.index({ averageAccuracy: -1 });
 
 // Virtual for completion rate
-TowerStackerSessionSchema.virtual('completionRate').get(function() {
+TowerStackerSessionSchema.virtual('completionRate').get(function(this: any) {
   if (this.totalDrops === 0) return 0;
   return this.perfectDrops / this.totalDrops;
 });
 
 // Virtual for game duration in seconds
-TowerStackerSessionSchema.virtual('gameDurationSeconds').get(function() {
+TowerStackerSessionSchema.virtual('gameDurationSeconds').get(function(this: any) {
   if (!this.endTime || !this.startTime) return null;
   return Math.floor((this.endTime.getTime() - this.startTime.getTime()) / 1000);
 });
 
 // Methods
-TowerStackerSessionSchema.methods.updateScore = function(newScore: number) {
+TowerStackerSessionSchema.methods.updateScore = function(this: any, newScore: number) {
   this.score = Math.max(this.score, newScore);
   return this.save();
 };
 
-TowerStackerSessionSchema.methods.addMove = function(move: TowerStackerMove) {
+TowerStackerSessionSchema.methods.addMove = function(this: any, move: TowerStackerMove) {
   this.moves.push(move);
   this.totalDrops = this.moves.length;
-  this.perfectDrops = this.moves.filter(m => m.perfectDrop).length;
+  this.perfectDrops = this.moves.filter((m: TowerStackerMove) => m.perfectDrop).length;
   
   // Update accuracy
   if (this.moves.length > 0) {
-    this.averageAccuracy = this.moves.reduce((sum, m) => sum + m.accuracy, 0) / this.moves.length;
+    this.averageAccuracy = this.moves.reduce((sum: number, m: TowerStackerMove) => sum + m.accuracy, 0) / this.moves.length;
   }
   
   // Update streak
@@ -235,14 +278,14 @@ TowerStackerSessionSchema.methods.addMove = function(move: TowerStackerMove) {
   return this.save();
 };
 
-TowerStackerSessionSchema.methods.completeGame = function() {
+TowerStackerSessionSchema.methods.completeGame = function(this: any) {
   this.gameState = 'completed';
   this.endTime = new Date();
   this.totalTime = this.endTime.getTime() - this.startTime.getTime();
   return this.save();
 };
 
-TowerStackerSessionSchema.methods.failGame = function() {
+TowerStackerSessionSchema.methods.failGame = function(this: any) {
   this.gameState = 'failed';
   this.endTime = new Date();
   this.totalTime = this.endTime.getTime() - this.startTime.getTime();
@@ -250,11 +293,11 @@ TowerStackerSessionSchema.methods.failGame = function() {
 };
 
 // Static methods
-TowerStackerSessionSchema.statics.findActiveSession = function(userId: string) {
+TowerStackerSessionSchema.statics.findActiveSession = function(this: any, userId: string) {
   return this.findOne({ userId, gameState: 'playing' });
 };
 
-TowerStackerSessionSchema.statics.getUserStats = function(userId: string) {
+TowerStackerSessionSchema.statics.getUserStats = function(this: any, userId: string) {
   return this.aggregate([
     { $match: { userId } },
     {
@@ -278,14 +321,14 @@ TowerStackerSessionSchema.statics.getUserStats = function(userId: string) {
   ]);
 };
 
-TowerStackerSessionSchema.statics.getLeaderboard = function(limit: number = 10) {
+TowerStackerSessionSchema.statics.getLeaderboard = function(this: any, limit: number = 10) {
   return this.find({ gameState: 'completed' })
     .sort({ score: -1, maxLevel: -1, totalTime: 1 })
     .limit(limit)
     .select('userId score maxLevel averageAccuracy perfectDrops totalTime startTime');
 };
 
-TowerStackerSessionSchema.statics.getTopPerformers = function(timeframe: 'daily' | 'weekly' | 'monthly' = 'weekly') {
+TowerStackerSessionSchema.statics.getTopPerformers = function(this: any, timeframe: 'daily' | 'weekly' | 'monthly' = 'weekly') {
   const now = new Date();
   let startDate: Date;
   
@@ -310,7 +353,7 @@ TowerStackerSessionSchema.statics.getTopPerformers = function(timeframe: 'daily'
 };
 
 // Pre-save middleware
-TowerStackerSessionSchema.pre('save', function(next) {
+TowerStackerSessionSchema.pre('save', function(this: any, next: any) {
   if (this.isNew) {
     // Generate session ID if not provided
     if (!this.sessionId) {

@@ -6,9 +6,18 @@ import mongoose from 'mongoose';
 // } from '@/types/games/speed-math';
 
 // Local type definitions to avoid import issues
-type SpeedMathDifficulty = 'easy' | 'medium' | 'hard';
-type SpeedMathOperation = 'addition' | 'subtraction' | 'multiplication' | 'division';
-type ISpeedMathAnswer = any;
+type SpeedMathDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
+type SpeedMathOperation = 'addition' | 'subtraction' | 'multiplication' | 'division' | 'exponent' | 'squareRoot';
+type ISpeedMathAnswer = {
+  problemIndex: number;
+  question: string;
+  userAnswer: number;
+  correctAnswer: number;
+  isCorrect: boolean;
+  timeElapsed: number;
+  points: number;
+  timestamp?: Date;
+};
 
 /**
  * Speed Math Session Schema
@@ -223,19 +232,19 @@ speedMathSessionSchema.index({ isCompleted: 1, totalScore: -1 });
 speedMathSessionSchema.index({ accuracy: -1, questionsPerMinute: -1 });
 
 // Virtual for calculated accuracy
-speedMathSessionSchema.virtual('calculatedAccuracy').get(function() {
+speedMathSessionSchema.virtual('calculatedAccuracy').get(function(this: any) {
   if (this.totalQuestions === 0) return 0;
   return Math.round((this.correctAnswers / this.totalQuestions) * 100);
 });
 
 // Virtual for questions per minute
-speedMathSessionSchema.virtual('calculatedQPM').get(function() {
+speedMathSessionSchema.virtual('calculatedQPM').get(function(this: any) {
   if (this.timeElapsed === 0) return 0;
   return Math.round((this.totalQuestions / this.timeElapsed) * 60);
 });
 
 // Pre-save middleware to calculate metrics
-speedMathSessionSchema.pre('save', function(next) {
+speedMathSessionSchema.pre('save', function(this: any, next: any) {
   // Calculate accuracy
   if (this.totalQuestions > 0) {
     this.accuracy = Math.round((this.correctAnswers / this.totalQuestions) * 100);
@@ -260,7 +269,7 @@ speedMathSessionSchema.pre('save', function(next) {
 });
 
 // Static methods
-speedMathSessionSchema.statics.findByUser = function(userId: string, limit: number = 20) {
+speedMathSessionSchema.statics.findByUser = function(this: any, userId: string, limit: number = 20) {
   return this.find({ userId })
     .sort({ createdAt: -1 })
     .limit(limit)
@@ -268,7 +277,8 @@ speedMathSessionSchema.statics.findByUser = function(userId: string, limit: numb
 };
 
 speedMathSessionSchema.statics.getLeaderboard = function(
-  difficulty?: SpeedMathDifficulty,
+  this: any,
+  difficulty?: any,
   limit: number = 10
 ) {
   const filter: any = { isCompleted: true };
@@ -284,14 +294,14 @@ speedMathSessionSchema.statics.getLeaderboard = function(
     .select('totalScore accuracy totalQuestions questionsPerMinute longestStreak difficulty playerName userId createdAt');
 };
 
-speedMathSessionSchema.statics.getTopScores = function(limit: number = 100) {
+speedMathSessionSchema.statics.getTopScores = function(this: any, limit: number = 100) {
   return this.find({ isCompleted: true })
     .sort({ totalScore: -1 })
     .limit(limit)
     .select('totalScore accuracy totalQuestions difficulty playerName userId createdAt');
 };
 
-speedMathSessionSchema.statics.getUserStats = function(userId: string) {
+speedMathSessionSchema.statics.getUserStats = function(this: any, userId: string) {
   return this.aggregate([
     { 
       $match: { 
@@ -334,7 +344,7 @@ speedMathSessionSchema.statics.getUserStats = function(userId: string) {
   ]);
 };
 
-speedMathSessionSchema.statics.getDifficultyStats = function() {
+speedMathSessionSchema.statics.getDifficultyStats = function(this: any) {
   return this.aggregate([
     { $match: { isCompleted: true } },
     {
@@ -362,7 +372,7 @@ speedMathSessionSchema.statics.getDifficultyStats = function() {
 };
 
 // Instance methods
-speedMathSessionSchema.methods.addAnswer = function(answer: ISpeedMathAnswer) {
+speedMathSessionSchema.methods.addAnswer = function(this: any, answer: any) {
   this.answers.push(answer);
   this.totalQuestions += 1;
   
@@ -380,12 +390,12 @@ speedMathSessionSchema.methods.addAnswer = function(answer: ISpeedMathAnswer) {
   return this.save();
 };
 
-speedMathSessionSchema.methods.addProblem = function(problem: any) {
+speedMathSessionSchema.methods.addProblem = function(this: any, problem: any) {
   this.problems.push(problem);
   return this.save();
 };
 
-speedMathSessionSchema.methods.completeSession = function(finalScore?: number) {
+speedMathSessionSchema.methods.completeSession = function(this: any, finalScore?: number) {
   this.isCompleted = true;
   this.endTime = new Date();
   

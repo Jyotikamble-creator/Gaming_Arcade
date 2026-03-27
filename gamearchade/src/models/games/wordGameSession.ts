@@ -4,8 +4,30 @@
  */
 
 import { prisma } from '@/lib/mongodb';
-import type { WordGameSession } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+
+// Local interface definition
+interface WordGameSession {
+  id?: string;
+  sessionId: string;
+  gameType: string;
+  userId?: string;
+  difficulty?: string;
+  category?: string;
+  words: string[];
+  currentWordIndex: number;
+  score: number;
+  correctGuesses: number;
+  moves?: number;
+  hintsUsed: number;
+  state?: Record<string, any>;
+  meta?: Record<string, any>;
+  completed: boolean;
+  startedAt: Date;
+  completedAt?: Date;
+  updatedAt: Date;
+  createdAt: Date;
+}
 
 export interface IWordGameSession extends WordGameSession {}
 
@@ -189,14 +211,14 @@ export async function getUserWordGameStats(userId: string, gameType: string) {
     };
   }
 
-  const scores = sessions.map((s) => s.score);
-  const correctGuesses = sessions.reduce((sum, s) => sum + s.correctGuesses, 0);
+  const scores = sessions.map((s: WordGameSession) => s.score);
+  const correctGuesses = sessions.reduce((sum: number, s: WordGameSession) => sum + s.correctGuesses, 0);
 
   return {
     totalGames: sessions.length,
-    averageScore: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
+    averageScore: Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length),
     bestScore: Math.max(...scores),
-    totalWords: sessions.reduce((sum, s) => sum + s.words.length, 0),
+    totalWords: sessions.reduce((sum: number, s: WordGameSession) => sum + s.words.length, 0),
     correctGuesses,
   };
 }

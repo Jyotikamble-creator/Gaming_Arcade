@@ -1,28 +1,103 @@
 // Word Scramble Game MongoDB Model
 import mongoose, { Schema, Document } from 'mongoose';
-import {
-  WordScrambleGameSession as IWordScrambleGameSession,
-  WordScrambleAttempt,
-  WordScramblePowerUp,
-  WordScrambleWord,
-  WordScrambleDifficulty,
-  WordScrambleGameMode,
-  WordScrambleCategory
-} from '@/types/games/word-scramble';
+
+// Local type definitions
+type WordScrambleWord = {
+  id: number;
+  original: string;
+  scrambled: string;
+  category: 'programming' | 'science' | 'animals' | 'countries' | 'technology' | 'general' | 'mixed';
+  difficulty: 'easy' | 'medium' | 'hard' | 'expert' | 'insane';
+  hints: string[];
+  definition?: string;
+  length: number;
+  points: number;
+};
+
+type WordScrambleAttempt = {
+  word: string;
+  guess: string;
+  isCorrect: boolean;
+  reactionTime: number;
+  hintsUsed: number;
+  score: number;
+  timestamp: Date;
+  attemptsCount: number;
+};
+
+type WordScramblePowerUp = {
+  id: string;
+  type: 'reveal-letter' | 'extra-time' | 'double-points' | 'hint-boost' | 'skip-word';
+  name: string;
+  description: string;
+  duration?: number;
+  effect: number;
+  cost: number;
+  isActive: boolean;
+  usesRemaining?: number;
+};
+
+type WordScrambleDifficulty = 'easy' | 'medium' | 'hard' | 'expert' | 'insane';
+type WordScrambleGameMode = 'classic' | 'timed' | 'streak' | 'marathon' | 'blitz' | 'zen';
+type WordScrambleCategory = 'programming' | 'science' | 'animals' | 'countries' | 'technology' | 'general' | 'mixed';
+
+interface IWordScrambleGameSession extends Document {
+  sessionId: string;
+  userId: string;
+  difficulty: WordScrambleDifficulty;
+  gameMode: WordScrambleGameMode;
+  category: WordScrambleCategory;
+  currentWord?: WordScrambleWord;
+  currentWordIndex: number;
+  totalWords: number;
+  wordsCompleted: number;
+  currentScore: number;
+  startTime: Date;
+  endTime?: Date;
+  timeRemaining?: number;
+  totalDuration: number;
+  isPaused: boolean;
+  pausedAt?: Date;
+  totalGuesses: number;
+  correctGuesses: number;
+  incorrectGuesses: number;
+  accuracy: number;
+  averageReactionTime: number;
+  fastestSolve: number;
+  slowestSolve: number;
+  currentStreak: number;
+  maxStreak: number;
+  perfectWords: number;
+  oneGuessWords: number;
+  activePowerUps: WordScramblePowerUp[];
+  totalHintsUsed: number;
+  maxHints: number;
+  isCompleted: boolean;
+  completionPercentage: number;
+  finalRating: string;
+  achievements: string[];
+  categoryStats: Map<string, number>;
+  difficultyProgression: boolean;
+  bonusMultiplier: number;
+  consistencyScore: number;
+  attempts: WordScrambleAttempt[];
+  completedWords: WordScrambleWord[];
+  skippedWords: string[];
+}
 
 // Word Schema
-const wordSchema = new Schema<WordScrambleWord>({
+const wordSchema = new Schema({
   id: { type: Number, required: true },
   original: { type: String, required: true },
   scrambled: { type: String, required: true },
   category: { 
     type: String, 
-    enum: ['programming', 'science', 'animals', 'countries', 'technology', 'general', 'mixed'] as WordScrambleCategory[],
+    enum: ['programming', 'science', 'animals', 'countries', 'technology', 'general', 'mixed'],
     required: true 
   },
   difficulty: { 
     type: String, 
-    enum: ['easy', 'medium', 'hard', 'expert', 'insane'] as WordScrambleDifficulty[],
+    enum: ['easy', 'medium', 'hard', 'expert', 'insane'],
     required: true 
   },
   hints: [{ type: String, default: [] }],
@@ -32,7 +107,7 @@ const wordSchema = new Schema<WordScrambleWord>({
 });
 
 // Attempt Schema
-const attemptSchema = new Schema<WordScrambleAttempt>({
+const attemptSchema = new Schema({
   word: { type: String, required: true },
   guess: { type: String, required: true },
   isCorrect: { type: Boolean, required: true },
@@ -44,7 +119,7 @@ const attemptSchema = new Schema<WordScrambleAttempt>({
 });
 
 // Power-up Schema
-const powerUpSchema = new Schema<WordScramblePowerUp>({
+const powerUpSchema = new Schema({
   id: { type: String, required: true },
   type: { 
     type: String, 
@@ -61,7 +136,7 @@ const powerUpSchema = new Schema<WordScramblePowerUp>({
 });
 
 // Main Game Session Schema
-const wordScrambleGameSessionSchema = new Schema<IWordScrambleGameSession>({
+const wordScrambleGameSessionSchema = new Schema({
   sessionId: { 
     type: String, 
     required: true, 
@@ -74,19 +149,19 @@ const wordScrambleGameSessionSchema = new Schema<IWordScrambleGameSession>({
   },
   difficulty: { 
     type: String, 
-    enum: ['easy', 'medium', 'hard', 'expert', 'insane'] as WordScrambleDifficulty[],
+    enum: ['easy', 'medium', 'hard', 'expert', 'insane'],
     required: true,
     index: true
   },
   gameMode: { 
     type: String, 
-    enum: ['classic', 'timed', 'streak', 'marathon', 'blitz', 'zen'] as WordScrambleGameMode[],
+    enum: ['classic', 'timed', 'streak', 'marathon', 'blitz', 'zen'],
     required: true,
     index: true
   },
   category: { 
     type: String, 
-    enum: ['programming', 'science', 'animals', 'countries', 'technology', 'general', 'mixed'] as WordScrambleCategory[],
+    enum: ['programming', 'science', 'animals', 'countries', 'technology', 'general', 'mixed'],
     required: true,
     index: true
   },
@@ -135,8 +210,7 @@ const wordScrambleGameSessionSchema = new Schema<IWordScrambleGameSession>({
   // Advanced Features
   categoryStats: { 
     type: Map, 
-    of: Number,
-    default: new Map() 
+    of: Number
   },
   difficultyProgression: { type: Boolean, default: false },
   bonusMultiplier: { type: Number, default: 1.0 },
@@ -160,22 +234,22 @@ wordScrambleGameSessionSchema.index({ isCompleted: 1, currentScore: -1 });
 wordScrambleGameSessionSchema.index({ sessionId: 1, isCompleted: 1 });
 
 // Virtual for game duration
-wordScrambleGameSessionSchema.virtual('actualDuration').get(function() {
+wordScrambleGameSessionSchema.virtual('actualDuration').get(function(this: any) {
   if (this.endTime && this.startTime) {
-    return Math.round((this.endTime.getTime() - this.startTime.getTime()) / 1000);
+    return Math.round(((this.endTime as Date).getTime() - (this.startTime as Date).getTime()) / 1000);
   }
   return 0;
 });
 
 // Virtual for completion status
-wordScrambleGameSessionSchema.virtual('isTimeExpired').get(function() {
+wordScrambleGameSessionSchema.virtual('isTimeExpired').get(function(this: any) {
   if (this.totalDuration <= 0) return false;
-  const elapsed = (Date.now() - this.startTime.getTime()) / 1000;
+  const elapsed = (Date.now() - (this.startTime as Date).getTime()) / 1000;
   return !this.isPaused && elapsed >= this.totalDuration;
 });
 
 // Virtual for success rate
-wordScrambleGameSessionSchema.virtual('successRate').get(function() {
+wordScrambleGameSessionSchema.virtual('successRate').get(function(this: any) {
   const totalCompleted = this.completedWords.length;
   const totalAttempted = totalCompleted + this.skippedWords.length;
   return totalAttempted > 0 ? totalCompleted / totalAttempted : 0;
@@ -285,14 +359,14 @@ wordScrambleGameSessionSchema.methods.getPerformanceRating = function() {
 };
 
 // Static methods
-wordScrambleGameSessionSchema.statics.findActiveByUser = function(userId: string) {
+wordScrambleGameSessionSchema.statics.findActiveByUser = function(this: any, userId: string) {
   return this.find({ 
     userId, 
     isCompleted: false 
   }).sort({ startTime: -1 });
 };
 
-wordScrambleGameSessionSchema.statics.getLeaderboard = function(
+wordScrambleGameSessionSchema.statics.getLeaderboard = function(this: any,
   difficulty?: WordScrambleDifficulty,
   gameMode?: WordScrambleGameMode,
   category?: WordScrambleCategory,
@@ -309,7 +383,7 @@ wordScrambleGameSessionSchema.statics.getLeaderboard = function(
     .select('userId currentScore wordsCompleted accuracy averageReactionTime maxStreak difficulty gameMode category createdAt');
 };
 
-wordScrambleGameSessionSchema.statics.getUserStats = function(userId: string) {
+wordScrambleGameSessionSchema.statics.getUserStats = function(this: any, userId: string) {
   return this.aggregate([
     { $match: { userId, isCompleted: true } },
     {
@@ -329,7 +403,7 @@ wordScrambleGameSessionSchema.statics.getUserStats = function(userId: string) {
   ]);
 };
 
-wordScrambleGameSessionSchema.statics.getCategoryStats = function(
+wordScrambleGameSessionSchema.statics.getCategoryStats = function(this: any,
   userId?: string,
   difficulty?: WordScrambleDifficulty
 ) {
@@ -354,7 +428,7 @@ wordScrambleGameSessionSchema.statics.getCategoryStats = function(
 };
 
 // Pre-save middleware
-wordScrambleGameSessionSchema.pre('save', function(next) {
+wordScrambleGameSessionSchema.pre('save', function(this: any, next: any) {
   // Update completion percentage
   if (this.totalWords > 0) {
     this.completionPercentage = Math.round((this.wordsCompleted / this.totalWords) * 100);

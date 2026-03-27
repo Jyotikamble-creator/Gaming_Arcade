@@ -1,6 +1,11 @@
 // MongoDB Model: Word Management System
 import mongoose, { Schema, model, models } from 'mongoose';
-// import type { WordDefinition, WordCategory, WordDifficulty, WordLanguage, WordStatus } from '@/types/games/word';\n\n// Local type definitions to avoid import issues\ntype WordDefinition = any;\ntype WordCategory = any;\ntype WordDifficulty = 'easy' | 'medium' | 'hard';\ntype WordLanguage = string;\ntype WordStatus = 'active' | 'inactive';
+
+// Local type definitions
+type WordDifficulty = 'beginner' | 'intermediate' | 'advanced' | 'expert' | 'master';
+type WordLanguage = 'english' | 'spanish' | 'french' | 'german' | 'italian' | 'portuguese';
+type WordCategory = 'Programming' | 'Technology' | 'Computer Science' | 'Web Development' | 'Security' | 'Biology' | 'Physics' | 'Environment' | 'Politics' | 'Communication' | 'Geography' | 'Education' | 'Science' | 'General' | 'Custom';
+type WordStatus = 'active' | 'inactive' | 'pending' | 'archived';
 
 const WordMetadataSchema = new Schema({
   usageCount: { 
@@ -45,7 +50,7 @@ const WordMetadataSchema = new Schema({
   }]
 }, { _id: false });
 
-const WordDefinitionSchema = new Schema<WordDefinition>({
+const WordDefinitionSchema = new Schema({
   word: {
     type: String,
     required: true,
@@ -214,36 +219,36 @@ WordDefinitionSchema.index({
 });
 
 // Pre-save middleware
-WordDefinitionSchema.pre('save', function(next) {
+WordDefinitionSchema.pre('save', function(this: any, next: any) {
   // Calculate word length
-  this.length = this.word.length;
+  this.length = (this.word as string).length;
   
   // Remove duplicates from arrays
-  this.examples = [...new Set(this.examples)];
-  this.synonyms = [...new Set(this.synonyms)];
-  this.antonyms = [...new Set(this.antonyms)];
-  this.tags = [...new Set(this.tags)];
+  this.examples = [...new Set(this.examples as string[])];
+  this.synonyms = [...new Set(this.synonyms as string[])];
+  this.antonyms = [...new Set(this.antonyms as string[])];
+  this.tags = [...new Set(this.tags as string[])];
   
   // Limit array sizes
-  this.examples = this.examples.slice(0, 5);
-  this.synonyms = this.synonyms.slice(0, 10);
-  this.antonyms = this.antonyms.slice(0, 10);
-  this.tags = this.tags.slice(0, 15);
+  this.examples = (this.examples as string[]).slice(0, 5);
+  this.synonyms = (this.synonyms as string[]).slice(0, 10);
+  this.antonyms = (this.antonyms as string[]).slice(0, 10);
+  this.tags = (this.tags as string[]).slice(0, 15);
   
   // Update difficulty score based on word characteristics
-  const difficultyScores = {
+  const difficultyScores: Record<WordDifficulty, number> = {
     beginner: 1,
     intermediate: 2,
     advanced: 3,
     expert: 4,
     master: 5
   };
-  this.metadata.difficulty_score = difficultyScores[this.difficulty];
+  this.metadata.difficulty_score = difficultyScores[this.difficulty as WordDifficulty];
   
   // Calculate popularity score based on frequency and usage
   this.metadata.popularity_score = Math.min(
     100, 
-    this.frequency + (this.metadata.usageCount * 0.1)
+    (this.frequency as number) + ((this.metadata.usageCount as number) * 0.1)
   );
   
   next();
@@ -277,15 +282,15 @@ WordDefinitionSchema.methods.verify = function() {
 };
 
 // Static methods
-WordDefinitionSchema.statics.findByCategory = function(category: WordCategory) {
+WordDefinitionSchema.statics.findByCategory = function(this: any, category: WordCategory) {
   return this.find({ category, status: 'active' });
 };
 
-WordDefinitionSchema.statics.findByDifficulty = function(difficulty: WordDifficulty) {
+WordDefinitionSchema.statics.findByDifficulty = function(this: any, difficulty: WordDifficulty) {
   return this.find({ difficulty, status: 'active' });
 };
 
-WordDefinitionSchema.statics.findByLength = function(minLength: number, maxLength?: number) {
+WordDefinitionSchema.statics.findByLength = function(this: any, minLength: number, maxLength?: number) {
   const query: any = { length: { $gte: minLength }, status: 'active' };
   if (maxLength) {
     query.length.$lte = maxLength;
@@ -293,7 +298,7 @@ WordDefinitionSchema.statics.findByLength = function(minLength: number, maxLengt
   return this.find(query);
 };
 
-WordDefinitionSchema.statics.searchWords = function(searchTerm: string, options: any = {}) {
+WordDefinitionSchema.statics.searchWords = function(this: any, searchTerm: string, options: any = {}) {
   const {
     category,
     difficulty,
@@ -319,13 +324,13 @@ WordDefinitionSchema.statics.searchWords = function(searchTerm: string, options:
     .limit(limit);
 };
 
-WordDefinitionSchema.statics.getMostUsed = function(limit = 10) {
+WordDefinitionSchema.statics.getMostUsed = function(this: any, limit = 10) {
   return this.find({ status: 'active' })
     .sort({ 'metadata.usageCount': -1, 'metadata.popularity_score': -1 })
     .limit(limit);
 };
 
-WordDefinitionSchema.statics.getRandomWords = function(count = 1, filters: any = {}) {
+WordDefinitionSchema.statics.getRandomWords = function(this: any, count = 1, filters: any = {}) {
   const query = { status: 'active', ...filters };
   return this.aggregate([
     { $match: query },
@@ -333,7 +338,7 @@ WordDefinitionSchema.statics.getRandomWords = function(count = 1, filters: any =
   ]);
 };
 
-WordDefinitionSchema.statics.getWordsByTags = function(tags: string[], operator = 'any') {
+WordDefinitionSchema.statics.getWordsByTags = function(this: any, tags: string[], operator = 'any') {
   const query: any = { status: 'active' };
   
   if (operator === 'all') {
@@ -346,6 +351,6 @@ WordDefinitionSchema.statics.getWordsByTags = function(tags: string[], operator 
 };
 
 // Create and export model
-const WordModel = models.Word || model<WordDefinition>('Word', WordDefinitionSchema);
+const WordModel = models.Word || model('Word', WordDefinitionSchema);
 
 export default WordModel;
