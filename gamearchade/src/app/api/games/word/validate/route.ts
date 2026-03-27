@@ -1,20 +1,42 @@
 // API Route: Validate words and get suggestions
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import { validateWord, getWordSuggestions } from '@/lib/games/word';
+import { findWordByText, getAllWords } from '@/models/word';
 import type { WordValidationRequest } from '@/types/games/word';
+
+// Simple word validation
+async function validateWord(word: string) {
+  const foundWord = await findWordByText(word);
+  
+  return {
+    isValid: !!foundWord,
+    exists: !!foundWord,
+    word: word.toUpperCase(),
+    message: foundWord ? 'Word is valid' : 'Word not found'
+  };
+}
+
+// Get word suggestions
+async function getWordSuggestions(wordFragment: string, category?: string, limit: number = 5) {
+  const words = await getAllWords({ category, limit: limit * 2 });
+  
+  const fragment = wordFragment.toLowerCase();
+  const suggestions = words
+    .filter(w => w.word.toLowerCase().includes(fragment))
+    .slice(0, limit)
+    .map(w => w.word);
+    
+  return suggestions;
+}
 
 export async function POST(request: Request) {
   try {
-    await connectDB();
-    
     const body = await request.json();
     const validationRequest = body as WordValidationRequest;
     
     if (!validationRequest.word) {
       return NextResponse.json(
         { 
-          success: false, 
+          ok: false, 
           error: 'Word is required for validation' 
         },
         { status: 400 }
@@ -22,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     // Validate the word
-    const validation = await validateWord(validationRequest);
+    const validation = await validateWord(validationRequest.word);
     
     // Get suggestions if word is not valid or doesn't exist
     let suggestions: string[] = [];
@@ -35,7 +57,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      success: true,
+      ok: true,
       data: {
         ...validation,
         suggestions
@@ -44,10 +66,10 @@ export async function POST(request: Request) {
     });
 
   } catch (error: any) {
-    console.error('Word validation error:', error);
+    console.error('[WORD] Word validation error:', error);
     return NextResponse.json(
       { 
-        success: false, 
+        ok: false, 
         error: 'Failed to validate word',
         message: error.message 
       },
@@ -58,8 +80,6 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    await connectDB();
-    
     const { searchParams } = new URL(request.url);
     
     const word = searchParams.get('word');
@@ -69,7 +89,7 @@ export async function GET(request: Request) {
     if (!word) {
       return NextResponse.json(
         { 
-          success: false, 
+          ok: false, 
           error: 'Word parameter is required' 
         },
         { status: 400 }

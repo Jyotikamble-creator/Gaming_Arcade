@@ -1,5 +1,4 @@
 // Type definitions for Coding Puzzle game
-import { Types } from 'mongoose';
 
 // Difficulty levels
 export type DifficultyLevel = 'easy' | 'medium' | 'hard';
@@ -50,7 +49,7 @@ export interface PuzzleAttempt {
 // Game session
 export interface CodingPuzzleSession {
   sessionId: string;
-  userId?: Types.ObjectId;
+  userId?: string;
   startTime: Date;
   endTime?: Date;
   score: number;

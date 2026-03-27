@@ -1,9 +1,8 @@
 // Type definitions for Score and Leaderboard system
-import { Types } from 'mongoose';
 
 // Score document structure
 export interface IScore {
-  _id: Types.ObjectId;
+  _id: string;
   game: string;
   user?: Types.ObjectId;
   playerName: string;
@@ -15,7 +14,7 @@ export interface IScore {
 // Score creation request
 export interface CreateScoreRequest {
   game: string;
-  player?: string;
+  playerName?: string;
   score: number;
   meta?: Record<string, any>;
 }

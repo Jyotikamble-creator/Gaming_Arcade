@@ -1,14 +1,8 @@
 // API Route: Start Word Scramble Game Session
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
-import { WordScrambleGameSession } from '@/models/games/word-scramble';
+import { createWordGameSession } from '@/models/wordGameSession';
+import { getAllWords } from '@/models/word';
 import { 
-  createWordScrambleSession, 
-  generateWordSequence,
-  getFirstWord 
-} from '@/lib/games/word-scramble';
-import { 
-  WordScrambleGameConfig, 
   WordScrambleDifficulty, 
   WordScrambleGameMode,
   WordScrambleCategory 
@@ -16,29 +10,24 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
-    await connectToDatabase();
-    
     const body = await request.json();
     const {
       difficulty = 'medium',
       gameMode = 'classic',
       category = 'mixed',
-      customWords,
-      customTimeLimit,
-      enablePowerUps = true,
-      enableHints = true,
-      enableAchievements = true,
-      autoProgress = true,
-      showDefinitions = false,
-      allowSkipping = true,
       userId
-    }: Partial<WordScrambleGameConfig & { userId?: string }> = body;
+    }: {
+      difficulty?: WordScrambleDifficulty;
+      gameMode?: WordScrambleGameMode;
+      category?: string;
+      userId?: string;
+    } = body;
 
     // Validate difficulty
     const validDifficulties: WordScrambleDifficulty[] = ['easy', 'medium', 'hard', 'expert', 'insane'];
     if (!validDifficulties.includes(difficulty)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid difficulty level' },
+        { ok: false, error: 'Invalid difficulty level' },
         { status: 400 }
       );
     }
@@ -47,7 +36,7 @@ export async function POST(request: NextRequest) {
     const validGameModes: WordScrambleGameMode[] = ['classic', 'timed', 'streak', 'marathon', 'blitz', 'zen'];
     if (!validGameModes.includes(gameMode)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid game mode' },
+        { ok: false, error: 'Invalid game mode' },
         { status: 400 }
       );
     }

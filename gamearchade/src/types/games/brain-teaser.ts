@@ -1,5 +1,4 @@
 // Type definitions for Brain Teaser game
-import { Types } from 'mongoose';
 
 // Difficulty levels
 export type DifficultyLevel = 'easy' | 'medium' | 'hard';
@@ -54,7 +53,7 @@ export interface Puzzle {
 // Game session
 export interface BrainTeaserSession {
   sessionId: string;
-  userId?: Types.ObjectId;
+  userId?: string;
   startTime: Date;
   endTime?: Date;
   score: number;

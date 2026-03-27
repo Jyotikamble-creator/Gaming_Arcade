@@ -1,8 +1,8 @@
 // Type definitions for authentication
-import { Types } from 'mongoose';
+// Using Prisma - no MongoDB/Mongoose types
 
 export interface IUser {
-  _id: Types.ObjectId;
+  id: string;
   email: string;
   passwordHash: string;
   username?: string;

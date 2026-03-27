@@ -28,6 +28,10 @@ model User {
   scores            Score[]
   followers         Follow[]  @relation("Followers")
   following         Follow[]  @relation("Following")
+  gameSessions      GameSession[]
+  wordGameSessions  WordGameSession[]
+  memoryGameSessions MemoryGameSession[]
+  gameData          GameData[]
   
   // Metadata
   meta              Json      @default("{}")
@@ -90,4 +94,151 @@ model Follow {
   @@unique([followerId, followingId])
   @@index([followerId])
   @@index([followingId])
+}
+
+// Word model for word games
+model Word {
+  id                String   @id @default(cuid())
+  word              String   @unique
+  category          String   @default("General")
+  difficulty        String   @default("beginner") // beginner, intermediate, advanced, expert, master
+  language          String   @default("english")
+  description       String
+  definition        String?
+  pronunciation     String?
+  etymology         String?
+  examples          String[] @default([])
+  hints             String[] @default([])
+  frequency         Int      @default(50) // 0-100 popularity score
+  status            String   @default("active") // active, inactive
+  
+  // Metadata
+  usageCount        Int      @default(0)
+  lastUsed          DateTime?
+  verifiedAt        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([category])
+  @@index([difficulty])
+  @@index([language])
+  @@index([status])
+}
+
+// Game session model for tracking game progress
+model GameSession {
+  id                String   @id @default(cuid())
+  sessionId         String   @unique
+  game              String   // Game type identifier
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  difficulty        String?
+  gameMode          String?
+  category          String?
+  
+  state             Json     @default("{}") // Current game state
+  meta              Json     @default("{}") // Game-specific metadata
+  
+  startedAt         DateTime @default(now())
+  completedAt       DateTime?
+  duration          Int?     // Duration in milliseconds
+  
+  completed         Boolean  @default(false)
+  score             Int      @default(0)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([game])
+  @@index([userId])
+  @@index([sessionId])
+  @@index([completed])
+  @@index([startedAt])
+}
+
+// Word game session for word scramble, word builder, word guess
+model WordGameSession {
+  id                String   @id @default(cuid())
+  sessionId         String   @unique
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  gameType          String   // word-scramble, word-builder, word-guess
+  difficulty        String   @default("medium")
+  category          String?
+  
+  words             String[]
+  currentWordIndex  Int      @default(0)
+  
+  score             Int      @default(0)
+  moves             Int      @default(0)
+  hintsUsed         Int      @default(0)
+  correctGuesses    Int      @default(0)
+  
+  state             Json     @default("{}") // Current game state
+  meta              Json     @default("{}") // Additional metadata
+  
+  startedAt         DateTime @default(now())
+  completedAt       DateTime?
+  completed         Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([gameType])
+  @@index([userId])
+  @@index([sessionId])
+  @@index([completed])
+}
+
+// Memory game session
+model MemoryGameSession {
+  id                String   @id @default(cuid())
+  sessionId         String   @unique
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  difficulty        String   @default("easy") // easy, medium, hard
+  theme             String   @default("fruits")
+  
+  cards             Json     // Card array stored as JSON
+  flips             Json     @default("[]")
+  matches           Int      @default(0)
+  totalPairs        Int
+  moves             Int      @default(0)
+  score             Int      @default(0)
+  
+  state             Json     @default("{}") // Current game state
+  meta              Json     @default("{}") // Additional metadata
+  
+  startedAt         DateTime @default(now())
+  completedAt       DateTime?
+  completed         Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([completed])
+}
+
+// Generic game-specific session data store
+model GameData {
+  id                String   @id @default(cuid())
+  game              String   // Game type
+  key               String   // Data key
+  value             Json     // Data value
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  expiresAt         DateTime? // For temporary data
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([game, key, userId])
+  @@index([game])
+  @@index([userId])
+  @@index([expiresAt])
 }

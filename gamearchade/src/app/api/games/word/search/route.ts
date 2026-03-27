@@ -1,52 +1,39 @@
 // API Route: Search and filter words
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import WordModel from '@/models/games/word';
-import { searchWords } from '@/lib/games/word';
-import type { 
-  WordSearchQuery, 
-  WordSearchResult,
-  WordFilterCriteria,
-  WordSortOptions,
-  WordPagination 
-} from '@/types/games/word';
+import { getAllWords, searchWordsByCategory } from '@/models/word';
 
 export async function GET(request: Request) {
   try {
-    await connectDB();
-    
     const { searchParams } = new URL(request.url);
     
     // Extract search parameters
-    const searchQuery: WordSearchQuery = {
-      query: searchParams.get('query') || undefined,
-      category: searchParams.get('category') as any || undefined,
-      difficulty: searchParams.get('difficulty') as any || undefined,
-      language: searchParams.get('language') as any || 'english',
-      minLength: searchParams.get('minLength') ? parseInt(searchParams.get('minLength')!) : undefined,
-      maxLength: searchParams.get('maxLength') ? parseInt(searchParams.get('maxLength')!) : undefined,
-      tags: searchParams.get('tags')?.split(',') || undefined,
-      status: searchParams.get('status') as any || 'active',
-      sortBy: searchParams.get('sortBy') as any || 'word',
-      sortOrder: searchParams.get('sortOrder') as any || 'asc',
-      limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20,
-      offset: searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : 0,
-    };
+    const category = searchParams.get('category') as any || undefined;
+    const difficulty = searchParams.get('difficulty') as any || undefined;
+    const language = (searchParams.get('language') as any) || 'english';
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20;
 
-    // Perform search using lib function
-    const searchResult = await searchWords(searchQuery);
+    // Perform search
+    const words = await getAllWords({
+      category,
+      difficulty,
+      language,
+      limit
+    });
 
     return NextResponse.json({
-      success: true,
-      data: searchResult,
+      ok: true,
+      data: {
+        words,
+        total: words.length
+      },
       timestamp: new Date().toISOString()
     });
 
   } catch (error: any) {
-    console.error('Word search error:', error);
+    console.error('[WORD] Word search error:', error);
     return NextResponse.json(
       { 
-        success: false, 
+        ok: false, 
         error: 'Failed to search words',
         message: error.message 
       },
@@ -57,27 +44,15 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    await connectDB();
-    
     const body = await request.json();
-    const { query, filters, sort, pagination } = body as {
-      query?: string;
-      filters?: WordFilterCriteria;
-      sort?: WordSortOptions;
-      pagination?: WordPagination;
-    };
+    const { category, difficulty, language = 'english', limit = 20 } = body;
 
     // Build search query from request body
-    const searchQuery: WordSearchQuery = {
-      query: query,
-      category: filters?.category?.[0],
-      difficulty: filters?.difficulty?.[0],
-      language: filters?.language?.[0] || 'english',
-      minLength: filters?.lengthRange?.[0],
-      maxLength: filters?.lengthRange?.[1],
-      tags: filters?.tags,
-      status: filters?.status?.[0] || 'active',
-      sortBy: sort?.field || 'word',
+    const words = await getAllWords({
+      category,
+      difficulty,
+      language,
+      limit
       sortOrder: sort?.direction || 'asc',
       limit: pagination?.limit || 20,
       offset: pagination?.offset || 0,
