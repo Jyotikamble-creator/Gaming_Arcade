@@ -7,18 +7,50 @@ import mongoose, { Schema, Model } from 'mongoose';
 
 // Local type definitions to avoid import issues
 type MathQuestion = {
-  questionId: string;
-  question: string;
-  answer: number;
+  id: number;
+  q: string;
+  options: string[];
+  ans: string;
+  operation?: '+' | '-' | '*' | '/';
+  difficulty?: 'Easy' | 'Medium' | 'Hard' | 'Expert';
+  type?: 'basic' | 'equation' | 'wordProblem' | 'multiStep';
+  explanation?: string;
+  questionId?: string;
+  question?: string;
+  answer?: number;
   userAnswer?: number;
   isCorrect?: boolean;
   timeSpent?: number;
-  difficulty: 'easy' | 'medium' | 'hard';
   pointsEarned?: number;
 };
 
-type UserAnswer = any;
-type MathQuizSession = any; // Will be properly typed by schema
+type UserAnswer = {
+  questionId: number;
+  userAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  timeTaken: number;
+  timestamp?: Date;
+};
+
+type MathQuizSession = {
+  userId?: string;
+  sessionId: string;
+  questions: MathQuestion[];
+  answers: UserAnswer[];
+  startTime: Date;
+  endTime?: Date;
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  difficulty: 'Easy' | 'Medium' | 'Hard' | 'Expert';
+  timeLimit?: number;
+  completed: boolean;
+  duration?: number | null;
+  accuracy?: number;
+  calculateScore(): number;
+  addAnswer(questionId: number, userAnswer: string, timeTaken: number): boolean;
+};
 
 /**
  * Math question sub-schema
@@ -126,26 +158,26 @@ mathQuizSessionSchema.index({ difficulty: 1, score: -1 });
 mathQuizSessionSchema.index({ score: -1, createdAt: -1 });
 
 // Virtual for quiz duration
-mathQuizSessionSchema.virtual('duration').get(function() {
+mathQuizSessionSchema.virtual('duration').get(function(this: any) {
   if (this.endTime) {
-    return this.endTime.getTime() - this.startTime.getTime();
+    return (this.endTime as Date).getTime() - (this.startTime as Date).getTime();
   }
   return null;
 });
 
 // Virtual for accuracy percentage
-mathQuizSessionSchema.virtual('accuracy').get(function() {
+mathQuizSessionSchema.virtual('accuracy').get(function(this: any) {
   if (this.totalQuestions === 0) return 0;
   return (this.correctAnswers / this.totalQuestions) * 100;
 });
 
 // Method to calculate final score
-mathQuizSessionSchema.methods.calculateScore = function(): number {
+mathQuizSessionSchema.methods.calculateScore = function(this: any): number {
   const accuracy = (this.correctAnswers / this.totalQuestions) * 100;
   let timeBonus = 0;
 
   if (this.endTime && this.timeLimit) {
-    const timeTaken = (this.endTime.getTime() - this.startTime.getTime()) / 1000;
+    const timeTaken = ((this.endTime as Date).getTime() - (this.startTime as Date).getTime()) / 1000;
     const timeRemaining = this.timeLimit - timeTaken;
     if (timeRemaining > 0) {
       timeBonus = (timeRemaining / this.timeLimit) * 10;
@@ -157,6 +189,7 @@ mathQuizSessionSchema.methods.calculateScore = function(): number {
 
 // Method to add an answer
 mathQuizSessionSchema.methods.addAnswer = function(
+  this: any,
   questionId: number,
   userAnswer: string,
   timeTaken: number

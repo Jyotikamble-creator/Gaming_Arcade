@@ -7,14 +7,34 @@ import mongoose, { Schema, Model } from 'mongoose';
 
 // Local type definitions to avoid import issues
 type MazeMove = {
-  fromPosition: { row: number; col: number };
-  toPosition: { row: number; col: number };
-  moveNumber: number;
+  operation: 'add' | 'subtract' | 'multiply' | 'divide' | 'square' | 'sqrt';
+  operand?: number;
+  resultValue: number;
   timestamp?: Date;
-  isValid?: boolean;
+  moveNumber: number;
 };
 
-type NumberMazeSession = any; // Will be properly typed by schema
+type NumberMazeSession = {
+  userId?: string;
+  sessionId: string;
+  startNumber: number;
+  targetNumber: number;
+  currentNumber: number;
+  moves: MazeMove[];
+  moveCount: number;
+  startTime: Date;
+  endTime?: Date;
+  completed: boolean;
+  success: boolean;
+  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert' | 'master';
+  score: number;
+  timeElapsed: number;
+  duration?: number;
+  moveEfficiency?: number;
+  timeEfficiency?: number;
+  makeMove(operation: string, operand?: number): { success: boolean; newValue: number };
+  calculateScore(): number;
+};
 
 /**
  * Maze move sub-schema
@@ -114,29 +134,30 @@ numberMazeSessionSchema.index({ difficulty: 1, score: -1 });
 numberMazeSessionSchema.index({ score: -1, moveCount: 1 });
 
 // Virtual for duration in seconds
-numberMazeSessionSchema.virtual('duration').get(function() {
+numberMazeSessionSchema.virtual('duration').get(function(this: any) {
   if (this.endTime) {
-    return Math.floor((this.endTime.getTime() - this.startTime.getTime()) / 1000);
+    return Math.floor(((this.endTime as Date).getTime() - (this.startTime as Date).getTime()) / 1000);
   }
-  return Math.floor((Date.now() - this.startTime.getTime()) / 1000);
+  return Math.floor((Date.now() - (this.startTime as Date).getTime()) / 1000);
 });
 
 // Virtual for move efficiency percentage
-numberMazeSessionSchema.virtual('moveEfficiency').get(function() {
+numberMazeSessionSchema.virtual('moveEfficiency').get(function(this: any) {
   if (this.moveCount === 0) return 0;
   // Compare against a baseline of 20 moves
-  return Math.round((20 / Math.max(this.moveCount, 1)) * 100);
+  return Math.round((20 / Math.max(this.moveCount as number, 1)) * 100);
 });
 
 // Virtual for time efficiency percentage
-numberMazeSessionSchema.virtual('timeEfficiency').get(function() {
+numberMazeSessionSchema.virtual('timeEfficiency').get(function(this: any) {
   if (this.timeElapsed === 0) return 0;
   // Compare against a baseline of 300 seconds (5 minutes)
-  return Math.round((300 / Math.max(this.timeElapsed, 1)) * 100);
+  return Math.round((300 / Math.max(this.timeElapsed as number, 1)) * 100);
 });
 
 // Method to make a move
 numberMazeSessionSchema.methods.makeMove = function(
+  this: any,
   operation: string,
   operand?: number
 ): { success: boolean; newValue: number } {
@@ -187,14 +208,14 @@ numberMazeSessionSchema.methods.makeMove = function(
     this.completed = true;
     this.success = true;
     this.endTime = new Date();
-    this.timeElapsed = Math.floor((this.endTime.getTime() - this.startTime.getTime()) / 1000);
+    this.timeElapsed = Math.floor(((this.endTime as Date).getTime() - (this.startTime as Date).getTime()) / 1000);
   }
 
   return { success: true, newValue };
 };
 
 // Method to calculate final score
-numberMazeSessionSchema.methods.calculateScore = function(): number {
+numberMazeSessionSchema.methods.calculateScore = function(this: any): number {
   if (!this.completed || !this.success) return 0;
 
   let score = 1000;

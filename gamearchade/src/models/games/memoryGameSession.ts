@@ -4,10 +4,26 @@
  */
 
 import { prisma } from '@/lib/mongodb';
-import type { MemoryGameSession } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface IMemoryGameSession extends MemoryGameSession {}
+export interface IMemoryGameSession {
+  sessionId: string;
+  userId?: string;
+  difficulty: string;
+  theme: string;
+  cards: any[];
+  totalPairs: number;
+  flips: any[];
+  matches: number;
+  moves: number;
+  score: number;
+  completed: boolean;
+  state?: Record<string, any>;
+  meta?: Record<string, any>;
+  startedAt: Date;
+  completedAt?: Date;
+  updatedAt: Date;
+}
 
 /**
  * Create a new memory game session
@@ -148,15 +164,15 @@ export async function getUserMemoryGameStats(userId: string) {
     };
   }
 
-  const scores = sessions.map((s) => s.score);
-  const moves = sessions.map((s) => s.moves);
-  const perfectGames = sessions.filter((s) => s.moves === s.totalPairs).length;
+  const scores = sessions.map((s: any) => s.score);
+  const moves = sessions.map((s: any) => s.moves);
+  const perfectGames = sessions.filter((s: any) => s.moves === s.totalPairs).length;
 
   return {
     totalGames: sessions.length,
-    averageScore: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
+    averageScore: Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length),
     bestScore: Math.max(...scores),
-    averageMoves: Math.round(moves.reduce((a, b) => a + b, 0) / moves.length),
+    averageMoves: Math.round(moves.reduce((a: number, b: number) => a + b, 0) / moves.length),
     bestMoves: Math.min(...moves),
     perfectGames,
   };

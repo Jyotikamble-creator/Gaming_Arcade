@@ -3,15 +3,59 @@
  */
 
 import mongoose, { Schema, Document } from 'mongoose';
-// import type { QuizSession, QuizAnswer, QuizCategory, QuizDifficulty } from '@/types/games/quiz';\n\n// Local type definitions to avoid import issues\ntype QuizSession = any;\ntype QuizAnswer = any;\ntype QuizCategory = any;\ntype QuizDifficulty = 'easy' | 'medium' | 'hard';
+// import type { QuizSession, QuizAnswer, QuizCategory, QuizDifficulty } from '@/types/games/quiz';
+
+// Local type definitions to avoid import issues
+type QuizQuestion = {
+  id: number;
+  q: string;
+  options: string[];
+  ans: string;
+  category: string;
+  difficulty: string;
+  explanation?: string;
+  points?: number;
+  timeLimit?: number;
+};
+
+type QuizAnswer = {
+  questionId: number;
+  selectedAnswer: string;
+  timeSpent: number;
+  correct?: boolean;
+  pointsEarned?: number;
+};
+
+type QuizCategory = string;
+type QuizDifficulty = 'easy' | 'medium' | 'hard';
+
+type QuizSession = {
+  sessionId: string;
+  userId?: string;
+  questions: QuizQuestion[];
+  answers: QuizAnswer[];
+  currentQuestionIndex: number;
+  score: number;
+  correctAnswers: number;
+  totalQuestions: number;
+  startTime: Date;
+  endTime?: Date;
+  duration?: number;
+  category?: string;
+  difficulty?: string;
+  completed: boolean;
+  timeLimit?: number;
+  bonusPoints: number;
+  accuracy?: number;
+  calculateScore(): number;
+  checkAnswer(questionId: number, selectedAnswer: string): boolean;
+};
 
 /**
  * Quiz session document interface
  */
-export interface QuizSessionDocument extends Omit<QuizSession, 'sessionId'>, Document {
+export interface QuizSessionDocument extends QuizSession, Document {
   sessionId: string;
-  calculateScore(): number;
-  checkAnswer(questionId: number, selectedAnswer: string): boolean;
 }
 
 /**
@@ -93,7 +137,7 @@ const quizSessionSchema = new Schema<QuizSessionDocument>({
 /**
  * Calculate total score
  */
-quizSessionSchema.methods.calculateScore = function(): number {
+quizSessionSchema.methods.calculateScore = function(this: any): number {
   let baseScore = this.answers.reduce((sum: number, answer: any) => sum + (answer.pointsEarned || 0), 0);
   
   // Calculate accuracy
@@ -139,7 +183,7 @@ quizSessionSchema.methods.calculateScore = function(): number {
 /**
  * Check if answer is correct
  */
-quizSessionSchema.methods.checkAnswer = function(questionId: number, selectedAnswer: string): boolean {
+quizSessionSchema.methods.checkAnswer = function(this: any, questionId: number, selectedAnswer: string): boolean {
   const question = this.questions.find((q: any) => q.id === questionId);
   if (!question) return false;
   

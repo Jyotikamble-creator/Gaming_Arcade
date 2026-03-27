@@ -6,9 +6,36 @@ import mongoose, { Schema, Model } from 'mongoose';
 // import type { EmojiGameSession, EmojiAttempt, EmojiPuzzle } from '@/types/games/emoji';
 
 // Local type definitions to avoid import issues
-type EmojiGameSession = any;
-type EmojiAttempt = any;
-type EmojiPuzzle = any;
+type EmojiAttempt = {
+  guess: string;
+  correct: boolean;
+  timestamp?: Date;
+  timeTaken: number;
+};
+
+type EmojiPuzzle = {
+  id: number;
+  emojis: string;
+  answer: string;
+  category: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+};
+
+type EmojiGameSession = {
+  userId?: string;
+  sessionId: string;
+  currentPuzzle: EmojiPuzzle;
+  startTime: Date;
+  endTime?: Date;
+  attempts: EmojiAttempt[];
+  score: number;
+  hintsUsed: number;
+  completed: boolean;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  createdAt: Date;
+  updatedAt: Date;
+  calculateAccuracy(): number;
+};
 
 /**
  * Attempt sub-schema
@@ -95,17 +122,17 @@ emojiGameSessionSchema.index({ completed: 1, createdAt: -1 });
 emojiGameSessionSchema.index({ difficulty: 1, score: -1 });
 
 // Virtual for duration
-emojiGameSessionSchema.virtual('duration').get(function() {
+emojiGameSessionSchema.virtual('duration').get(function(this: any) {
   if (this.endTime) {
-    return this.endTime.getTime() - this.startTime.getTime();
+    return (this.endTime as Date).getTime() - (this.startTime as Date).getTime();
   }
   return null;
 });
 
 // Method to calculate accuracy
-emojiGameSessionSchema.methods.calculateAccuracy = function(): number {
+emojiGameSessionSchema.methods.calculateAccuracy = function(this: any): number {
   if (this.attempts.length === 0) return 0;
-  const correctAttempts = this.attempts.filter(a => a.correct).length;
+  const correctAttempts = ((this.attempts as any[]) as EmojiAttempt[]).filter((a: any) => a.correct).length;
   return (correctAttempts / this.attempts.length) * 100;
 };
 

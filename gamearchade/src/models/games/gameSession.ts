@@ -4,10 +4,24 @@
  */
 
 import { prisma } from '@/lib/mongodb';
-import type { GameSession } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface IGameSession extends GameSession {}
+export interface IGameSession {
+  sessionId: string;
+  game: string;
+  userId?: string;
+  difficulty?: string;
+  gameMode?: string;
+  category?: string;
+  state: Record<string, any>;
+  meta: Record<string, any>;
+  score?: number;
+  duration?: number;
+  completed: boolean;
+  startedAt: Date;
+  completedAt?: Date;
+  updatedAt: Date;
+}
 
 /**
  * Create a new game session
@@ -144,14 +158,14 @@ export async function getGameSessionStats(game: string) {
     };
   }
 
-  const scores = sessions.map((s) => s.score);
-  const durations = sessions.map((s) => s.duration || 0);
+  const scores = sessions.map((s: any) => s.score);
+  const durations = sessions.map((s: any) => s.duration || 0);
 
   return {
     totalSessions: sessions.length,
-    averageScore: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
+    averageScore: Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length),
     highestScore: Math.max(...scores),
-    averageDuration: Math.round(durations.reduce((a, b) => a + b, 0) / durations.length),
+    averageDuration: Math.round(durations.reduce((a: number, b: number) => a + b, 0) / durations.length),
   };
 }
 

@@ -5,10 +5,15 @@ import mongoose, { Schema, Model } from 'mongoose';
 // Local type definitions to avoid import issues
 type PuzzleAttempt = {
   puzzleId: string;
+  category: 'patterns' | 'codeOutput' | 'logic' | 'bitwise';
+  difficulty: 'easy' | 'medium' | 'hard';
   answer: string;
+  answered: boolean;
+  correct: boolean;
   isCorrect?: boolean;
   timeSpent: number;
   pointsEarned?: number;
+  hintsUsed: number;
   attemptedAt?: Date;
 };
 

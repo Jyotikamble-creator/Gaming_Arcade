@@ -21,7 +21,27 @@ type CardFlip = {
   pairId?: number;
 };
 
-type MemoryGameSession = any; // Will be properly typed by schema
+type MemoryGameSession = {
+  userId?: string;
+  sessionId: string;
+  cards: MemoryCard[];
+  flips: CardFlip[];
+  matches: number;
+  totalPairs: number;
+  moves: number;
+  startTime: Date;
+  endTime?: Date;
+  completed: boolean;
+  difficulty: 'Easy' | 'Medium' | 'Hard' | 'Expert';
+  theme: 'fruits' | 'animals' | 'emojis' | 'numbers' | 'letters';
+  score: number;
+  timeLimit?: number;
+  duration?: number | null;
+  efficiency?: number;
+  accuracy?: number;
+  calculateScore(): number;
+  flipCards(cardIds: number[]): boolean;
+};
 
 /**
  * Memory card sub-schema
@@ -41,7 +61,7 @@ const cardFlipSchema = new Schema<CardFlip>({
   cardId: { type: Number, required: true },
   timestamp: { type: Date, default: Date.now },
   wasMatch: { type: Boolean, required: true },
-  pairCardId: { type: Number }
+  pairId: { type: Number }
 }, { _id: false });
 
 /**
@@ -134,31 +154,31 @@ memoryGameSessionSchema.index({ difficulty: 1, score: -1 });
 memoryGameSessionSchema.index({ score: -1, moves: 1 });
 
 // Virtual for game duration
-memoryGameSessionSchema.virtual('duration').get(function() {
+memoryGameSessionSchema.virtual('duration').get(function(this: any) {
   if (this.endTime) {
-    return this.endTime.getTime() - this.startTime.getTime();
+    return (this.endTime as Date).getTime() - (this.startTime as Date).getTime();
   }
   return null;
 });
 
 // Virtual for efficiency (perfect game = totalPairs moves)
-memoryGameSessionSchema.virtual('efficiency').get(function() {
+memoryGameSessionSchema.virtual('efficiency').get(function(this: any) {
   if (this.moves === 0) return 0;
   return (this.totalPairs / this.moves) * 100;
 });
 
 // Virtual for accuracy
-memoryGameSessionSchema.virtual('accuracy').get(function() {
+memoryGameSessionSchema.virtual('accuracy').get(function(this: any) {
   if (this.moves === 0) return 0;
   return (this.matches / this.moves) * 100;
 });
 
 // Method to calculate final score
-memoryGameSessionSchema.methods.calculateScore = function(): number {
+memoryGameSessionSchema.methods.calculateScore = function(this: any): number {
   if (!this.completed) return 0;
 
   const duration = this.endTime 
-    ? (this.endTime.getTime() - this.startTime.getTime()) / 1000 
+    ? ((this.endTime as Date).getTime() - (this.startTime as Date).getTime()) / 1000 
     : 0;
 
   // Base score from moves (fewer moves = higher score)
@@ -188,7 +208,7 @@ memoryGameSessionSchema.methods.calculateScore = function(): number {
 };
 
 // Method to flip cards and check for match
-memoryGameSessionSchema.methods.flipCards = function(cardIds: number[]): boolean {
+memoryGameSessionSchema.methods.flipCards = function(this: any, cardIds: number[]): boolean {
   if (cardIds.length !== 2) return false;
 
   const card1 = this.cards.find((c: MemoryCard) => c.id === cardIds[0]);
@@ -221,7 +241,7 @@ memoryGameSessionSchema.methods.flipCards = function(cardIds: number[]): boolean
     cardId: cardIds[0],
     timestamp: new Date(),
     wasMatch: isMatch,
-    pairCardId: cardIds[1]
+    pairId: cardIds[1]
   });
 
   return isMatch;
