@@ -1,14 +1,11 @@
 // GET /api/auth/user-stats — returns stats for the authenticated user
 // Optional query: ?userId=<id> to fetch another user's public stats (still requires auth)
 import { NextRequest, NextResponse } from 'next/server';
-import User from '@/models/auth/auth';
-import { connectDB } from '@/models/db';
 import { verifyToken, extractToken } from '@/lib/auth/auth';
+import { prisma } from '@/lib/api/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    await connectDB();
-
     // Auth required for all stat requests
     const token = extractToken(request);
     if (!token) {
@@ -28,18 +25,35 @@ export async function GET(request: NextRequest) {
     // If querying another user, allow it (social feature) but caller must be authenticated
     const targetId = queryUserId || decoded.id;
 
-    const user = await User.findById(targetId).select(
-      'displayName username email stats'
-    );
+    const user = await prisma.user.findUnique({
+      where: { id: targetId },
+      select: {
+        id: true,
+        displayName: true,
+        username: true,
+        email: true
+      }
+    });
+
     if (!user) {
       return NextResponse.json({ error: 'user not found' }, { status: 404 });
     }
 
+    // Get user stats
+    const stats = await prisma.userStats.findUnique({
+      where: { userId: user.id }
+    });
+
     return NextResponse.json({
-      userId: user._id.toString(),
+      userId: user.id,
       displayName: user.displayName,
       username: user.username,
-      stats: user.stats ?? {
+      stats: stats ? {
+        followerCount: stats.followerCount,
+        followingCount: stats.followingCount,
+        totalScore: stats.totalScore,
+        gamesPlayed: stats.gamesPlayed,
+      } : {
         followerCount: 0,
         followingCount: 0,
         totalScore: 0,

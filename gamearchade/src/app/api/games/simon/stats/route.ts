@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import SimonSession from '@/models/games/simon';
+// TODO: Replace with Prisma ORM using GameSession table
+import { prisma } from '@/lib/api/prisma';
 
 /**
  * GET /api/simon/stats
@@ -14,41 +15,17 @@ export async function GET(request: NextRequest) {
 
     let response: any = {};
 
-    // Get leaderboard
-    response.leaderboard = await SimonSession.getLeaderboard(difficulty, limit);
+    // TODO: Implement leaderboard using Prisma Score table
+    response.leaderboard = [];
 
     // Get user stats if userId provided
     if (userId) {
-      const userStats = await SimonSession.getUserStats(userId);
-      response.userStats = userStats[0] || null;
-      
-      // Get user's recent games
-      response.recentGames = await SimonSession.findByUser(userId, 10);
+      response.userStats = null;
+      response.recentGames = [];
     }
 
     // Get global stats
-    const globalStats = await SimonSession.aggregate([
-      { $match: { isCompleted: true } },
-      {
-        $group: {
-          _id: null,
-          totalGames: { $sum: 1 },
-          averageScore: { $avg: '$score' },
-          highestScore: { $max: '$score' },
-          totalPlayers: { $addToSet: '$userId' }
-        }
-      },
-      {
-        $project: {
-          totalGames: 1,
-          averageScore: { $round: ['$averageScore', 0] },
-          highestScore: 1,
-          totalPlayers: { $size: '$totalPlayers' }
-        }
-      }
-    ]);
-
-    response.globalStats = globalStats[0] || {
+    response.globalStats = {
       totalGames: 0,
       averageScore: 0,
       highestScore: 0,

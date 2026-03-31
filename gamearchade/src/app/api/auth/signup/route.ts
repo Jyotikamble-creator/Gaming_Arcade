@@ -1,10 +1,9 @@
 // POST /api/auth/signup - User signup endpoint
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import User from '@/models/auth/auth';
-import { connectDB } from '@/models/db';
 import { generateToken } from '@/lib/auth/auth';
 import { SignupRequest, AuthResponse, ErrorResponse } from '@/types/auth/auth';
+import { prisma } from '@/lib/api/prisma';
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,21 +32,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Connect to database
-    try {
-      await connectDB();
-    } catch (dbError) {
-      console.error('[AUTH] Database connection failed:', dbError);
-      return NextResponse.json(
-        { error: 'service temporarily unavailable' } as ErrorResponse,
-        { status: 503 }
-      );
-    }
-
     // Check if email is already in use
     let existing;
     try {
-      existing = await User.findOne({ email });
+      existing = await prisma.user.findUnique({
+        where: { email }
+      });
     } catch (queryError) {
       console.error('[AUTH] User query failed:', queryError);
       return NextResponse.json(
@@ -69,8 +59,13 @@ export async function POST(request: NextRequest) {
     try {
       salt = await bcrypt.genSalt(10);
       hash = await bcrypt.hash(password, salt);
-      user = await User.create({ email, passwordHash: hash });
-      token = generateToken(user._id.toString(), user.email);
+      user = await prisma.user.create({
+        data: {
+          email,
+          passwordHash: hash
+        }
+      });
+      token = generateToken(user.id, user.email);
     } catch (cryptoError) {
       console.error('[AUTH] Encryption/user creation failed:', cryptoError);
       return NextResponse.json(
@@ -85,7 +80,7 @@ export async function POST(request: NextRequest) {
     const response: AuthResponse = {
       token,
       user: {
-        id: user._id.toString(),
+        id: user.id,
         email: user.email,
       },
     };

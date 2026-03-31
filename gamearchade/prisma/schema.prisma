@@ -1,10 +1,10 @@
-// Prisma schema for PostgreSQL database
+// Prisma schema for SQLite database (development) / PostgreSQL (production)
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -15,7 +15,7 @@ model User {
   passwordHash      String
   username          String?  @unique
   displayName       String   @default("")
-  bio               String   @default("") @db.VarChar(500)
+  bio               String   @default("")
   avatar            String   @default("")
   favoriteGame      String   @default("")
   profileCompleted  Boolean  @default(false)
@@ -34,7 +34,7 @@ model User {
   gameData          GameData[]
   
   // Metadata
-  meta              Json      @default("{}")
+  meta              String   @default("{}")
   createdAt         DateTime  @default(now())
   lastLogin         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -69,7 +69,7 @@ model Score {
   
   playerName        String   @default("guest")
   score             Int
-  meta              Json     @default("{}")
+  meta              String   @default("{}")
   
   createdAt         DateTime @default(now())
 
@@ -107,8 +107,8 @@ model Word {
   definition        String?
   pronunciation     String?
   etymology         String?
-  examples          String[] @default([])
-  hints             String[] @default([])
+  examples          String   @default("[]")
+  hints             String   @default("[]")
   frequency         Int      @default(50) // 0-100 popularity score
   status            String   @default("active") // active, inactive
   
@@ -137,8 +137,8 @@ model GameSession {
   gameMode          String?
   category          String?
   
-  state             Json     @default("{}") // Current game state
-  meta              Json     @default("{}") // Game-specific metadata
+  state             String   @default("{}") // Current game state
+  meta              String   @default("{}") // Game-specific metadata
   
   startedAt         DateTime @default(now())
   completedAt       DateTime?
@@ -168,7 +168,7 @@ model WordGameSession {
   difficulty        String   @default("medium")
   category          String?
   
-  words             String[]
+  words             String   @default("[]")
   currentWordIndex  Int      @default(0)
   
   score             Int      @default(0)
@@ -176,8 +176,8 @@ model WordGameSession {
   hintsUsed         Int      @default(0)
   correctGuesses    Int      @default(0)
   
-  state             Json     @default("{}") // Current game state
-  meta              Json     @default("{}") // Additional metadata
+  state             String   @default("{}") // Current game state
+  meta              String   @default("{}") // Additional metadata
   
   startedAt         DateTime @default(now())
   completedAt       DateTime?
@@ -202,15 +202,15 @@ model MemoryGameSession {
   difficulty        String   @default("easy") // easy, medium, hard
   theme             String   @default("fruits")
   
-  cards             Json     // Card array stored as JSON
-  flips             Json     @default("[]")
+  cards             String   // Card array stored as JSON
+  flips             String   @default("[]")
   matches           Int      @default(0)
   totalPairs        Int
   moves             Int      @default(0)
   score             Int      @default(0)
   
-  state             Json     @default("{}") // Current game state
-  meta              Json     @default("{}") // Additional metadata
+  state             String   @default("{}") // Current game state
+  meta              String   @default("{}") // Additional metadata
   
   startedAt         DateTime @default(now())
   completedAt       DateTime?
@@ -229,7 +229,7 @@ model GameData {
   id                String   @id @default(cuid())
   game              String   // Game type
   key               String   // Data key
-  value             Json     // Data value
+  value             String   // Data value
   userId            String?
   user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   

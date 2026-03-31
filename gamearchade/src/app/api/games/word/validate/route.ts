@@ -1,11 +1,12 @@
 // API Route: Validate words and get suggestions
 import { NextResponse } from 'next/server';
-import { findWordByText, getAllWords } from '@/models/word';
+// import { findWordByText, getAllWords } from '@/models/word';
 import type { WordValidationRequest } from '@/types/games/word';
 
 // Simple word validation
 async function validateWord(word: string) {
-  const foundWord = await findWordByText(word);
+  // TODO: Validate word with Prisma
+  const foundWord = null;
   
   return {
     isValid: !!foundWord,

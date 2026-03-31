@@ -2,7 +2,9 @@
  * Database operations for Reaction Time Game
  */
 
-import ReactionSessionModel from '@/models/games/reaction-time';
+// TODO: Replace with Prisma ORM
+// import ReactionSessionModel from '@/models/games/reaction-time';
+import { prisma } from '@/lib/api/prisma';
 import type {
   ReactionSession,
   ReactionAttempt,

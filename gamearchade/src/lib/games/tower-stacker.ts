@@ -1,19 +1,7 @@
 // Tower Stacker Game Core Logic
-import {
-  TowerStackerGameSession,
-  TowerStackerSessionRequest,
-  TowerStackerScoreResult,
-  TowerStackerScoreCalculation,
-  TowerStackerBlock,
-  TowerStackerMove,
-  TowerStackerValidation,
-  TowerStackerGameConfiguration,
-  TowerStackerRating,
-  TowerStackerDifficulty,
-  TowerStackerAchievement,
-  TowerStackerPerformanceMetrics
-} from "@/types/games/tower-stacker";
-import { TowerStackerSession } from "@/models/games/tower-stacker";
+// TODO: Replace with Prisma ORM
+// import { TowerStackerSession } from "@/models/games/tower-stacker";
+import { prisma } from '@/lib/api/prisma';
 import { 
   generateTowerStackerColors,
   calculateBlockPosition,

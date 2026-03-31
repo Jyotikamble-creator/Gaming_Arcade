@@ -4,7 +4,9 @@ import {
   TowerStackerAPIResponse,
   TowerStackerSessionRequest 
 } from "@/types/games/tower-stacker";
-import { TowerStackerSession } from "@/models/games/tower-stacker";
+// TODO: Replace with Prisma ORM
+// import { TowerStackerSession } from "@/models/games/tower-stacker";
+import { prisma } from '@/lib/api/prisma';
 import { createTowerStackerSession } from "@/lib/games/tower-stacker";
 
 // POST /api/tower-stacker/session - Create a new game session
@@ -65,25 +67,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(response, { status: 400 });
     }
 
-    const session = await TowerStackerSession.findById(sessionId);
-
-    if (!session) {
-      const response: TowerStackerAPIResponse = {
-        success: false,
-        error: "Session not found",
-        timestamp: new Date().toISOString()
-      };
-      return NextResponse.json(response, { status: 404 });
-    }
-
-    const response: TowerStackerAPIResponse<TowerStackerGameSession> = {
-      success: true,
-      data: session.toObject(),
-      message: "Session retrieved successfully",
+    // TODO: Implement using Prisma GameSession table
+    const response: TowerStackerAPIResponse = {
+      success: false,
+      error: "Session not found",
       timestamp: new Date().toISOString()
     };
-
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(response, { status: 404 });
   } catch (error) {
     console.error("Error retrieving tower stacker session:", error);
     

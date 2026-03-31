@@ -1,7 +1,9 @@
 // API Route: Start Word Builder Game Session
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import { WordBuilderGameSession } from '@/models/games/word-builder';
+// TODO: Replace with Prisma ORM
+// import { WordBuilderGameSession } from '@/models/games/word-builder';
+import { prisma } from '@/lib/api/prisma';
 import { createWordBuilderSession, selectRandomChallenge } from '@/lib/games/word-builder';
 import { WordBuilderGameConfig, WordBuilderDifficulty, WordBuilderGameMode } from '@/types/games/word-builder';
 

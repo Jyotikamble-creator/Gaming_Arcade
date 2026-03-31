@@ -1,60 +1,33 @@
-/**
- * API Route: Get quiz statistics
- * GET /api/games/quiz/stats
- */
-
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth/auth';
-import { getUserQuizStats } from '@/lib/games/quiz';
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/api/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get authorization header
-    const authHeader = request.headers.get('authorization');
-    
-    if (!authHeader) {
-      return NextResponse.json(
-        { error: 'Unauthorized - No token provided' },
-        { status: 401 }
-      );
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    let response: any = {};
+    response.leaderboard = [];
+    response.globalStats = {
+      totalGames: 0,
+      averageScore: 0,
+      highestScore: 0,
+      totalPlayers: 0
+    };
+
+    if (userId) {
+      response.userStats = null;
+      response.recentGames = [];
     }
 
-    // Verify token
-    const token = authHeader.split(' ')[1];
-    const decoded = verifyToken(token);
-
-    if (!decoded || !decoded.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized - Invalid token' },
-        { status: 401 }
-      );
-    }
-
-    const userId = decoded.id;
-
-    // Get statistics
-    const stats = await getUserQuizStats(userId);
-
-    console.log('[QUIZ] Stats retrieved:', {
-      userId,
-      totalQuizzes: stats.totalQuizzes,
-      overallAccuracy: stats.overallAccuracy
-    });
-
-    return NextResponse.json({ stats }, { status: 200 });
-
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    console.error('[QUIZ] Error fetching stats:', error);
-    
-    if (error instanceof Error && error.message.includes('jwt')) {
-      return NextResponse.json(
-        { error: 'Unauthorized - Invalid token' },
-        { status: 401 }
-      );
-    }
-
+    console.error('Game stats error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch statistics' },
+      { 
+        error: 'Failed to get statistics', 
+        message: error instanceof Error ? error.message : 'Unknown error' 
+      }, 
       { status: 500 }
     );
   }

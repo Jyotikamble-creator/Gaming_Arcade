@@ -1,24 +1,7 @@
 // Whack-a-Mole Game Core Logic
-import {
-  WhackGameSession,
-  WhackStartRequest,
-  WhackGameConfiguration,
-  WhackMole,
-  WhackMoleType,
-  WhackMolePosition,
-  WhackMoleHit,
-  WhackPowerUp,
-  WhackSessionResult,
-  WhackGameStatistics,
-  WhackPerformanceMetrics,
-  WhackAchievement,
-  WhackGameSettings,
-  WhackDifficulty,
-  WhackGameMode,
-  WhackGrade,
-  WhackRank
-} from "@/types/games/whack-a-mole";
-import { WhackSession } from "@/models/games/whack-a-mole";
+// TODO: Replace with Prisma ORM
+// import { WhackSession } from "@/models/games/whack-a-mole";
+import { prisma } from '@/lib/api/prisma';
 import { 
   generateMoleId, 
   calculateMolePoints, 

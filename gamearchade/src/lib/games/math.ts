@@ -3,7 +3,9 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import MathQuizSessionModel from '@/models/games/math';
+// TODO: Replace with Prisma ORM
+// import MathQuizSessionModel from '@/models/games/math';
+import { prisma } from '@/lib/api/prisma';
 import type {
   MathQuizSession,
   MathQuestion,

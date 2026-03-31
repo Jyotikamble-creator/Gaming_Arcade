@@ -6,10 +6,10 @@ import { getRandomPuzzle, isValidCategory } from '@/utility/games/coding-puzzle'
 // Returns a random puzzle from the specified category
 export async function GET(
   request: NextRequest,
-  { params }: { params: { category: string } }
+  { params }: { params: Promise<{ category: string }> }
 ) {
   try {
-    const { category } = params;
+    const { category } = await params;
 
     // Validate category
     if (!isValidCategory(category)) {

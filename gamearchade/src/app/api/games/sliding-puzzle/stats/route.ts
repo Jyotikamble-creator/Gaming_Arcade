@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import SlidingPuzzleSession from '@/models/games/sliding-puzzle';
+// TODO: Replace with Prisma ORM - use GameSession and Score tables
+import { prisma } from '@/lib/api/prisma';
 
 /**
  * GET /api/sliding-puzzle/stats
@@ -16,66 +17,19 @@ export async function GET(request: NextRequest) {
 
     let response: any = {};
 
-    // Get leaderboard
-    response.leaderboard = await SlidingPuzzleSession.getLeaderboard(
-      difficulty as any,
-      puzzleSize,
-      limit
-    );
+    // TODO: Implement using Prisma Score and GameSession tables
+    response.leaderboard = [];
 
     // Get user stats if userId provided
     if (userId) {
-      const userStats = await SlidingPuzzleSession.getUserStats(userId);
-      response.userStats = userStats[0] || null;
-      
-      // Get user's recent games
-      response.recentGames = await SlidingPuzzleSession.findByUser(userId, 10);
+      response.userStats = null;
+      response.recentGames = [];
     }
 
     // Get difficulty breakdown stats
-    response.difficultyStats = await SlidingPuzzleSession.getDifficultyStats();
+    response.difficultyStats = [];
 
-    // Get global stats
-    const globalStats = await SlidingPuzzleSession.aggregate([
-      { $match: { isCompleted: true } },
-      {
-        $group: {
-          _id: null,
-          totalGames: { $sum: 1 },
-          solvedGames: { 
-            $sum: { $cond: [{ $eq: ['$isSolved', true] }, 1, 0] }
-          },
-          averageScore: { $avg: '$score' },
-          highestScore: { $max: '$score' },
-          averageMoves: { $avg: '$moves' },
-          bestMoves: { $min: '$moves' },
-          averageTime: { $avg: '$timeElapsed' },
-          bestTime: { $min: '$timeElapsed' },
-          uniquePlayers: { $addToSet: '$userId' }
-        }
-      },
-      {
-        $project: {
-          totalGames: 1,
-          solvedGames: 1,
-          completionRate: {
-            $round: [
-              { $multiply: [{ $divide: ['$solvedGames', '$totalGames'] }, 100] },
-              1
-            ]
-          },
-          averageScore: { $round: ['$averageScore', 0] },
-          highestScore: 1,
-          averageMoves: { $round: ['$averageMoves', 0] },
-          bestMoves: 1,
-          averageTime: { $round: ['$averageTime', 0] },
-          bestTime: 1,
-          totalPlayers: { $size: '$uniquePlayers' }
-        }
-      }
-    ]);
-
-    response.globalStats = globalStats[0] || {
+    response.globalStats = {
       totalGames: 0,
       solvedGames: 0,
       completionRate: 0,

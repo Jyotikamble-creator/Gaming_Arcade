@@ -35,11 +35,7 @@ export default function WordScrambleDisplay({
           {scrambled.split('').map((letter, index) => (
             <div
               key={index}
-              className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center
-                         text-2xl sm:text-3xl font-bold rounded-lg border-2 
-                         bg-linear-to-br from-purple-600 to-blue-600 
-                         text-white border-purple-400 shadow-lg 
-                         transform hover:scale-105 transition-all duration-200"
+              className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center text-2xl sm:text-3xl font-bold rounded-lg border-2 bg-gradient-to-br from-purple-600 to-blue-600 text-white border-purple-400 shadow-lg transform hover:scale-105 transition-all duration-200"
               style={{
                 animationDelay: `${index * 0.1}s`,
                 animation: 'fadeInScale 0.5s ease-out forwards'

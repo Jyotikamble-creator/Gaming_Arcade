@@ -4,7 +4,9 @@ import {
   WhackAPIResponse,
   WhackHitRequest 
 } from "@/types/games/whack-a-mole";
-import { WhackSession } from "@/models/games/whack-a-mole";
+// TODO: Replace with Prisma ORM
+// import { WhackSession } from "@/models/games/whack-a-mole";
+import { prisma } from '@/lib/api/prisma';
 import { processWhackMoleHit } from "@/lib/games/whack-a-mole";
 
 // POST /api/whack-a-mole/hit - Process a mole hit

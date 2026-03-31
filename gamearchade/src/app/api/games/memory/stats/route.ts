@@ -1,46 +1,33 @@
-/**
- * API Route: Get user's memory game statistics
- * GET /api/games/memory/stats
- */
-
-import { NextRequest, NextResponse } from 'next/server';
-import { getUserGameStats, getRecentSessions } from '@/lib/games/memory';
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/api/prisma';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Missing required parameter: userId' },
-        { status: 400 }
-      );
+    let response: any = {};
+    response.leaderboard = [];
+    response.globalStats = {
+      totalGames: 0,
+      averageScore: 0,
+      highestScore: 0,
+      totalPlayers: 0
+    };
+
+    if (userId) {
+      response.userStats = null;
+      response.recentGames = [];
     }
 
-    const stats = await getUserGameStats(userId);
-    const recentSessions = await getRecentSessions(userId, 5);
-
-    console.log('[MEMORY] Retrieved stats for user:', userId);
-
-    return NextResponse.json({
-      ...stats,
-      recentGames: recentSessions.map(s => ({
-        sessionId: s.sessionId,
-        difficulty: s.difficulty,
-        theme: s.theme,
-        moves: s.moves,
-        matches: s.matches,
-        score: s.score,
-        completed: s.completed,
-        createdAt: s.createdAt
-      }))
-    }, { status: 200 });
-
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    console.error('[MEMORY] Error fetching stats:', error);
+    console.error('Game stats error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch statistics' },
+      { 
+        error: 'Failed to get statistics', 
+        message: error instanceof Error ? error.message : 'Unknown error' 
+      }, 
       { status: 500 }
     );
   }

@@ -5,7 +5,9 @@ import {
   TypingSessionRequest,
   TypingUpdateRequest 
 } from "@/types/games/typing";
-import { TypingSession } from "@/models/games/typing";
+// TODO: Replace with Prisma ORM
+// import { TypingSession } from "@/models/games/typing";
+import { prisma } from '@/lib/api/prisma';
 import { createTypingSession, updateTypingSession } from "@/lib/games/typing";
 
 // POST /api/typing/session - Create a new typing session
@@ -78,25 +80,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(response, { status: 400 });
     }
 
-    const session = await TypingSession.findById(sessionId);
-
-    if (!session) {
-      const response: TypingAPIResponse = {
-        success: false,
-        error: "Session not found",
-        timestamp: new Date().toISOString()
-      };
-      return NextResponse.json(response, { status: 404 });
-    }
-
-    const response: TypingAPIResponse<TypingGameSession> = {
-      success: true,
-      data: session.toObject(),
-      message: "Session retrieved successfully",
+    // TODO: Implement using Prisma GameSession table
+    const response: TypingAPIResponse = {
+      success: false,
+      error: "Session not found",
       timestamp: new Date().toISOString()
     };
-
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(response, { status: 404 });
   } catch (error) {
     console.error("Error retrieving typing session:", error);
     

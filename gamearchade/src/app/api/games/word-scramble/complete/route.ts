@@ -1,7 +1,9 @@
 // API Route: Complete Word Scramble Game Session
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import { WordScrambleGameSession } from '@/models/games/word-scramble';
+// TODO: Replace with Prisma ORM
+// import { WordScrambleGameSession } from '@/models/games/word-scramble';
+import { prisma } from '@/lib/api/prisma';
 import { 
   calculateFinalPerformanceMetrics,
   determineGameRating,

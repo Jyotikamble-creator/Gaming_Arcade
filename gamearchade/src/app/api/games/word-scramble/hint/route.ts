@@ -1,7 +1,9 @@
 // API Route: Word Scramble Hint System
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import { WordScrambleGameSession } from '@/models/games/word-scramble';
+// TODO: Replace with Prisma ORM
+// import { WordScrambleGameSession } from '@/models/games/word-scramble';
+import { prisma } from '@/lib/api/prisma';
 import { generateWordHint } from '@/lib/games/word-scramble';
 
 export async function POST(request: NextRequest) {

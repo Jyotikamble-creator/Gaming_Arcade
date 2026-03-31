@@ -1,23 +1,7 @@
 // Typing Test Game Core Logic
-import {
-  TypingGameSession,
-  TypingSessionRequest,
-  TypingPassage,
-  TypingPassageRequest,
-  TypingUpdateRequest,
-  TypingSessionResult,
-  TypingStatistics,
-  TypingPerformanceMetrics,
-  TypingCharacter,
-  TypingWord,
-  TypingAchievement,
-  TypingDifficulty,
-  TypingCategory,
-  TypingGameSettings,
-  TypingGrade,
-  TypingRank
-} from "@/types/games/typing";
-import { TypingSession } from "@/models/games/typing";
+// TODO: Replace with Prisma ORM
+// import { TypingSession } from "@/models/games/typing";
+import { prisma } from '@/lib/api/prisma';
 import { 
   calculateWPM, 
   calculateAccuracy, 

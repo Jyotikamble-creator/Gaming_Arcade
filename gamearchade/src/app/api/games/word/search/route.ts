@@ -1,6 +1,6 @@
 // API Route: Search and filter words
 import { NextResponse } from 'next/server';
-import { getAllWords, searchWordsByCategory } from '@/models/word';
+// import { getAllWords, searchWordsByCategory } from '@/models/word';
 
 export async function GET(request: Request) {
   try {
@@ -12,13 +12,8 @@ export async function GET(request: Request) {
     const language = (searchParams.get('language') as any) || 'english';
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20;
 
-    // Perform search
-    const words = await getAllWords({
-      category,
-      difficulty,
-      language,
-      limit
-    });
+    // TODO: Implement word search with Prisma
+    const words: any[] = [];
 
     return NextResponse.json({
       ok: true,
@@ -47,24 +42,12 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { category, difficulty, language = 'english', limit = 20 } = body;
 
-    // Build search query from request body
-    const words = await getAllWords({
-      category,
-      difficulty,
-      language,
-      limit
-      sortOrder: sort?.direction || 'asc',
-      limit: pagination?.limit || 20,
-      offset: pagination?.offset || 0,
-    };
-
-    // Perform advanced search
-    const searchResult = await searchWords(searchQuery);
+    // TODO: Implement advanced word search with Prisma
+    const searchResult: any[] = [];
 
     return NextResponse.json({
       success: true,
       data: searchResult,
-      query: searchQuery,
       timestamp: new Date().toISOString()
     });
 

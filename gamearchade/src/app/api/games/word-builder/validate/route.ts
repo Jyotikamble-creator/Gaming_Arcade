@@ -1,7 +1,9 @@
 // API Route: Validate Word in Word Builder Game
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import { WordBuilderGameSession } from '@/models/games/word-builder';
+// TODO: Replace with Prisma ORM
+// import { WordBuilderGameSession } from '@/models/games/word-builder';
+import { prisma } from '@/lib/api/prisma';
 import { 
   validateWordInGame, 
   calculateWordScore, 

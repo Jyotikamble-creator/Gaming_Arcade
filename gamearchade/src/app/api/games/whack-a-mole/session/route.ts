@@ -4,7 +4,8 @@ import {
   WhackAPIResponse,
   WhackUpdateRequest 
 } from "@/types/games/whack-a-mole";
-import { WhackSession } from "@/models/games/whack-a-mole";
+// TODO: Replace with Prisma ORM - use GameSession table
+import { prisma } from '@/lib/api/prisma';
 import { 
   updateWhackGameSession, 
   pauseWhackSession, 
@@ -26,25 +27,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(response, { status: 400 });
     }
 
-    const session = await WhackSession.findOne({ sessionId });
-
-    if (!session) {
-      const response: WhackAPIResponse = {
-        success: false,
-        error: "Session not found",
-        timestamp: new Date().toISOString()
-      };
-      return NextResponse.json(response, { status: 404 });
-    }
-
-    const response: WhackAPIResponse<WhackGameSession> = {
-      success: true,
-      data: session.toObject(),
-      message: "Session retrieved successfully",
+    // TODO: Implement using Prisma GameSession table
+    const response: WhackAPIResponse = {
+      success: false,
+      error: "Session not found",
       timestamp: new Date().toISOString()
     };
-
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(response, { status: 404 });
   } catch (error) {
     console.error("Error retrieving whack-a-mole session:", error);
     

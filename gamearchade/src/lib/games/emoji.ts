@@ -3,7 +3,9 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import EmojiGameSessionModel from '@/models/games/emoji';
+// TODO: Replace with Prisma ORM
+// import EmojiGameSessionModel from '@/models/games/emoji';
+import { prisma } from '@/lib/api/prisma';
 import type {
   EmojiGameSession,
   EmojiPuzzle,

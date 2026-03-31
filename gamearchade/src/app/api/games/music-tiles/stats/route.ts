@@ -1,51 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getGameSession, calculateStats } from '@/utility/games/music-tiles';
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/api/prisma';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const sessionId = searchParams.get('sessionId');
+    const userId = searchParams.get('userId');
 
-    if (!sessionId) {
-      return NextResponse.json(
-        { error: 'Session ID is required' },
-        { status: 400 }
-      );
+    let response: any = {};
+    response.leaderboard = [];
+    response.globalStats = {
+      totalGames: 0,
+      averageScore: 0,
+      highestScore: 0,
+      totalPlayers: 0
+    };
+
+    if (userId) {
+      response.userStats = null;
+      response.recentGames = [];
     }
 
-    const session = getGameSession(sessionId);
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Game session not found' },
-        { status: 404 }
-      );
-    }
-
-    const { gameState } = session;
-    const stats = calculateStats(gameState);
-
-    return NextResponse.json({
-      success: true,
-      stats,
-      gameState: {
-        score: gameState.score,
-        combo: gameState.combo,
-        maxCombo: gameState.maxCombo,
-        hits: gameState.hits,
-        misses: gameState.misses,
-        perfectHits: gameState.perfectHits,
-        gameStarted: gameState.gameStarted,
-        gameEnded: gameState.gameEnded,
-        isPlaying: gameState.isPlaying,
-        difficulty: gameState.difficulty,
-        timeElapsed: gameState.timeElapsed,
-      },
-    });
-
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    console.error('Error getting Music Tiles stats:', error);
+    console.error('Game stats error:', error);
     return NextResponse.json(
-      { error: 'Failed to get stats' },
+      { 
+        error: 'Failed to get statistics', 
+        message: error instanceof Error ? error.message : 'Unknown error' 
+      }, 
       { status: 500 }
     );
   }

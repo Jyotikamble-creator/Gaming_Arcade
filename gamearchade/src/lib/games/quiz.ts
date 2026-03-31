@@ -2,7 +2,9 @@
  * Database operations for Quiz Game
  */
 
-import QuizSessionModel from '@/models/games/quiz';
+// TODO: Replace with Prisma ORM
+// import QuizSessionModel from '@/models/games/quiz';
+import { prisma } from '@/lib/api/prisma';
 import type {
   QuizSession,
   QuizAnswer,

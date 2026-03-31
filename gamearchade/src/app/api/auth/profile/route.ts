@@ -1,15 +1,11 @@
 // PUT /api/auth/profile - Update user profile
 import { NextRequest, NextResponse } from 'next/server';
-import User from '@/models/auth/auth';
-import { connectDB } from '@/models/db';
 import { verifyToken, extractToken } from '@/lib/auth/auth';
 import { ProfileUpdateRequest, UserResponse, ErrorResponse } from '@/types/auth/auth';
+import { prisma } from '@/lib/api/prisma';
 
 export async function PUT(request: NextRequest) {
   try {
-    // Connect to database
-    await connectDB();
-
     // Extract and verify token
     const token = extractToken(request);
     if (!token) {
@@ -31,7 +27,9 @@ export async function PUT(request: NextRequest) {
     }
 
     // Find user
-    const currentUser = await User.findById(decoded.id);
+    const currentUser = await prisma.user.findUnique({
+      where: { id: decoded.id }
+    });
     if (!currentUser) {
       return NextResponse.json(
         { error: 'user not found' } as ErrorResponse,
@@ -72,9 +70,8 @@ export async function PUT(request: NextRequest) {
 
     // Check if username is already taken
     if (username && username !== currentUser.username) {
-      const existingUser = await User.findOne({
-        username,
-        _id: { $ne: currentUser._id },
+      const existingUser = await prisma.user.findUnique({
+        where: { username: username }
       });
       if (existingUser) {
         return NextResponse.json(
@@ -85,7 +82,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Build update data
-    const updateData: Partial<ProfileUpdateRequest> = {};
+    const updateData: any = {};
     if (displayName !== undefined) updateData.displayName = displayName;
     if (bio !== undefined) updateData.bio = bio;
     if (avatar !== undefined) updateData.avatar = avatar;
@@ -93,11 +90,10 @@ export async function PUT(request: NextRequest) {
     if (username !== undefined) updateData.username = username;
 
     // Update user profile
-    const updatedUser = await User.findByIdAndUpdate(
-      currentUser._id,
-      updateData,
-      { new: true, runValidators: true }
-    );
+    const updatedUser = await prisma.user.update({
+      where: { id: currentUser.id },
+      data: updateData
+    });
 
     if (!updatedUser) {
       return NextResponse.json(
@@ -111,13 +107,13 @@ export async function PUT(request: NextRequest) {
     // Return updated user info
     const response: UserResponse = {
       user: {
-        id: updatedUser._id.toString(),
+        id: updatedUser.id,
         email: updatedUser.email,
-        username: updatedUser.username,
-        displayName: updatedUser.displayName,
-        bio: updatedUser.bio,
-        avatar: updatedUser.avatar,
-        favoriteGame: updatedUser.favoriteGame,
+        username: updatedUser.username ?? undefined,
+        displayName: updatedUser.displayName ?? undefined,
+        bio: updatedUser.bio ?? undefined,
+        avatar: updatedUser.avatar ?? undefined,
+        favoriteGame: updatedUser.favoriteGame ?? undefined,
         profileCompleted: updatedUser.profileCompleted,
         createdAt: updatedUser.createdAt,
       },

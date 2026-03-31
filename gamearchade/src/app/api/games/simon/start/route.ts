@@ -9,7 +9,8 @@ import type { SimonStartRequest, SimonStartResponse } from '@/types/games/simon'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const difficulty = searchParams.get('difficulty') as 'easy' | 'medium' | 'hard' | null;
+    const difficultyParam = searchParams.get('difficulty');
+    const difficulty = (difficultyParam as 'easy' | 'medium' | 'hard' | undefined) || 'medium';
     const enableSound = searchParams.get('enableSound') === 'true';
 
     // Create Simon session

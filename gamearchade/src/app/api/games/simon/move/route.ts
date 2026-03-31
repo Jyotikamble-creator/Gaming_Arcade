@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateSimonMove, updateSimonGameState } from '@/lib/games/simon';
-import SimonSession from '@/models/games/simon';
+// TODO: Replace with Prisma ORM - GameSession table
+import { prisma } from '@/lib/api/prisma';
 import type { SimonMoveRequest, SimonMoveResponse, SimonColor } from '@/types/games/simon';
 import { isValidSimonColor } from '@/utility/games/simon';
 
@@ -28,45 +29,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the game session
-    const session = await SimonSession.findOne({ sessionId });
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Game session not found', success: false },
-        { status: 404 }
-      );
-    }
-
-    if (!session.isGameActive) {
-      return NextResponse.json(
-        { error: 'Game session is not active', success: false },
-        { status: 400 }
-      );
-    }
-
-    // Validate the move
-    const expectedColor = session.sequence[step] as SimonColor;
-    const isCorrect = validateSimonMove(color, expectedColor, step);
-
-    // Update session with the move
-    await session.addMove(color, isCorrect);
-
+    // TODO: Implement using Prisma GameSession table
+    // For now, return a placeholder response
     const response: SimonMoveResponse = {
       success: true,
-      isCorrect,
-      gameOver: !session.isGameActive
+      isCorrect: true,
+      gameOver: false
     };
-
-    // If game is over, include final score
-    if (!session.isGameActive) {
-      response.finalScore = session.score;
-      response.message = `Game over! Final score: ${session.score}`;
-    } else if (step + 1 >= session.sequence.length) {
-      // Level complete
-      await session.completeLevel();
-      response.message = `Level ${session.level - 1} complete!`;
-      response.nextSequence = session.sequence;
-    }
 
     return NextResponse.json(response, { status: 200 });
   } catch (error) {

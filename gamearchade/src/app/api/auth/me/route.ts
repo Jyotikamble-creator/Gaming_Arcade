@@ -1,15 +1,11 @@
 // GET /api/auth/me - Get current user info
 import { NextRequest, NextResponse } from 'next/server';
-import User from '@/models/auth/auth';
-import { connectDB } from '@/models/db';
 import { verifyToken, extractToken } from '@/lib/auth/auth';
 import { UserResponse, ErrorResponse } from '@/types/auth/auth';
+import { prisma } from '@/lib/api/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    // Connect to database
-    await connectDB();
-
     // Extract and verify token
     const token = extractToken(request);
     if (!token) {
@@ -35,7 +31,23 @@ export async function GET(request: NextRequest) {
     console.log('[AUTH] Me request for user:', decoded.email);
 
     // Find user by ID
-    const user = await User.findById(decoded.id).select('-passwordHash');
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        displayName: true,
+        bio: true,
+        avatar: true,
+        favoriteGame: true,
+        profileCompleted: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+
     if (!user) {
       console.warn('[AUTH] Me request: user not found:', decoded.email);
       return NextResponse.json(
@@ -46,19 +58,29 @@ export async function GET(request: NextRequest) {
 
     console.log('[AUTH] Me request successful for user:', user.email);
 
+    // Get user stats from UserStats table or create default
+    const stats = await prisma.userStats.findUnique({
+      where: { userId: user.id }
+    });
+
     // Return user info
     const response: UserResponse = {
       user: {
-        id: user._id.toString(),
+        id: user.id,
         email: user.email,
-        username: user.username,
-        displayName: user.displayName,
-        bio: user.bio,
-        avatar: user.avatar,
-        favoriteGame: user.favoriteGame,
+        username: user.username ?? undefined,
+        displayName: user.displayName ?? undefined,
+        bio: user.bio ?? undefined,
+        avatar: user.avatar ?? undefined,
+        favoriteGame: user.favoriteGame ?? undefined,
         profileCompleted: user.profileCompleted,
         role: user.role,
-        stats: user.stats ?? {
+        stats: stats ? {
+          followerCount: stats.followerCount,
+          followingCount: stats.followingCount,
+          totalScore: stats.totalScore,
+          gamesPlayed: stats.gamesPlayed,
+        } : {
           followerCount: 0,
           followingCount: 0,
           totalScore: 0,

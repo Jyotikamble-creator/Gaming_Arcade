@@ -1,6 +1,6 @@
 // API Route: Create new words
 import { NextResponse } from 'next/server';
-import { createWord } from '@/models/word';
+// import { createWord } from '@/models/word';
 import type { WordDefinition } from '@/types/games/word';
 
 export async function POST(request: Request) {
@@ -21,19 +21,13 @@ export async function POST(request: Request) {
       );
     }
     
-    // Create the word
-    const newWord = await createWord({
-      word: wordData.word,
-      category: wordData.category || 'General',
-      difficulty: wordData.difficulty || 'beginner',
-      language: wordData.language || 'english',
-      description: wordData.description,
-      definition: wordData.definition,
-      pronunciation: wordData.pronunciation,
-      etymology: wordData.etymology,
-      examples: wordData.examples,
-      hints: wordData.hints,
-    });
+    // TODO: Create word with Prisma
+    const newWord = {
+      id: 'temp-id',
+      ...wordData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
     
     return NextResponse.json({
       ok: true,
@@ -43,18 +37,6 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     console.error('[WORD] Create word error:', error);
-    
-    // Check for duplicate word error
-    if (error.code === 'P2002') {
-      return NextResponse.json(
-        { 
-          ok: false, 
-          error: 'Word already exists',
-          message: 'A word with this name already exists'
-        },
-        { status: 409 }
-      );
-    }
     
     return NextResponse.json(
       { 

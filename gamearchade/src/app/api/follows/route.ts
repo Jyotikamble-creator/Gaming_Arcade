@@ -2,16 +2,12 @@
 // POST /api/follows  { followingId }                       — auth required
 // DELETE /api/follows { followingId }                      — auth required
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/models/db';
-import Follow from '@/models/common/Follow';
-import User from '@/models/auth/auth';
 import { verifyToken, extractToken } from '@/lib/auth/auth';
+import { prisma } from '@/lib/api/prisma';
 
 // ── GET /api/follows ─────────────────────────────────────────────────────────
 export async function GET(request: NextRequest) {
   try {
-    await connectDB();
-
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'followers';
     const userId = searchParams.get('userId');
@@ -21,17 +17,43 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'followers') {
-      const follows = await Follow.find({ following: userId })
-        .populate('follower', '_id email displayName username avatar')
-        .sort({ createdAt: -1 });
+      const follows = await prisma.follow.findMany({
+        where: { followingId: userId },
+        include: {
+          follower: {
+            select: {
+              id: true,
+              email: true,
+              displayName: true,
+              username: true,
+              avatar: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+      
       return NextResponse.json({
         followers: follows.map((f) => f.follower),
         count: follows.length,
       });
     } else {
-      const follows = await Follow.find({ follower: userId })
-        .populate('following', '_id email displayName username avatar')
-        .sort({ createdAt: -1 });
+      const follows = await prisma.follow.findMany({
+        where: { followerId: userId },
+        include: {
+          following: {
+            select: {
+              id: true,
+              email: true,
+              displayName: true,
+              username: true,
+              avatar: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+      
       return NextResponse.json({
         following: follows.map((f) => f.following),
         count: follows.length,
@@ -46,8 +68,6 @@ export async function GET(request: NextRequest) {
 // ── POST /api/follows ─────────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
   try {
-    await connectDB();
-
     const token = extractToken(request);
     if (!token) {
       return NextResponse.json({ error: 'authentication required' }, { status: 401 });
@@ -73,27 +93,58 @@ export async function POST(request: NextRequest) {
     }
 
     // Target user must exist
-    const target = await User.findById(followingId);
+    const target = await prisma.user.findUnique({
+      where: { id: followingId }
+    });
+    
     if (!target) {
       return NextResponse.json({ error: 'user not found' }, { status: 404 });
     }
 
-    // Upsert to avoid race conditions on duplicate
-    await Follow.findOneAndUpdate(
-      { follower: decoded.id, following: followingId },
-      { follower: decoded.id, following: followingId },
-      { upsert: true, new: true }
-    );
+    // Check if already following
+    const existing = await prisma.follow.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId: decoded.id,
+          followingId: followingId
+        }
+      }
+    });
 
-    // Increment stats counters atomically
-    await User.findByIdAndUpdate(decoded.id, { $inc: { 'stats.followingCount': 1 } });
-    await User.findByIdAndUpdate(followingId, { $inc: { 'stats.followerCount': 1 } });
+    if (!existing) {
+      // Create follow relationship
+      await prisma.follow.create({
+        data: {
+          followerId: decoded.id,
+          followingId: followingId
+        }
+      });
+
+      // Update stats - use atomic increment
+      await prisma.userStats.update({
+        where: { userId: decoded.id },
+        data: { followingCount: { increment: 1 } }
+      }).catch(() => {
+        // Create stats if doesn't exist
+        return prisma.userStats.create({
+          data: { userId: decoded.id, followingCount: 1 }
+        });
+      });
+
+      await prisma.userStats.update({
+        where: { userId: followingId },
+        data: { followerCount: { increment: 1 } }
+      }).catch(() => {
+        return prisma.userStats.create({
+          data: { userId: followingId, followerCount: 1 }
+        });
+      });
+    } else {
+      return NextResponse.json({ error: 'already following' }, { status: 409 });
+    }
 
     return NextResponse.json({ success: true, message: 'followed' }, { status: 201 });
   } catch (err: any) {
-    if (err.code === 11000) {
-      return NextResponse.json({ error: 'already following' }, { status: 409 });
-    }
     console.error('[FOLLOWS] POST error:', err);
     return NextResponse.json({ error: 'server error' }, { status: 500 });
   }
@@ -102,8 +153,6 @@ export async function POST(request: NextRequest) {
 // ── DELETE /api/follows ───────────────────────────────────────────────────────
 export async function DELETE(request: NextRequest) {
   try {
-    await connectDB();
-
     const token = extractToken(request);
     if (!token) {
       return NextResponse.json({ error: 'authentication required' }, { status: 401 });
@@ -123,22 +172,27 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'followingId required' }, { status: 400 });
     }
 
-    const deleted = await Follow.findOneAndDelete({
-      follower: decoded.id,
-      following: followingId,
+    const deleted = await prisma.follow.deleteMany({
+      where: {
+        followerId: decoded.id,
+        followingId: followingId
+      }
     });
 
-    if (!deleted) {
+    if (deleted.count === 0) {
       return NextResponse.json({ error: 'not following' }, { status: 404 });
     }
 
-    // Decrement stats counters atomically (floor at 0 via $max)
-    await User.findByIdAndUpdate(decoded.id, [
-      { $set: { 'stats.followingCount': { $max: [{ $subtract: ['$stats.followingCount', 1] }, 0] } } },
-    ]);
-    await User.findByIdAndUpdate(followingId, [
-      { $set: { 'stats.followerCount': { $max: [{ $subtract: ['$stats.followerCount', 1] }, 0] } } },
-    ]);
+    // Decrement stats counters atomically (floor at 0)
+    await prisma.userStats.update({
+      where: { userId: decoded.id },
+      data: { followingCount: { decrement: 1 } }
+    }).catch(() => null);
+
+    await prisma.userStats.update({
+      where: { userId: followingId },
+      data: { followerCount: { decrement: 1 } }
+    }).catch(() => null);
 
     return NextResponse.json({ success: true, message: 'unfollowed' });
   } catch (err) {

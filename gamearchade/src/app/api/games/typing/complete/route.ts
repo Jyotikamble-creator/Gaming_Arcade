@@ -3,7 +3,9 @@ import {
   TypingSessionResult, 
   TypingAPIResponse 
 } from "@/types/games/typing";
-import { TypingSession } from "@/models/games/typing";
+// TODO: Replace with Prisma ORM
+// import { TypingSession } from "@/models/games/typing";
+import { prisma } from '@/lib/api/prisma';
 import { completeTypingSession } from "@/lib/games/typing";
 
 // POST /api/typing/complete - Complete a typing session

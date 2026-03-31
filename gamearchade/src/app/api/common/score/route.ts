@@ -9,10 +9,10 @@ export async function POST(request: NextRequest) {
   try {
     // Extract data from request body
     const body: CreateScoreRequest = await request.json();
-    const { game, player = 'guest', score = 0, meta = {} } = body;
+    const { game, playerName = 'guest', score = 0, meta = {} } = body;
 
     // Validate input
-    const validation = validateScoreData(game, score, player);
+    const validation = validateScoreData(game, score, playerName);
     if (!validation.valid) {
       return NextResponse.json(
         { ok: false, error: validation.errors.join(', ') },
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create score
-    const newScore = await createScore(game, score, player, meta);
+    const newScore = await createScore(game, score, playerName, meta);
 
     // Respond with created score
     return NextResponse.json({

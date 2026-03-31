@@ -3,7 +3,9 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import MemoryGameSessionModel from '@/models/games/memory';
+// TODO: Replace with Prisma ORM
+// import MemoryGameSessionModel from '@/models/games/memory';
+import { prisma } from '@/lib/api/prisma';
 import type {
   MemoryGameSession,
   MemoryCard,

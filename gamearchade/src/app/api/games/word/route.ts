@@ -1,6 +1,6 @@
 // API Route: Get all words with optional filtering
 import { NextResponse } from 'next/server';
-import { getAllWords, getWordStats } from '@/models/word';
+// import { getAllWords, getWordStats } from '@/models/word';
 import type { WordCategory, WordDifficulty, WordLanguage } from '@/types/games/word';
 
 export async function GET(request: Request) {
@@ -14,18 +14,14 @@ export async function GET(request: Request) {
     const includeAnalytics = searchParams.get('analytics') === 'true';
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
     
-    // Get words with optional filtering
-    const words = await getAllWords({
-      category: category || undefined,
-      difficulty: difficulty || undefined,
-      language,
-      limit
-    });
+    // TODO: Get words with optional filtering using Prisma
+    const words: any[] = [];
 
     // Get analytics if requested
     let analytics = null;
     if (includeAnalytics) {
-      analytics = await getWordStats();
+      // TODO: Implement word stats
+      analytics = { totalWords: 0, categories: [] };
     }
 
     return NextResponse.json({

@@ -1,5 +1,7 @@
 // Word Management System Core Logic
-import WordModel from '@/models/games/word';
+// TODO: Replace with Prisma ORM
+// import WordModel from '@/models/games/word';
+import { prisma } from '@/lib/api/prisma';
 import type { 
   WordDefinition,
   WordCategory,

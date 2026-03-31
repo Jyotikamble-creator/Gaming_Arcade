@@ -5,12 +5,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateSudokuBoard } from '@/lib/games/sudoku';
-import type { ISudokuSubmissionRequest } from '@/types/games/sudoku';
+import type { SudokuValidationRequest } from '@/types/games/sudoku';
 
 export async function POST(request: NextRequest) {
   try {
-    const body: SudokuSubmissionRequest = await request.json();
-    const { puzzle, solution, startTime, endTime, hintsUsed, difficulty } = body;
+    const body: SudokuValidationRequest = await request.json();
+    const { board: solution, solution: puzzle, puzzleId } = body;
+    const { startTime, endTime, hintsUsed, difficulty } = (body as any);
 
     // Validate required fields
     if (!puzzle || !solution || !startTime) {

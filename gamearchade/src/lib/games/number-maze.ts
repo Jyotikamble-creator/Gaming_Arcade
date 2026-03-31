@@ -3,7 +3,9 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import NumberMazeSessionModel from '@/models/games/number-maze';
+// TODO: Replace with Prisma ORM
+// import NumberMazeSessionModel from '@/models/games/number-maze';
+import { prisma } from '@/lib/api/prisma';
 import type {
   NumberMazeSession,
   NumberMazeDifficultyLevel,
