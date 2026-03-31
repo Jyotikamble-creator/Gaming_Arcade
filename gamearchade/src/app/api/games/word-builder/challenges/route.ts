@@ -15,10 +15,10 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '0');
 
     // Validate difficulty if provided
-    const validDifficulties: WordBuilderDifficulty[] = ['easy', 'medium', 'hard', 'expert', 'master'];
+    const validDifficulties: WordBuilderDifficulty[] = ['easy', 'medium', 'hard'];
     if (difficulty && !validDifficulties.includes(difficulty)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid difficulty. Use: easy, medium, hard, expert, or master' },
+        { success: false, error: 'Invalid difficulty. Use: easy, medium, or hard' },
         { status: 400 }
       );
     }
@@ -73,7 +73,6 @@ export async function GET(request: NextRequest) {
           maxScore: challenge.maxScore,
           timeLimit: challenge.timeLimit,
           category: challenge.category,
-          description: challenge.description,
           totalTargetWords: challenge.targetWords.length
         }
       });
@@ -88,7 +87,6 @@ export async function GET(request: NextRequest) {
       maxScore: challenge.maxScore,
       timeLimit: challenge.timeLimit,
       category: challenge.category,
-      description: challenge.description,
       totalTargetWords: challenge.targetWords.length,
       letterCount: challenge.letters.length,
       avgWordLength: Math.round(

@@ -110,8 +110,9 @@ export async function GET(request: Request) {
         timestamp: new Date().toISOString()
       });
     } else {
+      const contentType = contentTypes[format as keyof typeof contentTypes] || 'application/octet-stream';
       const headers = {
-        'Content-Type': contentTypes[format],
+        'Content-Type': contentType,
         'Content-Disposition': `attachment; filename="words_export_${Date.now()}.${format}"`
       };
 

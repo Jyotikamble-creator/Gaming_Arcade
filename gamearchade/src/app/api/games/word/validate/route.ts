@@ -1,33 +1,7 @@
 // API Route: Validate words and get suggestions
 import { NextResponse } from 'next/server';
-// import { findWordByText, getAllWords } from '@/models/word';
+import { validateWord, getWordSuggestions } from '@/lib/games/word';
 import type { WordValidationRequest } from '@/types/games/word';
-
-// Simple word validation
-async function validateWord(word: string) {
-  // TODO: Validate word with Prisma
-  const foundWord = null;
-  
-  return {
-    isValid: !!foundWord,
-    exists: !!foundWord,
-    word: word.toUpperCase(),
-    message: foundWord ? 'Word is valid' : 'Word not found'
-  };
-}
-
-// Get word suggestions
-async function getWordSuggestions(wordFragment: string, category?: string, limit: number = 5) {
-  const words = await getAllWords({ category, limit: limit * 2 });
-  
-  const fragment = wordFragment.toLowerCase();
-  const suggestions = words
-    .filter(w => w.word.toLowerCase().includes(fragment))
-    .slice(0, limit)
-    .map(w => w.word);
-    
-  return suggestions;
-}
 
 export async function POST(request: Request) {
   try {
@@ -45,11 +19,11 @@ export async function POST(request: Request) {
     }
 
     // Validate the word
-    const validation = await validateWord(validationRequest.word);
+    const validation = await validateWord(validationRequest);
     
-    // Get suggestions if word is not valid or doesn't exist
+    // Get suggestions if word is not valid
     let suggestions: string[] = [];
-    if (!validation.isValid || !validation.exists) {
+    if (!validation.isValid) {
       suggestions = await getWordSuggestions(
         validationRequest.word,
         validationRequest.category,
