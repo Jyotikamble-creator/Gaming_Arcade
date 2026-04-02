@@ -1,9 +1,9 @@
-// Component to display a modal when Sudoku puzzle is completed
+﻿// Component to display a modal when Sudoku puzzle is completed
 import React, { useEffect, useRef } from 'react';
-import type { SudokuCompletedModalProps, SudokuDifficulty } from '../../types/games/sudoku';
+import type { SudokuCompletedModalProps, SudokuDifficulty } from '@/types/games/sudoku';
 
 // Exported SudokuCompletedModal component
-export default function SudokuCompletedModal({
+const SudokuCompletedModal: React.FC<SudokuCompletedModalProps> = ({
   isOpen,
   score,
   time,
@@ -12,7 +12,7 @@ export default function SudokuCompletedModal({
   hintsUsed,
   onClose,
   onNewGame
-}: SudokuCompletedModalProps): JSX.Element {
+}) => {
   const modalRef = useRef(null);
 
   // Focus the modal when it's opened
@@ -33,9 +33,9 @@ export default function SudokuCompletedModal({
 
   // Difficulty configuration
   const difficultyConfig: Record<SudokuDifficulty, { color: string, label: string, emoji: string }> = {
-    easy: { color: 'green', label: 'Easy', emoji: '😊' },
-    medium: { color: 'yellow', label: 'Medium', emoji: '🤔' },
-    hard: { color: 'red', label: 'Hard', emoji: '😤' }
+    easy: { color: 'green', label: 'Easy', emoji: 'ðŸ˜Š' },
+    medium: { color: 'yellow', label: 'Medium', emoji: 'ðŸ¤”' },
+    hard: { color: 'red', label: 'Hard', emoji: 'ðŸ˜¤' }
   };
 
   const config = difficultyConfig[difficulty] || difficultyConfig.easy;
@@ -453,4 +453,6 @@ export default function SudokuCompletedModal({
       </div>
     </div>
   );
-}
+};
+
+export default SudokuCompletedModal;

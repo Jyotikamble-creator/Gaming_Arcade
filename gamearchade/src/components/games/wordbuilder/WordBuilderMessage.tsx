@@ -1,11 +1,11 @@
-// WordBuilderMessage component for displaying game messages
+﻿// WordBuilderMessage component for displaying game messages
 import React from 'react';
 import { WordBuilderMessageProps } from '@/types/games/word-builder';
 
-export default function WordBuilderMessage({
+const WordBuilderMessage: React.FC<WordBuilderMessageProps> = ({
   message,
   messageType
-}: WordBuilderMessageProps): JSX.Element {
+}) => {
   if (!message || !messageType) return <></>;
 
   const getMessageStyles = () => {
@@ -24,13 +24,13 @@ export default function WordBuilderMessage({
   const getMessageIcon = () => {
     switch (messageType) {
       case 'success':
-        return '✅';
+        return 'âœ…';
       case 'error':
-        return '❌';
+        return 'âŒ';
       case 'hint':
-        return '💡';
+        return 'ðŸ’¡';
       default:
-        return 'ℹ️';
+        return 'â„¹ï¸';
     }
   };
 
@@ -45,4 +45,6 @@ export default function WordBuilderMessage({
       </p>
     </div>
   );
-}
+};
+
+export default WordBuilderMessage;

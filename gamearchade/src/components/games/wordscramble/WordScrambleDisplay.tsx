@@ -1,11 +1,11 @@
-// WordScrambleDisplay component to show the scrambled word
+﻿// WordScrambleDisplay component to show the scrambled word
 import React from 'react';
 import { WordScrambleDisplayProps } from '@/types/games/word-scramble';
 
-export default function WordScrambleDisplay({
+const WordScrambleDisplay: React.FC<WordScrambleDisplayProps> = ({
   scrambled,
   isLoading = false
-}: WordScrambleDisplayProps): JSX.Element {
+}) => {
   if (isLoading) {
     return (
       <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700 mb-6">
@@ -27,7 +27,7 @@ export default function WordScrambleDisplay({
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700 mb-6">
       <h3 className="text-white text-lg font-semibold mb-6 text-center">
-        🔀 Scrambled Word
+        ðŸ”€ Scrambled Word
       </h3>
       
       <div className="flex justify-center items-center mb-6">
@@ -59,7 +59,7 @@ export default function WordScrambleDisplay({
         
         {/* Letter frequency hint */}
         <div className="text-gray-500 text-xs">
-          Letters: {scrambled.split('').join(' • ')}
+          Letters: {scrambled.split('').join(' â€¢ ')}
         </div>
       </div>
 
@@ -77,4 +77,6 @@ export default function WordScrambleDisplay({
       `}</style>
     </div>
   );
-}
+};
+
+export default WordScrambleDisplay;

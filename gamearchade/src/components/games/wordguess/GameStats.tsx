@@ -1,14 +1,14 @@
-// GameStats component to display game statistics
+﻿// GameStats component to display game statistics
 import React from 'react';
 import { GameStatsProps } from '@/types/games/word-guess';
 
-export default function GameStats({
+const GameStats: React.FC<GameStatsProps> = ({
   score,
   wrongGuesses,
   maxWrongGuesses,
   hints,
   maxHints
-}: GameStatsProps): JSX.Element {
+}) => {
   const remainingGuesses = maxWrongGuesses - wrongGuesses;
   const hintsUsed = maxHints - hints;
 
@@ -104,22 +104,24 @@ export default function GameStats({
       <div className="mt-4 space-y-2">
         {wrongGuesses === maxWrongGuesses - 1 && (
           <div className="text-center bg-red-500/20 text-red-300 px-4 py-2 rounded-lg text-sm">
-            ⚠️ Last chance! One more wrong guess and it's game over!
+            âš ï¸ Last chance! One more wrong guess and it's game over!
           </div>
         )}
         
         {hints === 0 && (
           <div className="text-center bg-blue-500/20 text-blue-300 px-4 py-2 rounded-lg text-sm">
-            💡 No more hints available
+            ðŸ’¡ No more hints available
           </div>
         )}
         
         {score > 50 && (
           <div className="text-center bg-green-500/20 text-green-300 px-4 py-2 rounded-lg text-sm">
-            🌟 Great job! You're doing well!
+            ðŸŒŸ Great job! You're doing well!
           </div>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default GameStats;

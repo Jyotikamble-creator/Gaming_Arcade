@@ -1,4 +1,4 @@
-// Displays statistics for the sliding puzzle game including moves, time, status, and efficiency.
+﻿// Displays statistics for the sliding puzzle game including moves, time, status, and efficiency.
 interface PuzzleStatsProps {
   moves: number;
   timeElapsed: number;
@@ -6,7 +6,7 @@ interface PuzzleStatsProps {
   gameCompleted: boolean;
 }
 
-export default function PuzzleStats({ moves, timeElapsed, gameStarted, gameCompleted }: PuzzleStatsProps): JSX.Element {
+const PuzzleStats: React.FC<PuzzleStatsProps> = ({ moves, timeElapsed, gameStarted, gameCompleted }) => {
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -68,4 +68,6 @@ export default function PuzzleStats({ moves, timeElapsed, gameStarted, gameCompl
       )}
     </div>
   );
-}
+};
+
+export default PuzzleStats;

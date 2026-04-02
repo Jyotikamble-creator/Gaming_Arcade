@@ -1,15 +1,15 @@
-// WhackMoleGameOverModal component to display game over results
+﻿// WhackMoleGameOverModal component to display game over results
 import React from 'react';
 import { WhackMoleGameOverModalProps } from '@/types/games/whack-a-mole';
 import { getWhackPerformanceRating } from '@/utility/games/whack-a-mole';
 
-export default function WhackMoleGameOverModal({
+const WhackMoleGameOverModal: React.FC<WhackMoleGameOverModalProps> = ({
   score,
   accuracy = 0,
   molesHit = 0,
   totalMoles = 0,
   onRestart
-}: WhackMoleGameOverModalProps): JSX.Element {
+}) => {
   const rating = getPerformanceRating(score);
 
   return (
@@ -17,7 +17,7 @@ export default function WhackMoleGameOverModal({
       <div className="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4 border border-gray-700 shadow-2xl">
         {/* Header */}
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold text-white mb-2">🎯 Game Over!</h2>
+          <h2 className="text-3xl font-bold text-white mb-2">ðŸŽ¯ Game Over!</h2>
           <p className="text-gray-300">Time's up! Here's how you did:</p>
         </div>
 
@@ -68,7 +68,7 @@ export default function WhackMoleGameOverModal({
             onClick={onRestart}
             className="w-full py-3 px-6 bg-linear-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
-            🔨 Play Again
+            ðŸ”¨ Play Again
           </button>
           
           <button
@@ -82,15 +82,17 @@ export default function WhackMoleGameOverModal({
         {/* Tips */}
         {accuracy < 50 && (
           <div className="mt-6 p-4 bg-blue-900/30 rounded-lg border border-blue-700">
-            <h4 className="text-blue-400 font-semibold mb-2">💡 Tips:</h4>
+            <h4 className="text-blue-400 font-semibold mb-2">ðŸ’¡ Tips:</h4>
             <ul className="text-blue-200 text-sm space-y-1">
-              <li>• Focus on the center of the grid</li>
-              <li>• React quickly to movement</li>
-              <li>• Don't click empty holes</li>
+              <li>â€¢ Focus on the center of the grid</li>
+              <li>â€¢ React quickly to movement</li>
+              <li>â€¢ Don't click empty holes</li>
             </ul>
           </div>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default WhackMoleGameOverModal;

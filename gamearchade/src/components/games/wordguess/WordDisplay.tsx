@@ -1,13 +1,13 @@
-// WordDisplay component to show the word with revealed/hidden letters
+﻿// WordDisplay component to show the word with revealed/hidden letters
 import React from 'react';
 import { WordDisplayProps } from '@/types/games/word-guess';
 import { formatWordDisplay, getWordCompletionPercentage } from '@/utility/games/word-guess';
 
-export default function WordDisplay({
+const WordDisplay: React.FC<WordDisplayProps> = ({
   word,
   chosenLetters,
   showWord = false
-}: WordDisplayProps): JSX.Element {
+}) => {
   const displayWord = formatWordDisplay(word, chosenLetters, showWord);
   const completionPercentage = getWordCompletionPercentage(word, chosenLetters);
   
@@ -79,10 +79,12 @@ export default function WordDisplay({
       {completionPercentage === 100 && !showWord && (
         <div className="mt-4 text-center">
           <div className="bg-green-500/20 text-green-300 px-4 py-2 rounded-lg inline-block border border-green-500/30">
-            🎉 Word Complete!
+            ðŸŽ‰ Word Complete!
           </div>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default WordDisplay;

@@ -1,8 +1,8 @@
-// WordBuilderStats component to display game statistics
+﻿// WordBuilderStats component to display game statistics
 import React from 'react';
 import { WordBuilderStatsProps } from '@/types/games/word-builder';
 
-export default function WordBuilderStats({
+const WordBuilderStats: React.FC<WordBuilderStatsProps> = ({
   difficulty,
   time,
   wordsFound,
@@ -10,7 +10,7 @@ export default function WordBuilderStats({
   minWords,
   score,
   hintsUsed
-}: WordBuilderStatsProps): JSX.Element {
+}) => {
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -95,10 +95,12 @@ export default function WordBuilderStats({
       {wordsFound >= minWords && (
         <div className="mt-4 text-center">
           <div className="bg-green-500/20 text-green-300 px-4 py-2 rounded-lg">
-            🎉 Minimum words found! Keep going for bonus points!
+            ðŸŽ‰ Minimum words found! Keep going for bonus points!
           </div>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default WordBuilderStats;

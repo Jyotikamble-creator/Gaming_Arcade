@@ -1,8 +1,8 @@
-// Component to render the Sudoku board with cells, highlights, notes, and pause overlay
+﻿// Component to render the Sudoku board with cells, highlights, notes, and pause overlay
 import React from 'react';
-import type { SudokuBoardProps } from '../../types/games/sudoku';
+import type { SudokuBoardProps } from '@/types/games/sudoku';
 
-export default function SudokuBoard({
+const SudokuBoard: React.FC<SudokuBoardProps> = ({
   board,
   initialBoard,
   selectedCell,
@@ -10,7 +10,7 @@ export default function SudokuBoard({
   notes,
   onCellClick,
   isPaused
-}: SudokuBoardProps): JSX.Element {
+}) => {
   // Helper function to get cell classes
   function getCellClasses(row: number, col: number): string {
     const classes = ['sudoku-cell'];
@@ -274,4 +274,6 @@ export default function SudokuBoard({
       `}</style>
     </div>
   );
-}
+};
+
+export default SudokuBoard;

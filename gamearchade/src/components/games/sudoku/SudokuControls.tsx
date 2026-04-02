@@ -1,8 +1,8 @@
-// Component for Sudoku game controls including number pad, difficulty selector, and action buttons
+﻿// Component for Sudoku game controls including number pad, difficulty selector, and action buttons
 import React from 'react';
-import type { SudokuControlsProps, SudokuDifficulty } from '../../types/games/sudoku';
+import type { SudokuControlsProps, SudokuDifficulty } from '@/types/games/sudoku';
 
-export default function SudokuControls({
+const SudokuControls: React.FC<SudokuControlsProps> = ({
   difficulty,
   notesMode,
   isPaused,
@@ -16,7 +16,7 @@ export default function SudokuControls({
   onNewGame,
   onPause,
   onResume
-}: SudokuControlsProps): JSX.Element {
+}) => {
   const numbers: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   // Difficulty levels
   const difficultyLevels: Array<{ value: SudokuDifficulty, label: string, color: string }> = [
@@ -371,4 +371,6 @@ export default function SudokuControls({
       `}</style>
     </div>
   );
-}
+};
+
+export default SudokuControls;

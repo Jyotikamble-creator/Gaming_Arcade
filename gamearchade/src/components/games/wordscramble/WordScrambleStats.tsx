@@ -1,14 +1,14 @@
-// WordScrambleStats component to display game statistics
+﻿// WordScrambleStats component to display game statistics
 import React from 'react';
 import { WordScrambleStatsProps } from '@/types/games/word-scramble';
 
-export default function WordScrambleStats({
+const WordScrambleStats: React.FC<WordScrambleStatsProps> = ({
   attempts,
   correct,
   showAnswer,
   score = 0,
   maxAttempts = 10
-}: WordScrambleStatsProps): JSX.Element {
+}) => {
   const getStatusColor = () => {
     if (correct) return 'text-green-400';
     if (showAnswer) return 'text-orange-400';
@@ -54,9 +54,9 @@ export default function WordScrambleStats({
         {/* Status */}
         <div className="text-center">
           <div className={`text-lg font-bold mb-1 ${getStatusColor()}`}>
-            {correct && '✅'}
-            {showAnswer && !correct && '👁️'}
-            {!correct && !showAnswer && '🎯'}
+            {correct && 'âœ…'}
+            {showAnswer && !correct && 'ðŸ‘ï¸'}
+            {!correct && !showAnswer && 'ðŸŽ¯'}
           </div>
           <div className="text-gray-300 text-sm">Status</div>
         </div>
@@ -94,28 +94,30 @@ export default function WordScrambleStats({
       <div className="mt-4">
         {correct && (
           <div className="text-center bg-green-500/20 text-green-300 px-4 py-2 rounded-lg">
-            🎉 Congratulations! You unscrambled the word in {attempts} attempt{attempts !== 1 ? 's' : ''}!
+            ðŸŽ‰ Congratulations! You unscrambled the word in {attempts} attempt{attempts !== 1 ? 's' : ''}!
           </div>
         )}
         
         {showAnswer && !correct && (
           <div className="text-center bg-orange-500/20 text-orange-300 px-4 py-2 rounded-lg">
-            💭 Don't worry! Try a new word to practice more.
+            ðŸ’­ Don't worry! Try a new word to practice more.
           </div>
         )}
         
         {!correct && !showAnswer && attempts > 0 && (
           <div className="text-center bg-blue-500/20 text-blue-300 px-4 py-2 rounded-lg">
-            🎯 Keep trying! You have {maxAttempts - attempts} attempts remaining.
+            ðŸŽ¯ Keep trying! You have {maxAttempts - attempts} attempts remaining.
           </div>
         )}
         
         {attempts === 0 && !correct && !showAnswer && (
           <div className="text-center bg-gray-500/20 text-gray-300 px-4 py-2 rounded-lg">
-            🚀 Ready to start? Look at the scrambled letters and make your guess!
+            ðŸš€ Ready to start? Look at the scrambled letters and make your guess!
           </div>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default WordScrambleStats;

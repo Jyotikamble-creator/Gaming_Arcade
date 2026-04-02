@@ -1,9 +1,9 @@
-// TowerCompletedModal component to show game completion modal
+﻿// TowerCompletedModal component to show game completion modal
 import React from 'react';
 import { TowerCompletedModalProps } from '../../../../src/types/towerStacker';
 import { getPerformanceRating, GAME_CONFIG } from '../../../../src/utils/towerStackerUtils';
 
-export default function TowerCompletedModal({ score, level, perfectDrops, onPlayAgain }: TowerCompletedModalProps): JSX.Element {
+const TowerCompletedModal: React.FC<TowerCompletedModalProps> = ({ score, level, perfectDrops, onPlayAgain }) => {
   const rating = getPerformanceRating(level);
 
   return (
@@ -33,7 +33,7 @@ export default function TowerCompletedModal({ score, level, perfectDrops, onPlay
             {level >= GAME_CONFIG.MAX_LEVELS && (
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
                 <p className="text-yellow-400 text-sm font-semibold">
-                  🎉 Perfect Tower! You completed all {GAME_CONFIG.MAX_LEVELS} levels!
+                  ðŸŽ‰ Perfect Tower! You completed all {GAME_CONFIG.MAX_LEVELS} levels!
                 </p>
               </div>
             )}
@@ -41,7 +41,7 @@ export default function TowerCompletedModal({ score, level, perfectDrops, onPlay
             {perfectDrops >= 5 && (
               <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3 mt-2">
                 <p className="text-purple-400 text-sm font-semibold">
-                  ✨ Combo Master! {perfectDrops} perfect drops in a row!
+                  âœ¨ Combo Master! {perfectDrops} perfect drops in a row!
                 </p>
               </div>
             )}
@@ -50,13 +50,13 @@ export default function TowerCompletedModal({ score, level, perfectDrops, onPlay
           {/* Tips */}
           <div className="bg-gray-900/30 rounded-lg p-4 mb-6 text-left">
             <h3 className="text-white font-semibold mb-2 flex items-center">
-              <span className="mr-2">💡</span> Pro Tips:
+              <span className="mr-2">ðŸ’¡</span> Pro Tips:
             </h3>
             <ul className="text-subtle-text text-sm space-y-1">
-              <li>• Perfect drops (±{GAME_CONFIG.PERFECT_DROP_THRESHOLD}px) earn 20 bonus points</li>
-              <li>• Build combo streaks for extra points</li>
-              <li>• Speed increases every 5 levels</li>
-              <li>• Reach level {GAME_CONFIG.MAX_LEVELS} to win the game!</li>
+              <li>â€¢ Perfect drops (Â±{GAME_CONFIG.PERFECT_DROP_THRESHOLD}px) earn 20 bonus points</li>
+              <li>â€¢ Build combo streaks for extra points</li>
+              <li>â€¢ Speed increases every 5 levels</li>
+              <li>â€¢ Reach level {GAME_CONFIG.MAX_LEVELS} to win the game!</li>
             </ul>
           </div>
 
@@ -70,4 +70,6 @@ export default function TowerCompletedModal({ score, level, perfectDrops, onPlay
       </div>
     </div>
   );
-}
+};
+
+export default TowerCompletedModal;

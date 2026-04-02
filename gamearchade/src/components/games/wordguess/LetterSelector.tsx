@@ -1,13 +1,13 @@
-// LetterSelector component for selecting letters
+﻿// LetterSelector component for selecting letters
 import React from 'react';
 import { LetterSelectorProps } from '@/types/games/word-guess';
 import { WORD_GUESS_CONSTANTS } from '@/types/games/word-guess';
 
-export default function LetterSelector({
+const LetterSelector: React.FC<LetterSelectorProps> = ({
   chosenLetters,
   onSelectLetter,
   disabled
-}: LetterSelectorProps): JSX.Element {
+}) => {
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
       <h3 className="text-white text-lg font-semibold mb-4 text-center">
@@ -54,7 +54,7 @@ export default function LetterSelector({
         
         {disabled && (
           <div className="text-orange-400 text-sm font-medium">
-            🎮 Game ended - Start a new game to continue
+            ðŸŽ® Game ended - Start a new game to continue
           </div>
         )}
       </div>
@@ -72,4 +72,6 @@ export default function LetterSelector({
       </div>
     </div>
   );
-}
+};
+
+export default LetterSelector;

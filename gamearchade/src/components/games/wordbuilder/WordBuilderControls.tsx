@@ -1,8 +1,8 @@
-// WordBuilderControls component for game controls and settings
+﻿// WordBuilderControls component for game controls and settings
 import React from 'react';
 import { WordBuilderControlsProps } from '@/types/games/word-builder';
 
-export default function WordBuilderControls({
+const WordBuilderControls: React.FC<WordBuilderControlsProps> = ({
   onSubmit,
   onClear,
   onShuffle,
@@ -14,7 +14,7 @@ export default function WordBuilderControls({
   canSubmit,
   hintsUsed,
   maxHints
-}: WordBuilderControlsProps): JSX.Element {
+}) => {
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
       <h3 className="text-white text-lg font-semibold mb-4 text-center">Game Controls</h3>
@@ -32,7 +32,7 @@ export default function WordBuilderControls({
             }
           `}
         >
-          📝 Submit Word
+          ðŸ“ Submit Word
         </button>
 
         <button
@@ -46,7 +46,7 @@ export default function WordBuilderControls({
             }
           `}
         >
-          🗑️ Clear Word
+          ðŸ—‘ï¸ Clear Word
         </button>
       </div>
 
@@ -63,7 +63,7 @@ export default function WordBuilderControls({
             }
           `}
         >
-          🔄 Shuffle
+          ðŸ”„ Shuffle
         </button>
 
         <button
@@ -77,7 +77,7 @@ export default function WordBuilderControls({
             }
           `}
         >
-          💡 Hint ({maxHints - hintsUsed})
+          ðŸ’¡ Hint ({maxHints - hintsUsed})
         </button>
       </div>
 
@@ -102,14 +102,14 @@ export default function WordBuilderControls({
         onClick={onNewGame}
         className="w-full py-3 px-4 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
       >
-        🎮 New Game
+        ðŸŽ® New Game
       </button>
 
       {/* Game Status */}
       <div className="mt-4 text-center">
         {isCompleted && (
           <div className="bg-green-500/20 text-green-300 px-4 py-2 rounded-lg">
-            🎉 Game Complete!
+            ðŸŽ‰ Game Complete!
           </div>
         )}
         {hintsUsed > 0 && (
@@ -120,4 +120,6 @@ export default function WordBuilderControls({
       </div>
     </div>
   );
-}
+};
+
+export default WordBuilderControls;

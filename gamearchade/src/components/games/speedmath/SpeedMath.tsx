@@ -92,6 +92,16 @@ export default function SpeedMath() {
     setFeedback('');
   };
 
+  const onBackToMenu = () => {
+    // Reset game state and go back
+    setGameStarted(false);
+    setGameCompleted(false);
+    setCurrentProblemIndex(0);
+    setScore(0);
+    setStreak(0);
+    setBestStreak(0);
+  };
+
   const handleSubmit = () => {
     const currentProblem = problems[currentProblemIndex];
     const isCorrect = parseInt(userAnswer) === currentProblem.answer;
@@ -159,8 +169,11 @@ export default function SpeedMath() {
       <SpeedMathCompletedModal
         score={score}
         problemsSolved={currentProblemIndex + 1}
+        totalProblems={problems.length}
+        difficulty="normal"
         bestStreak={bestStreak}
         onRestart={startGame}
+        onBackToMenu={onBackToMenu}
       />
     );
   }

@@ -1,14 +1,14 @@
-// GameMessage component to display game messages and word reveal
+﻿// GameMessage component to display game messages and word reveal
 import React from 'react';
 import { GameMessageProps } from '@/types/games/word-guess';
 
-export default function GameMessage({
+const GameMessage: React.FC<GameMessageProps> = ({
   message,
   word,
   showWord,
   isWon,
   isGameOver
-}: GameMessageProps): JSX.Element {
+}) => {
   if (!message && !showWord) return <></>;
 
   const getMessageStyles = () => {
@@ -23,11 +23,11 @@ export default function GameMessage({
 
   const getMessageIcon = () => {
     if (isWon) {
-      return '🎉';
+      return 'ðŸŽ‰';
     } else if (isGameOver) {
-      return '💥';
+      return 'ðŸ’¥';
     } else {
-      return '📢';
+      return 'ðŸ“¢';
     }
   };
 
@@ -62,7 +62,7 @@ export default function GameMessage({
       {showWord && (
         <div className="bg-gray-800/70 backdrop-blur-sm rounded-xl p-6 border border-gray-600">
           <h3 className="text-white text-lg font-semibold mb-4 text-center">
-            {isWon ? '🏆 The word was:' : '💭 The word was:'}
+            {isWon ? 'ðŸ† The word was:' : 'ðŸ’­ The word was:'}
           </h3>
           
           <div className="flex justify-center items-center mb-4">
@@ -102,12 +102,14 @@ export default function GameMessage({
         <div className="text-center space-y-3">
           <div className="text-gray-400 text-sm">
             {isWon 
-              ? '🎮 Ready for another challenge?' 
-              : '🎮 Want to try again with a new word?'
+              ? 'ðŸŽ® Ready for another challenge?' 
+              : 'ðŸŽ® Want to try again with a new word?'
             }
           </div>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default GameMessage;

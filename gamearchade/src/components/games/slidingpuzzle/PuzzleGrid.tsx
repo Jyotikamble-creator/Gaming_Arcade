@@ -1,4 +1,4 @@
-// Renders the sliding puzzle grid and handles tile interactions, shuffling, and game status display.
+﻿// Renders the sliding puzzle grid and handles tile interactions, shuffling, and game status display.
 interface PuzzleGridProps {
   tiles: (number | null)[];
   gridSize: number;
@@ -9,7 +9,7 @@ interface PuzzleGridProps {
   onReset: () => void;
 }
 
-export default function PuzzleGrid({
+const PuzzleGrid: React.FC<PuzzleGridProps> = ({
   tiles,
   gridSize,
   onTileClick,
@@ -17,7 +17,7 @@ export default function PuzzleGrid({
   gameCompleted,
   onShuffle,
   onReset
-}: PuzzleGridProps): JSX.Element {
+}) => {
   const tileSize = 80;
   const gap = 4;
 
@@ -29,12 +29,12 @@ export default function PuzzleGrid({
         <div className="text-center mb-6">
           {isShuffling && (
             <div className="text-yellow-400 font-semibold mb-2">
-              🔀 Shuffling puzzle...
+              ðŸ”€ Shuffling puzzle...
             </div>
           )}
           {gameCompleted && (
             <div className="text-green-400 font-semibold mb-2">
-              🎉 Puzzle Solved!
+              ðŸŽ‰ Puzzle Solved!
             </div>
           )}
         </div>
@@ -89,14 +89,14 @@ export default function PuzzleGrid({
             disabled={isShuffling}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200"
           >
-            {isShuffling ? '🔀 Shuffling...' : '🎲 New Puzzle'}
+            {isShuffling ? 'ðŸ”€ Shuffling...' : 'ðŸŽ² New Puzzle'}
           </button>
 
           <button
             onClick={onReset}
             className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-colors duration-200"
           >
-            🔄 Reset
+            ðŸ”„ Reset
           </button>
         </div>
 
@@ -108,4 +108,6 @@ export default function PuzzleGrid({
       </div>
     </div>
   );
-}
+};
+
+export default PuzzleGrid;

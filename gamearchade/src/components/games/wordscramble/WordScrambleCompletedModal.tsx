@@ -1,8 +1,8 @@
-// WordScrambleCompletedModal component to display game completion results
+﻿// WordScrambleCompletedModal component to display game completion results
 import React from 'react';
 import { WordScrambleCompletedModalProps } from '@/types/games/word-scramble';
 
-export default function WordScrambleCompletedModal({
+const WordScrambleCompletedModal: React.FC<WordScrambleCompletedModalProps> = ({
   isOpen,
   isCorrect,
   score,
@@ -13,7 +13,7 @@ export default function WordScrambleCompletedModal({
   gameTime = 0,
   onClose,
   onNewGame
-}: WordScrambleCompletedModalProps): JSX.Element {
+}) => {
   if (!isOpen) return <></>;
 
   const formatTime = (seconds: number): string => {
@@ -25,7 +25,7 @@ export default function WordScrambleCompletedModal({
   const getPerformanceRating = () => {
     if (!isCorrect) {
       return {
-        text: '💪 Keep Trying!',
+        text: 'ðŸ’ª Keep Trying!',
         color: 'text-orange-400',
         description: 'Practice makes perfect!'
       };
@@ -33,25 +33,25 @@ export default function WordScrambleCompletedModal({
 
     if (attempts === 1) {
       return {
-        text: '🏆 Perfect!',
+        text: 'ðŸ† Perfect!',
         color: 'text-yellow-400',
         description: 'Amazing! You got it on the first try!'
       };
     } else if (attempts <= 3) {
       return {
-        text: '⭐ Excellent!',
+        text: 'â­ Excellent!',
         color: 'text-blue-400',
         description: 'Outstanding word unscrambling skills!'
       };
     } else if (attempts <= 6) {
       return {
-        text: '👍 Great Job!',
+        text: 'ðŸ‘ Great Job!',
         color: 'text-green-400',
         description: 'Well done! Good problem solving!'
       };
     } else {
       return {
-        text: '🎯 Good Effort!',
+        text: 'ðŸŽ¯ Good Effort!',
         color: 'text-purple-400',
         description: 'Nice work figuring it out!'
       };
@@ -66,7 +66,7 @@ export default function WordScrambleCompletedModal({
         {/* Header */}
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-white mb-2">
-            {isCorrect ? '🎉 Word Unscrambled!' : '🎯 Good Try!'}
+            {isCorrect ? 'ðŸŽ‰ Word Unscrambled!' : 'ðŸŽ¯ Good Try!'}
           </h2>
           <div className={`text-2xl font-bold ${rating.color} mb-2`}>
             {rating.text}
@@ -151,7 +151,7 @@ export default function WordScrambleCompletedModal({
 
         {/* Word Analysis */}
         <div className="bg-gray-700/30 rounded-lg p-4 mb-6">
-          <h4 className="text-white font-semibold mb-3">📊 Word Analysis</h4>
+          <h4 className="text-white font-semibold mb-3">ðŸ“Š Word Analysis</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
             <div>
               <div className="text-green-400 font-bold">{(word.match(/[AEIOU]/gi) || []).length}</div>
@@ -178,7 +178,7 @@ export default function WordScrambleCompletedModal({
             onClick={onNewGame}
             className="w-full py-3 px-6 bg-linear-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
-            🔄 New Word
+            ðŸ”„ New Word
           </button>
           
           <div className="grid grid-cols-2 gap-3">
@@ -201,16 +201,18 @@ export default function WordScrambleCompletedModal({
         {/* Tips */}
         {!isCorrect && (
           <div className="mt-6 p-4 bg-blue-900/30 rounded-lg border border-blue-700">
-            <h4 className="text-blue-400 font-semibold mb-2">💡 Tips for unscrambling:</h4>
+            <h4 className="text-blue-400 font-semibold mb-2">ðŸ’¡ Tips for unscrambling:</h4>
             <ul className="text-blue-200 text-sm space-y-1">
-              <li>• Look for common letter patterns (TH, ING, ED)</li>
-              <li>• Try starting with vowels or common letters</li>
-              <li>• Break longer words into smaller parts</li>
-              <li>• Think about word categories and contexts</li>
+              <li>â€¢ Look for common letter patterns (TH, ING, ED)</li>
+              <li>â€¢ Try starting with vowels or common letters</li>
+              <li>â€¢ Break longer words into smaller parts</li>
+              <li>â€¢ Think about word categories and contexts</li>
             </ul>
           </div>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default WordScrambleCompletedModal;

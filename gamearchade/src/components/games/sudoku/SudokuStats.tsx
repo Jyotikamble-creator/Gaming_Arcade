@@ -1,15 +1,15 @@
-// Component to display Sudoku game statistics including difficulty, time, mistakes, and hints used
+﻿// Component to display Sudoku game statistics including difficulty, time, mistakes, and hints used
 import React from 'react';
-import type { SudokuStatsProps, SudokuDifficulty } from '../../types/games/sudoku';
+import type { SudokuStatsProps, SudokuDifficulty } from '@/types/games/sudoku';
 
-export default function SudokuStats({
+const SudokuStats: React.FC<SudokuStatsProps> = ({
   difficulty,
   time,
   mistakes,
   hintsUsed,
   maxHints,
   maxMistakes = 3
-}: SudokuStatsProps): JSX.Element {
+}) => {
   // Helper function to format time in mm:ss
   function formatTime(seconds: number): string {
     const mins = Math.floor(seconds / 60);
@@ -19,9 +19,9 @@ export default function SudokuStats({
 
   // Difficulty configuration
   const difficultyConfig: Record<SudokuDifficulty, { color: string, label: string, emoji: string }> = {
-    easy: { color: 'green', label: 'Easy', emoji: '😊' },
-    medium: { color: 'yellow', label: 'Medium', emoji: '🤔' },
-    hard: { color: 'red', label: 'Hard', emoji: '😤' }
+    easy: { color: 'green', label: 'Easy', emoji: 'ðŸ˜Š' },
+    medium: { color: 'yellow', label: 'Medium', emoji: 'ðŸ¤”' },
+    hard: { color: 'red', label: 'Hard', emoji: 'ðŸ˜¤' }
   };
 
   const config = difficultyConfig[difficulty] || difficultyConfig.easy;
@@ -272,4 +272,6 @@ export default function SudokuStats({
       `}</style>
     </div>
   );
-}
+};
+
+export default SudokuStats;

@@ -1,14 +1,14 @@
-// WhackMoleGrid component to render the game grid
+﻿// WhackMoleGrid component to render the game grid
 import React from 'react';
 import { WhackMoleGridProps } from '@/types/games/whack-a-mole';
 
-export default function WhackMoleGrid({ 
+const WhackMoleGrid: React.FC<WhackMoleGridProps> = ({ 
   grid, 
   active, 
   gameStarted, 
   gameEnded, 
   onWhack 
-}: WhackMoleGridProps): JSX.Element {
+}) => {
   const gridCols = Math.ceil(Math.sqrt(grid.length));
   
   return (
@@ -40,7 +40,7 @@ export default function WhackMoleGrid({
               {/* Mole */}
               {active === hole && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-2xl animate-ping">🐭</div>
+                  <div className="text-2xl animate-ping">ðŸ­</div>
                 </div>
               )}
             </div>
@@ -57,10 +57,12 @@ export default function WhackMoleGrid({
       <div className="text-center mt-6">
         <p className="text-gray-300 text-sm">
           {!gameStarted && !gameEnded && 'Click "Start Game" to begin!'}
-          {gameStarted && !gameEnded && 'Click the moles as quickly as you can! 🔨'}
+          {gameStarted && !gameEnded && 'Click the moles as quickly as you can! ðŸ”¨'}
           {gameEnded && 'Game Over! Click "Play Again" to restart.'}
         </p>
       </div>
     </div>
   );
-}
+};
+
+export default WhackMoleGrid;

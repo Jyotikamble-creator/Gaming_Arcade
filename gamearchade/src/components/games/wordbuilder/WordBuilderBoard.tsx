@@ -1,14 +1,14 @@
-// WordBuilderBoard component for displaying letters and current word
+﻿// WordBuilderBoard component for displaying letters and current word
 import React from 'react';
 import { WordBuilderBoardProps } from '@/types/games/word-builder';
 
-export default function WordBuilderBoard({
+const WordBuilderBoard: React.FC<WordBuilderBoardProps> = ({
   availableLetters,
   currentWord,
   foundWords,
   onLetterClick,
   onRemoveLetter
-}: WordBuilderBoardProps): JSX.Element {
+}) => {
   return (
     <div className="space-y-8">
       {/* Current Word Display */}
@@ -94,4 +94,6 @@ export default function WordBuilderBoard({
       )}
     </div>
   );
-}
+};
+
+export default WordBuilderBoard;

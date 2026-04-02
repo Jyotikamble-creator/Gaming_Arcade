@@ -1,8 +1,8 @@
-// WordScrambleInput component for guess input and controls
+﻿// WordScrambleInput component for guess input and controls
 import React from 'react';
 import { WordScrambleInputProps } from '@/types/games/word-scramble';
 
-export default function WordScrambleInput({
+const WordScrambleInput: React.FC<WordScrambleInputProps> = ({
   guess,
   onChange,
   onCheck,
@@ -13,7 +13,7 @@ export default function WordScrambleInput({
   disabled = false,
   attempts = 0,
   maxAttempts = 10
-}: WordScrambleInputProps): JSX.Element {
+}) => {
   const isGameOver = correct || showAnswer || disabled;
   const hasReachedMaxAttempts = attempts >= maxAttempts;
 
@@ -64,7 +64,7 @@ export default function WordScrambleInput({
                 onClick={() => onChange('')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
               >
-                ✕
+                âœ•
               </button>
             )}
           </div>
@@ -84,7 +84,7 @@ export default function WordScrambleInput({
               }
             `}
           >
-            {correct ? '✅ Correct!' : '🎯 Check Answer'}
+            {correct ? 'âœ… Correct!' : 'ðŸŽ¯ Check Answer'}
           </button>
 
           {/* Reveal Answer Button */}
@@ -95,7 +95,7 @@ export default function WordScrambleInput({
               disabled={isGameOver}
               className="px-6 py-3 bg-yellow-600 hover:bg-yellow-500 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
-              💡 Reveal Answer
+              ðŸ’¡ Reveal Answer
             </button>
           )}
 
@@ -105,7 +105,7 @@ export default function WordScrambleInput({
             onClick={onNewWord}
             className="px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
-            🔄 New Word
+            ðŸ”„ New Word
           </button>
         </div>
       </form>
@@ -114,25 +114,25 @@ export default function WordScrambleInput({
       <div className="mt-4 space-y-2">
         {hasReachedMaxAttempts && !correct && (
           <div className="text-center bg-red-500/20 text-red-300 px-4 py-2 rounded-lg text-sm">
-            ❌ Maximum attempts reached! Try a new word.
+            âŒ Maximum attempts reached! Try a new word.
           </div>
         )}
 
         {guess.length > 15 && (
           <div className="text-center bg-orange-500/20 text-orange-300 px-4 py-2 rounded-lg text-sm">
-            ⚠️ That seems quite long. Are you sure?
+            âš ï¸ That seems quite long. Are you sure?
           </div>
         )}
 
         {!isGameOver && !hasReachedMaxAttempts && attempts > 0 && (
           <div className="text-center text-gray-400 text-sm">
-            💭 Attempt {attempts} of {maxAttempts}
+            ðŸ’­ Attempt {attempts} of {maxAttempts}
           </div>
         )}
 
         {!isGameOver && attempts === 0 && (
           <div className="text-center text-gray-400 text-sm">
-            💡 Type your guess and press Enter or click "Check Answer"
+            ðŸ’¡ Type your guess and press Enter or click "Check Answer"
           </div>
         )}
       </div>
@@ -140,9 +140,11 @@ export default function WordScrambleInput({
       {/* Input Validation */}
       {guess && !/^[A-Za-z]+$/.test(guess) && (
         <div className="mt-2 text-center bg-orange-500/20 text-orange-300 px-4 py-2 rounded-lg text-sm">
-          ⚠️ Please use only letters (A-Z)
+          âš ï¸ Please use only letters (A-Z)
         </div>
       )}
     </div>
   );
-}
+};
+
+export default WordScrambleInput;

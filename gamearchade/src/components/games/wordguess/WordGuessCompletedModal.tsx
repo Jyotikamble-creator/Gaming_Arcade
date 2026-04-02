@@ -1,9 +1,9 @@
-// WordGuessCompletedModal component to display game completion results
+﻿// WordGuessCompletedModal component to display game completion results
 import React from 'react';
 import { WordGuessCompletedModalProps } from '@/types/games/word-guess';
 import { getPerformanceRating, WORD_GUESS_CONSTANTS } from '@/utility/games/word-guess';
 
-export default function WordGuessCompletedModal({
+const WordGuessCompletedModal: React.FC<WordGuessCompletedModalProps> = ({
   isOpen,
   isWon,
   score,
@@ -13,7 +13,7 @@ export default function WordGuessCompletedModal({
   hintsUsed,
   onClose,
   onNewGame
-}: WordGuessCompletedModalProps): JSX.Element {
+}) => {
   if (!isOpen) return <></>;
 
   const rating = getPerformanceRating(isWon, score, wrongGuesses, hintsUsed);
@@ -27,7 +27,7 @@ export default function WordGuessCompletedModal({
         {/* Header */}
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-white mb-2">
-            {isWon ? '🎉 Congratulations!' : '💥 Game Over!'}
+            {isWon ? 'ðŸŽ‰ Congratulations!' : 'ðŸ’¥ Game Over!'}
           </h2>
           <div className={`text-2xl font-bold ${rating.color} mb-2`}>
             {rating.text}
@@ -97,7 +97,7 @@ export default function WordGuessCompletedModal({
           {/* Correct Letters */}
           <div className="bg-gray-700/30 rounded-lg p-4">
             <h4 className="text-green-400 font-semibold mb-3">
-              ✅ Correct Letters ({correctLetters.length})
+              âœ… Correct Letters ({correctLetters.length})
             </h4>
             <div className="flex flex-wrap gap-2">
               {correctLetters.length > 0 ? (
@@ -118,7 +118,7 @@ export default function WordGuessCompletedModal({
           {/* Wrong Letters */}
           <div className="bg-gray-700/30 rounded-lg p-4">
             <h4 className="text-red-400 font-semibold mb-3">
-              ❌ Wrong Letters ({wrongLetters.length})
+              âŒ Wrong Letters ({wrongLetters.length})
             </h4>
             <div className="flex flex-wrap gap-2">
               {wrongLetters.length > 0 ? (
@@ -143,7 +143,7 @@ export default function WordGuessCompletedModal({
             onClick={onNewGame}
             className="w-full py-3 px-6 bg-linear-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
-            🎮 Play Again
+            ðŸŽ® Play Again
           </button>
           
           <div className="grid grid-cols-2 gap-3">
@@ -166,16 +166,18 @@ export default function WordGuessCompletedModal({
         {/* Tips */}
         {!isWon && (
           <div className="mt-6 p-4 bg-blue-900/30 rounded-lg border border-blue-700">
-            <h4 className="text-blue-400 font-semibold mb-2">💡 Tips for next time:</h4>
+            <h4 className="text-blue-400 font-semibold mb-2">ðŸ’¡ Tips for next time:</h4>
             <ul className="text-blue-200 text-sm space-y-1">
-              <li>• Start with vowels (A, E, I, O, U)</li>
-              <li>• Try common consonants (R, S, T, L, N)</li>
-              <li>• Use hints when you're really stuck</li>
-              <li>• Think about the word category for clues</li>
+              <li>â€¢ Start with vowels (A, E, I, O, U)</li>
+              <li>â€¢ Try common consonants (R, S, T, L, N)</li>
+              <li>â€¢ Use hints when you're really stuck</li>
+              <li>â€¢ Think about the word category for clues</li>
             </ul>
           </div>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default WordGuessCompletedModal;

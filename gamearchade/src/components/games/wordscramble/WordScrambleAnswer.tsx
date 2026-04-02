@@ -1,13 +1,13 @@
-// WordScrambleAnswer component to reveal the correct answer
+﻿// WordScrambleAnswer component to reveal the correct answer
 import React from 'react';
 import { WordScrambleAnswerProps } from '@/types/games/word-scramble';
 
-export default function WordScrambleAnswer({
+const WordScrambleAnswer: React.FC<WordScrambleAnswerProps> = ({
   word,
   show,
   isCorrect = false,
   attempts = 0
-}: WordScrambleAnswerProps): JSX.Element {
+}) => {
   if (!show) return <></>;
 
   return (
@@ -19,7 +19,7 @@ export default function WordScrambleAnswer({
         <h3 className={`text-xl font-semibold mb-6 ${
           isCorrect ? 'text-green-400' : 'text-orange-400'
         }`}>
-          {isCorrect ? '🎉 Correct Answer!' : '💭 The Answer Was:'}
+          {isCorrect ? 'ðŸŽ‰ Correct Answer!' : 'ðŸ’­ The Answer Was:'}
         </h3>
         
         {/* Word Display */}
@@ -68,10 +68,10 @@ export default function WordScrambleAnswer({
                 : 'bg-purple-500/20 text-purple-300'
             }`}>
               <p className="font-semibold mb-1">
-                {attempts === 1 && '🏆 Perfect! First try!'}
-                {attempts > 1 && attempts <= 3 && '⭐ Excellent work!'}
-                {attempts > 3 && attempts <= 6 && '👍 Good job!'}
-                {attempts > 6 && '🎯 Well done, you got it!'}
+                {attempts === 1 && 'ðŸ† Perfect! First try!'}
+                {attempts > 1 && attempts <= 3 && 'â­ Excellent work!'}
+                {attempts > 3 && attempts <= 6 && 'ðŸ‘ Good job!'}
+                {attempts > 6 && 'ðŸŽ¯ Well done, you got it!'}
               </p>
               <p className="text-sm opacity-90">
                 Solved in {attempts} attempt{attempts !== 1 ? 's' : ''}
@@ -81,7 +81,7 @@ export default function WordScrambleAnswer({
 
           {!isCorrect && (
             <div className="bg-orange-500/20 text-orange-300 p-4 rounded-lg">
-              <p className="font-semibold mb-1">💪 Don't give up!</p>
+              <p className="font-semibold mb-1">ðŸ’ª Don't give up!</p>
               <p className="text-sm opacity-90">
                 Try a new word to practice your unscrambling skills
               </p>
@@ -121,11 +121,13 @@ export default function WordScrambleAnswer({
         {/* Encouragement */}
         <div className="mt-6 text-gray-400 text-sm">
           {isCorrect 
-            ? '🎮 Ready for another challenge? Click "New Word" to continue!' 
-            : '🔄 Click "New Word" to try a different scramble!'
+            ? 'ðŸŽ® Ready for another challenge? Click "New Word" to continue!' 
+            : 'ðŸ”„ Click "New Word" to try a different scramble!'
           }
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default WordScrambleAnswer;

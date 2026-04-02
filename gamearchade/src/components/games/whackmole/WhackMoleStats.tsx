@@ -1,14 +1,14 @@
-// WhackMoleStats component to display game statistics
+﻿// WhackMoleStats component to display game statistics
 import React from 'react';
 import { WhackMoleStatsProps } from '@/types/games/whack-a-mole';
 import { formatGameDuration } from '@/utility/games/whack-a-mole';
 
-export default function WhackMoleStats({ 
+const WhackMoleStats: React.FC<WhackMoleStatsProps> = ({ 
   score, 
   timeLeft, 
   gameStatus,
   accuracy 
-}: WhackMoleStatsProps): JSX.Element {
+}) => {
   return (
     <div className="flex justify-center gap-4 mb-8 flex-wrap">
       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center min-w-[100px]">
@@ -48,4 +48,6 @@ export default function WhackMoleStats({
       )}
     </div>
   );
-}
+};
+
+export default WhackMoleStats;

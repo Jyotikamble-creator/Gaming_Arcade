@@ -1,8 +1,8 @@
-// GameControls component for game actions
+﻿// GameControls component for game actions
 import React from 'react';
 import { GameControlsProps } from '@/types/games/word-guess';
 
-export default function GameControls({
+const GameControls: React.FC<GameControlsProps> = ({
   onRemoveLast,
   onUseHint,
   onGuess,
@@ -10,7 +10,7 @@ export default function GameControls({
   chosenLetters,
   hints,
   disabled
-}: GameControlsProps): JSX.Element {
+}) => {
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
       <h3 className="text-white text-lg font-semibold mb-4 text-center">
@@ -31,14 +31,14 @@ export default function GameControls({
               }
             `}
           >
-            🎯 Check Word
+            ðŸŽ¯ Check Word
           </button>
 
           <button
             onClick={onRestart}
             className="w-full py-3 px-4 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
-            🔄 New Word
+            ðŸ”„ New Word
           </button>
         </div>
 
@@ -55,7 +55,7 @@ export default function GameControls({
               }
             `}
           >
-            ⬅️ Remove Last
+            â¬…ï¸ Remove Last
           </button>
 
           <button
@@ -69,7 +69,7 @@ export default function GameControls({
               }
             `}
           >
-            💡 Use Hint
+            ðŸ’¡ Use Hint
             {hints > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
                 {hints}
@@ -85,9 +85,9 @@ export default function GameControls({
         <div className="text-center">
           <div className={`text-sm font-medium ${hints > 0 ? 'text-yellow-400' : 'text-gray-500'}`}>
             {hints > 0 ? (
-              <>💡 {hints} hint{hints !== 1 ? 's' : ''} remaining</>
+              <>ðŸ’¡ {hints} hint{hints !== 1 ? 's' : ''} remaining</>
             ) : (
-              <>💡 No hints remaining</>
+              <>ðŸ’¡ No hints remaining</>
             )}
           </div>
         </div>
@@ -105,7 +105,7 @@ export default function GameControls({
         {disabled && (
           <div className="text-center">
             <div className="bg-blue-500/20 text-blue-300 px-4 py-2 rounded-lg text-sm">
-              🎮 Game finished - Click "New Word" to play again
+              ðŸŽ® Game finished - Click "New Word" to play again
             </div>
           </div>
         )}
@@ -114,15 +114,17 @@ export default function GameControls({
       {/* Tips */}
       {!disabled && (
         <div className="mt-6 p-4 bg-gray-700/30 rounded-lg border border-gray-600">
-          <h4 className="text-gray-300 font-semibold text-sm mb-2">💡 Tips:</h4>
+          <h4 className="text-gray-300 font-semibold text-sm mb-2">ðŸ’¡ Tips:</h4>
           <ul className="text-gray-400 text-xs space-y-1">
-            <li>• Start with common vowels (A, E, I, O, U)</li>
-            <li>• Try frequent consonants (R, S, T, L, N)</li>
-            <li>• Use hints wisely - they cost points!</li>
-            <li>• Remove last letter if you make a mistake</li>
+            <li>â€¢ Start with common vowels (A, E, I, O, U)</li>
+            <li>â€¢ Try frequent consonants (R, S, T, L, N)</li>
+            <li>â€¢ Use hints wisely - they cost points!</li>
+            <li>â€¢ Remove last letter if you make a mistake</li>
           </ul>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default GameControls;

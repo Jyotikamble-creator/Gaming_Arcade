@@ -1,9 +1,9 @@
-// TowerDisplay component to render the game area
+﻿// TowerDisplay component to render the game area
 import React from 'react';
 import { TowerDisplayProps } from '@/types/games/tower-stacker';
 import { GAME_CONFIG, getBlockColor } from '@/utility/games/tower-stacker';
 
-export default function TowerDisplay({ 
+const TowerDisplay: React.FC<TowerDisplayProps> = ({ 
   tower, 
   currentBlock, 
   containerWidth, 
@@ -11,7 +11,7 @@ export default function TowerDisplay({
   gameState, 
   onStart, 
   onDrop 
-}: TowerDisplayProps): JSX.Element {
+}) => {
   const containerHeight = GAME_CONFIG.CONTAINER_HEIGHT;
   const maxVisibleBlocks = Math.floor(containerHeight / blockHeight);
 
@@ -97,7 +97,7 @@ export default function TowerDisplay({
                 <div className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-lg">
                   <div className="text-center">
                     <h3 className="text-3xl font-bold text-white mb-4">
-                      {tower.length >= GAME_CONFIG.MAX_LEVELS ? '🎉 You Win!' : 'Game Over!'}
+                      {tower.length >= GAME_CONFIG.MAX_LEVELS ? 'ðŸŽ‰ You Win!' : 'Game Over!'}
                     </h3>
                     <p className="text-subtle-text mb-6">
                       {tower.length >= GAME_CONFIG.MAX_LEVELS 
@@ -134,4 +134,6 @@ export default function TowerDisplay({
       </div>
     </div>
   );
-}
+};
+
+export default TowerDisplay;

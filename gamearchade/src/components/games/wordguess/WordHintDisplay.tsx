@@ -1,11 +1,11 @@
-// WordHintDisplay component to show word description and category
+﻿// WordHintDisplay component to show word description and category
 import React from 'react';
 import { WordHintDisplayProps } from '@/types/games/word-guess';
 
-export default function WordHintDisplay({
+const WordHintDisplay: React.FC<WordHintDisplayProps> = ({
   description,
   category
-}: WordHintDisplayProps): JSX.Element {
+}) => {
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 mb-6">
       <div className="text-center">
@@ -20,7 +20,7 @@ export default function WordHintDisplay({
 
         {/* Hint Title */}
         <h3 className="text-xl font-semibold text-blue-400 mb-4 flex items-center justify-center gap-2">
-          <span>💡</span>
+          <span>ðŸ’¡</span>
           Word Hint
         </h3>
 
@@ -38,4 +38,6 @@ export default function WordHintDisplay({
       </div>
     </div>
   );
-}
+};
+
+export default WordHintDisplay;
