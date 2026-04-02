@@ -30,7 +30,7 @@ const WordBuilderCompletedModal = dynamic(() => import('@/components/games/wordb
   ssr: false
 });
 
-export default function WordBuilderPage(): JSX.Element {
+export default function WordBuilderPage() {
   const { user } = useAuth();
   const [gameKey, setGameKey] = useState<number>(0);
   

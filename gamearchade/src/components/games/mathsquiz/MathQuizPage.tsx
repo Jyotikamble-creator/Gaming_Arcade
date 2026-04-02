@@ -306,7 +306,7 @@ const MathQuizPage: React.FC<MathQuizPageProps> = ({
 
         {/* Leaderboard */}
         <div className="mt-12">
-          <Leaderboard game="math-quiz" />
+          <Leaderboard gameType="math-quiz" />
         </div>
       </div>
 

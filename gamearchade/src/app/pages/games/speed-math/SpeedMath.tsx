@@ -5,16 +5,16 @@ import { submitScore } from '@/lib/api/client';
 // Logger Imports
 import { logger } from '@/lib/logger';
 // Component Imports
-import Instructions from '../../../components/shared/Instructions';
-import Leaderboard from '../../../components/leaderboard/Leaderboard';
-import SpeedMathProblem from '../../../components/games/speedmath/SpeedMathProblem';
-import SpeedMathStats from '../../../components/games/speedmath/SpeedMathStats';
-import SpeedMathTimer from '../../../components/games/speedmath/SpeedMathTimer';
-import SpeedMathCompletedModal from '../../../components/games/speedmath/SpeedMathCompletedModal';
-import AnimatedBackground from '../../../components/AnimatedBackground';
+import Instructions from '@/components/shared/Instructions';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
+import SpeedMathProblem from '@/components/games/speedmath/SpeedMathProblem';
+import SpeedMathStats from '@/components/games/speedmath/SpeedMathStats';
+import SpeedMathTimer from '@/components/games/speedmath/SpeedMathTimer';
+import SpeedMathCompletedModal from '@/components/games/speedmath/SpeedMathCompletedModal';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 // Main Speed Math Component
-export default function SpeedMath(): JSX.Element {
+export default function SpeedMath() {
   const [difficulty, setDifficulty] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentProblem, setCurrentProblem] = useState<{
@@ -142,7 +142,7 @@ export default function SpeedMath(): JSX.Element {
         difficulty
       });
     } catch (error) {
-      logger.error('Failed to submit Speed Math score', error, {});
+      logger.error('Speed Math', 'Failed to submit score', { error: error instanceof Error ? error.message : String(error) });
     }
   }, [score, problemsSolved, totalProblems, difficulty, bestStreak]);
 
@@ -346,7 +346,7 @@ export default function SpeedMath(): JSX.Element {
         {/* Leaderboard */}
         {!isPlaying && (
           <div className="mt-12">
-            <Leaderboard game="speed-math" />
+            <Leaderboard gameType="speed-math" />
           </div>
         )}
       </div>

@@ -9,6 +9,7 @@ interface QuizQuestion {
   q: string
   options: string[]
   ans: string
+  points?: number
 }
 
 export default function QuizPage() {

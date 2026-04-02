@@ -135,11 +135,7 @@ export default function BrainTeaserPage({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Instructions
-                gameType="brain-teaser"
-                onClose={() => setGameState("menu")}
-                onStartGame={handleStartGame}
-              />
+              <Instructions gameType="brain-teaser" />
             </motion.div>
           )}
 
@@ -248,10 +244,7 @@ export default function BrainTeaserPage({
             exit={{ x: "100%" }}
             className="fixed top-0 right-0 h-full w-80 bg-black/50 backdrop-blur-lg z-50 p-6"
           >
-            <Leaderboard
-              gameType="brain-teaser"
-              onClose={() => setShowLeaderboard(false)}
-            />
+            <Leaderboard gameType="brain-teaser" />
           </motion.div>
         )}
       </AnimatePresence>

@@ -19,10 +19,13 @@ import DashboardLayout from '@/components/shared/DashboardLayout';
 import type {
   SudokuDifficulty,
   SudokuBoard as BoardGrid,
-  SudokuCellPosition,
-  SudokuNotes,
-  SudokuGameState
-} from '../types/games/sudoku';
+  ISudokuCell,
+  ISudokuSession
+} from '@/types/games/sudoku';
+
+// Local type definitions
+type SudokuCellPosition = { row: number; col: number };
+type SudokuNotes = Record<string, number[]>; // "row,col" -> array of numbers
 
 // Generate a complete valid Sudoku board
 function generateCompleteBoard(): BoardGrid {
@@ -84,7 +87,8 @@ function createPuzzle(difficulty: SudokuDifficulty = 'medium'): { puzzle: BoardG
   const cellsToRemove: Record<SudokuDifficulty, number> = {
     easy: 30,
     medium: 45,
-    hard: 55
+    hard: 55,
+    expert: 65
   };
 
   const toRemove = cellsToRemove[difficulty] || 45;
@@ -104,7 +108,7 @@ function createPuzzle(difficulty: SudokuDifficulty = 'medium'): { puzzle: BoardG
 }
 
 // Main component
-export default function Sudoku(): JSX.Element {
+export default function Sudoku() {
   const [difficulty, setDifficulty] = useState<SudokuDifficulty>('medium');
   const [puzzle, setPuzzle] = useState<BoardGrid | null>(null);
   const [solution, setSolution] = useState<BoardGrid | null>(null);
@@ -275,7 +279,7 @@ export default function Sudoku(): JSX.Element {
         const finalTime = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
 
         // Calculate score based on time, mistakes, hints, and difficulty
-        const difficultyMultiplier: Record<SudokuDifficulty, number> = { easy: 1, medium: 1.5, hard: 2 };
+        const difficultyMultiplier: Record<SudokuDifficulty, number> = { easy: 1, medium: 1.5, hard: 2, expert: 2.5 };
         const baseScore = 1000 * difficultyMultiplier[difficulty];
         const timePenalty = Math.min(finalTime, 600); // Max 600 seconds penalty
         const mistakesPenalty = mistakes * 50;
@@ -377,7 +381,7 @@ export default function Sudoku(): JSX.Element {
               onClear={handleClearCell}
               onHint={handleHint}
               onNewGame={() => startNewGame(difficulty)}
-              onDifficultyChange={(diff) => {
+              onDifficultyChange={(diff: SudokuDifficulty) => {
                 if (window.confirm('Start a new game with different difficulty?')) {
                   startNewGame(diff);
                 }
@@ -403,7 +407,7 @@ export default function Sudoku(): JSX.Element {
         {isCompleted && (
           <SudokuCompletedModal
             isOpen={isCompleted}
-            score={Math.max(Math.round((1000 * ({ easy: 1, medium: 1.5, hard: 2 }[difficulty])) - Math.min(elapsedTime, 600) - (mistakes * 50) - (hintsUsed * 100)), 100)}
+            score={Math.max(Math.round((1000 * ({ easy: 1, medium: 1.5, hard: 2, expert: 2.5 }[difficulty])) - Math.min(elapsedTime, 600) - (mistakes * 50) - (hintsUsed * 100)), 100)}
             time={elapsedTime}
             mistakes={mistakes}
             hintsUsed={hintsUsed}
@@ -415,7 +419,7 @@ export default function Sudoku(): JSX.Element {
 
         {/* Leaderboard */}
         <div className="mt-12">
-          <Leaderboard game="sudoku" />
+          <Leaderboard gameType="sudoku" />
         </div>
         </div>
       </div>

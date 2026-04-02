@@ -1,11 +1,13 @@
 // Modal displayed at the end of a Simon Says game, showing score and restart option.
+import React from 'react';
+
 interface SimonSaysGameOverModalProps {
   gameWon: boolean;
   round: number;
   onRestart: () => void;
 }
 
-const SimonSaysGameOverModal = ({ gameWon, round, onRestart }: SimonSaysGameOverModalProps): JSX.Element => {
+const SimonSaysGameOverModal: React.FC<SimonSaysGameOverModalProps> = ({ gameWon, round, onRestart }) => {
   const score = gameWon ? 100 : (round - 1);
 
   // Render the modal

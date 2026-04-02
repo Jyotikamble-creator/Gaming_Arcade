@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { useWhackMole } from '@/hooks/games/useWhackMole';
-import { WhackMoleSettings } from '@/types/games/whack-a-mole';
+import { WhackGameSettings } from '@/types/games/whack-a-mole';
 import DashboardLayout from '@/components/shared/DashboardLayout';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorComponent from '@/components/shared/ErrorComponent';
@@ -22,12 +22,22 @@ const WhackMoleGameOverModal = dynamic(() => import('@/components/games/whackmol
   ssr: false
 });
 
-export default function WhackMolePage(): JSX.Element {
+export default function WhackMolePage() {
   const { user } = useAuth();
-  const [settings, setSettings] = useState<WhackMoleSettings>({
-    gridSize: 9,
-    gameTime: 60,
-    moleSpeed: 1000
+  const [settings, setSettings] = useState<WhackGameSettings>({
+    soundEnabled: true,
+    vibrationEnabled: true,
+    showReactionTime: false,
+    showStreakCounter: true,
+    showComboMultiplier: true,
+    highlightMoles: false,
+    difficulty: 'normal',
+    gameMode: 'classic',
+    customDuration: 60,
+    customGridSize: 9,
+    enablePowerUps: false,
+    enableSpecialMoles: false,
+    autoRestart: false
   });
   const [gameKey, setGameKey] = useState<number>(0);
   
@@ -44,14 +54,14 @@ export default function WhackMolePage(): JSX.Element {
     startGame,
     whackMole,
     resetGame
-  } = useWhackMole(settings);
+  } = useWhackMole();
 
   const handleRestart = (): void => {
     resetGame();
     setGameKey(prev => prev + 1);
   };
 
-  const handleSettingsChange = (newSettings: WhackMoleSettings): void => {
+  const handleSettingsChange = (newSettings: WhackGameSettings): void => {
     setSettings(newSettings);
     resetGame();
     setGameKey(prev => prev + 1);
@@ -113,10 +123,10 @@ export default function WhackMolePage(): JSX.Element {
                 <div>
                   <label className="block text-gray-300 text-sm mb-2">Grid Size</label>
                   <select
-                    value={settings.gridSize}
+                    value={settings.customGridSize || 9}
                     onChange={(e) => handleSettingsChange({ 
                       ...settings, 
-                      gridSize: Number(e.target.value) as 9 | 16 
+                      customGridSize: Number(e.target.value) as 9 | 16 
                     })}
                     className="w-full p-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
                   >
@@ -128,32 +138,16 @@ export default function WhackMolePage(): JSX.Element {
                 <div>
                   <label className="block text-gray-300 text-sm mb-2">Game Time (seconds)</label>
                   <select
-                    value={settings.gameTime}
+                    value={settings.customDuration || 60}
                     onChange={(e) => handleSettingsChange({ 
                       ...settings, 
-                      gameTime: Number(e.target.value) 
+                      customDuration: Number(e.target.value) 
                     })}
                     className="w-full p-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
                   >
                     <option value={30}>30 seconds</option>
                     <option value={60}>60 seconds</option>
                     <option value={90}>90 seconds</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-300 text-sm mb-2">Mole Speed</label>
-                  <select
-                    value={settings.moleSpeed}
-                    onChange={(e) => handleSettingsChange({ 
-                      ...settings, 
-                      moleSpeed: Number(e.target.value) 
-                    })}
-                    className="w-full p-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                  >
-                    <option value={1500}>Slow (1.5s)</option>
-                    <option value={1000}>Normal (1s)</option>
-                    <option value={500}>Fast (0.5s)</option>
                   </select>
                 </div>
               </div>
@@ -174,7 +168,7 @@ export default function WhackMolePage(): JSX.Element {
           {!isGameStarted && !isGameOver && (
             <div className="text-center mb-8">
               <button
-                onClick={startGame}
+                onClick={() => startGame()}
                 className="px-8 py-4 bg-linear-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold text-xl rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 🔨 Start Whacking!
@@ -188,7 +182,7 @@ export default function WhackMolePage(): JSX.Element {
               <WhackMoleGrid
                 key={`grid-${gameKey}`}
                 gameState={gameState}
-                gridSize={settings.gridSize}
+                gridSize={settings.customGridSize}
                 onMoleClick={whackMole}
               />
             </div>

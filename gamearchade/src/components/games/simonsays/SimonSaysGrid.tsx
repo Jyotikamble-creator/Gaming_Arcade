@@ -1,4 +1,6 @@
 // Renders a grid of colored buttons for the Simon Says game.
+import React from 'react';
+
 interface SimonSaysGridProps {
   colors: string[];
   activeColor: string | null;
@@ -8,14 +10,14 @@ interface SimonSaysGridProps {
   onPress: (color: string) => void;
 }
 
-const SimonSaysGrid = ({
+const SimonSaysGrid: React.FC<SimonSaysGridProps> = ({
   colors,
   activeColor,
   isShowingSequence,
   gameOver,
   gameWon,
   onPress
-}: SimonSaysGridProps): JSX.Element => {
+}) => {
   const getColorClasses = (color: string): string => {
     const baseClasses = 'w-20 h-20 rounded-full font-bold text-white text-lg transition-all duration-200 transform hover:scale-105 shadow-lg';
     const colorMap: Record<string, string> = {

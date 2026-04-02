@@ -1,11 +1,13 @@
 // Displays game statistics for the Simon Says game.
+import React from 'react';
+
 interface SimonSaysStatsProps {
   round: number;
   sequenceLength: number;
   gameStatus: string;
 }
 
-const SimonSaysStats = ({ round, sequenceLength, gameStatus }: SimonSaysStatsProps): JSX.Element => {
+const SimonSaysStats: React.FC<SimonSaysStatsProps> = ({ round, sequenceLength, gameStatus }) => {
   return (
     <div className="flex justify-center gap-6 mb-8">
       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">

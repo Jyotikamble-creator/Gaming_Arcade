@@ -20,7 +20,8 @@ const AuthLogTags = {
   LOGOUT: "LOGOUT",
   SESSIONS: "SESSIONS",
   TOKEN_MANAGER: "TOKEN_MANAGER",
-  PROFILE_UPDATE: "PROFILE_UPDATE"
+  PROFILE_UPDATE: "PROFILE_UPDATE",
+  PASSWORD_RESET: "PASSWORD_RESET"
 } as const;
 
 type AuthLogTag = typeof AuthLogTags[keyof typeof AuthLogTags];
@@ -367,6 +368,35 @@ export class AuthApiClient {
       authLogger.error("Token refresh failed", error, {}, AuthLogTags.TOKEN_MANAGER);
       // Clear invalid token
       removeStoredToken();
+      throw this.handleAuthError(error);
+    }
+  }
+
+  /**
+   * Reset password with token
+   */
+  async resetPassword(data: { token: string; password: string }): Promise<ApiResponse<AuthResponse>> {
+    try {
+      authLogger.info("Password reset initiated", {}, AuthLogTags.PASSWORD_RESET);
+      
+      const response = await this.api.post<AuthResponse>("/auth/reset-password", data);
+      const { token, user } = response.data;
+
+      if (token) {
+        storeToken(token);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem("user", JSON.stringify(user));
+        }
+      }
+
+      authLogger.info("Password reset successful", { userId: user.id }, AuthLogTags.PASSWORD_RESET);
+
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      authLogger.error("Password reset failed", error, {}, AuthLogTags.PASSWORD_RESET);
       throw this.handleAuthError(error);
     }
   }

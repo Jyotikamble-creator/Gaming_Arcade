@@ -16,7 +16,7 @@ import AnimatedBackground from '@/components/AnimatedBackground';
 import DashboardLayout from '@/components/shared/DashboardLayout';
 
 // Simon Says Page Component
-export default function SimonSays(): JSX.Element {
+export default function SimonSays() {
   const [colors, setColors] = useState<string[]>([]);
   const [seq, setSeq] = useState<string[]>([]);
   const [playerSeq, setPlayerSeq] = useState<string[]>([]);
@@ -44,7 +44,7 @@ export default function SimonSays(): JSX.Element {
         nextRound([]);
         logger.info('Simon Says initialized', { colors: r.data.colors?.length || 4 });
       } catch (error) {
-        logger.error('Failed to start Simon Says', error, {});
+        logger.error('Simon Says', 'Failed to start Simon Says', { error: error instanceof Error ? error.message : String(error) });
         setColors(['red', 'blue', 'green', 'yellow']);
         nextRound([]);
       } finally {
@@ -71,7 +71,7 @@ export default function SimonSays(): JSX.Element {
       nextRound([]);
       logger.info('Simon Says restarted', { colors: r.data.colors?.length || 4 });
     } catch (error) {
-      logger.error('Failed to restart Simon Says', error, {});
+      logger.error('Simon Says', 'Failed to restart Simon Says', { error: error instanceof Error ? error.message : String(error) });
       setColors(['red', 'blue', 'green', 'yellow']);
       nextRound([]);
     } finally {
@@ -193,7 +193,7 @@ export default function SimonSays(): JSX.Element {
 
         {/* Leaderboard */}
         <div className="mt-12">
-          <Leaderboard game="simon-says" />
+          <Leaderboard gameType="simon-says" />
         </div>
         </div>
       </div>

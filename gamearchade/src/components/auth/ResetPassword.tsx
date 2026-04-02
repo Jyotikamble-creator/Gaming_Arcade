@@ -44,7 +44,7 @@ export default function ResetPassword({
   isLoading: externalLoading = false,
   token: initialToken 
 }: ResetPasswordProps) {
-  const logger = new Logger({ tag: 'RESET_PASSWORD_COMPONENT' });
+  const logger = new Logger({ environment: 'development' });
   const authClient = new AuthApiClient();
 
   // Form state
@@ -140,9 +140,9 @@ export default function ResetPassword({
       setIsSuccess(true);
 
       // Call success handler
-      onSuccess?.(response);
+      onSuccess?.(response.data);
     } catch (error: any) {
-      logger.error('Reset password failed', { error });
+      logger.error('ResetPassword', 'Password reset failed', { error: error?.message || String(error) });
       
       const authError = AuthPageHelpers.Error.parseApiError(error);
       onError?.(authError);

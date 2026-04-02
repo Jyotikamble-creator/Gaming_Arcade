@@ -20,7 +20,7 @@ const GRID_SIZE = 4;
 const TOTAL_TILES = GRID_SIZE * GRID_SIZE;
 
 // SlidingPuzzle component
-export default function SlidingPuzzle(): JSX.Element {
+export default function SlidingPuzzle() {
   const [tiles, setTiles] = useState<(number | null)[]>([]);
   const [emptyIndex, setEmptyIndex] = useState<number>(TOTAL_TILES - 1);
   const [moves, setMoves] = useState<number>(0);
@@ -149,10 +149,10 @@ export default function SlidingPuzzle(): JSX.Element {
     const finalScore = Math.max(100, baseScore - movePenalty + timeBonus);
 
     try {
-      await submitScore('sliding-puzzle', finalScore);
+      await submitScore({ game: 'sliding-puzzle', score: finalScore });
       logger.info('Sliding Puzzle completed', { score: finalScore, moves, time: timeElapsed });
     } catch (error) {
-      logger.error('Failed to submit score', error, {});
+      logger.error('Sliding Puzzle', 'Failed to submit score', { error: error instanceof Error ? error.message : String(error) });
     }
   }, [moves, timeElapsed]);
 
@@ -218,7 +218,7 @@ export default function SlidingPuzzle(): JSX.Element {
 
         {/* Leaderboard */}
         <div className="mt-12">
-          <Leaderboard game="sliding-puzzle" />
+          <Leaderboard gameType="sliding-puzzle" />
         </div>
         </div>
       </div>

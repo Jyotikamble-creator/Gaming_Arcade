@@ -348,7 +348,7 @@ const NumberMazePage: React.FC<NumberMazePageProps> = ({
 
         {/* Leaderboard */}
         <div className="mt-8">
-          <Leaderboard game="number-maze" />
+          <Leaderboard gameType="number-maze" />
         </div>
 
         {/* Completion Modal */}

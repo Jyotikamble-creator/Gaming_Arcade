@@ -257,6 +257,36 @@ export class AuthPageValidationUtils {
   }
 
   /**
+   * Validate reset password form
+   */
+  static validateResetPasswordForm(data: any): AuthFormValidation {
+    const errors: Record<string, string[]> = {};
+
+    // Validate token
+    if (!data.token || !data.token.trim()) {
+      errors.token = ['Reset token is required'];
+    }
+
+    // Validate password and confirmation
+    errors.password = this.validatePassword(data.password);
+    errors.confirmPassword = this.validateConfirmPassword(data.password, data.confirmPassword);
+
+    // Remove empty error arrays
+    Object.keys(errors).forEach(key => {
+      if (errors[key].length === 0) {
+        delete errors[key];
+      }
+    });
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors,
+      touched: {},
+      isSubmitting: false
+    };
+  }
+
+  /**
    * Get password strength
    */
   static getPasswordStrength(password: string): {

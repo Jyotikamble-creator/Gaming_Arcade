@@ -165,11 +165,7 @@ export default function CodingPuzzlePage({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Instructions
-                gameType="coding-puzzle"
-                onClose={() => setGameState("menu")}
-                onStartGame={() => handleStartGame()}
-              />
+              <Instructions gameType="coding-puzzle" />
             </motion.div>
           )}
 
@@ -303,10 +299,7 @@ export default function CodingPuzzlePage({
             exit={{ x: "100%" }}
             className="fixed top-0 right-0 h-full w-80 bg-black/50 backdrop-blur-lg z-50 p-6"
           >
-            <Leaderboard
-              gameType="coding-puzzle"
-              onClose={() => setShowLeaderboard(false)}
-            />
+            <Leaderboard gameType="coding-puzzle" />
           </motion.div>
         )}
       </AnimatePresence>

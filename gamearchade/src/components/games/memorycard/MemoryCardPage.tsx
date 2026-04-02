@@ -307,7 +307,7 @@ const MemoryCardPage: React.FC<MemoryCardPageProps> = ({
 
         {/* Leaderboard */}
         <div className="mt-12">
-          <Leaderboard game="memory-card" />
+          <Leaderboard gameType="memory-card" />
         </div>
       </div>
 
