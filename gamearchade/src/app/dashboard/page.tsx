@@ -11,10 +11,10 @@ export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to auth if not authenticated after loading completes
-    if (!loading && !isAuthenticated) {
-      router.push("/pages/auth");
-    }
+    // BYPASSING AUTH CHECK - ALLOW DIRECT DASHBOARD ACCESS
+    // if (!loading && !isAuthenticated) {
+    //   router.push("/pages/auth");
+    // }
   }, [isAuthenticated, loading, router]);
 
   // Show loading state while checking authentication
@@ -30,9 +30,10 @@ export default function Dashboard() {
   }
 
   // Don't render dashboard if user is not authenticated
-  if (!isAuthenticated) {
-    return null;
-  }
+  // BYPASSING AUTH - ALLOW ALL USERS
+  // if (!isAuthenticated) {
+  //   return null;
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">

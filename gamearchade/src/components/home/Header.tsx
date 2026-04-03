@@ -11,7 +11,8 @@ export default function Header() {
   // Always navigate to the auth page first; `auth` page will
   // redirect authenticated users to their dashboard.
   const handleGetStarted = () => {
-    router.push('/pages/auth');
+    // BYPASSING AUTH - DIRECTLY GO TO DASHBOARD
+    router.push('/dashboard');
   };
 
   return (

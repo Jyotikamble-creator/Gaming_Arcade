@@ -71,23 +71,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const storedToken = localStorage.getItem('token');
-        if (!storedToken) return;
+        // COMMENTED OUT FOR TESTING - BYPASSING AUTH CHECK
+        // const storedToken = localStorage.getItem('token');
+        // if (!storedToken) return;
 
-        const res = await fetch('/api/auth/me', {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        });
+        // const res = await fetch('/api/auth/me', {
+        //   headers: { Authorization: `Bearer ${storedToken}` },
+        // });
 
-        if (res.ok) {
-          const data = await res.json();
-          const userData = mapApiUser(data.user);
-          setUser(userData);
-          localStorage.setItem('user', JSON.stringify(userData));
-        } else {
-          // Token expired or invalid — clear storage
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        }
+        // if (res.ok) {
+        //   const data = await res.json();
+        //   const userData = mapApiUser(data.user);
+        //   setUser(userData);
+        //   localStorage.setItem('user', JSON.stringify(userData));
+        // } else {
+        //   // Token expired or invalid — clear storage
+        //   localStorage.removeItem('token');
+        //   localStorage.removeItem('user');
+        // }
       } catch (error) {
         console.error('[AUTH] Initialization error:', error);
         localStorage.removeItem('token');

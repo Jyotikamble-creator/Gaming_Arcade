@@ -3,6 +3,8 @@
 // This component represents the main content section of the home page.
 // It provides an overview of available games and navigation options.
 
+import { useRouter } from 'next/navigation';
+
 interface Game {
   icon: string;
   title: string;
@@ -33,6 +35,16 @@ const games: Game[] = [
 ];
 
 export default function Card() {
+  const router = useRouter();
+
+  const handleExploreGames = () => {
+    router.push('/dashboard');
+  };
+
+  const handleGetStarted = () => {
+    router.push('/dashboard');
+  };
+
   return (
     <div className="container mx-auto px-4 py-16">
       {/* Welcome Section */}
@@ -44,10 +56,10 @@ export default function Card() {
           Discover fun and engaging games to challenge your mind and enjoy your time!
         </p>
         <div className="flex justify-center gap-4">
-          <button className="bg-primary-blue hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
+          <button onClick={handleExploreGames} className="bg-primary-blue hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
             Explore Games
           </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
+          <button onClick={handleGetStarted} className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
             Get Started
           </button>
         </div>
