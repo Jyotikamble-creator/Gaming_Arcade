@@ -6,9 +6,9 @@ import type {
   MinesweeperDifficulty,
   MinesweeperMoveData,
   MinesweeperResult,
-  GameStatus,
-  MINESWEEPER_CONFIGS
+  GameStatus
 } from '@/types/games/minesweeper';
+import { MINESWEEPER_CONFIGS } from '@/types/games/minesweeper';
 import {
   generateBoard,
   placeMines,

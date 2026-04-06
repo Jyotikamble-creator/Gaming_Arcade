@@ -1,10 +1,5 @@
-import Minesweeper from '@/components/games/minesweeper/Minesweeper';
+import { redirect } from 'next/navigation';
 
-export default function MinesweeperPage() {
-  return <Minesweeper />;
+export default function LegacyMinesweeperPage() {
+  redirect('/games/minesweeper');
 }
-
-export const metadata = {
-  title: 'Minesweeper - GameArchade',
-  description: 'Play the classic Minesweeper game. Find all mines without detonating any!',
-};

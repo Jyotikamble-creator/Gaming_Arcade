@@ -18,6 +18,7 @@ const MinesweeperControls: React.FC<MinesweeperControlsProps> = ({
   onReset,
   gameStatus
 }) => {
+  const resetButtonClass = "px-6 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transition-all duration-200 border border-green-500/20";
   const difficulties: MinesweeperDifficulty[] = ['beginner', 'intermediate', 'expert'];
 
   const getDifficultyInfo = (difficulty: MinesweeperDifficulty) => {
@@ -60,28 +61,25 @@ const MinesweeperControls: React.FC<MinesweeperControlsProps> = ({
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="
-          px-6 py-3 rounded-lg font-bold text-white
-          bg-gradient-to-r from-green-600 to-green-700
-          hover:from-green-700 hover:to-green-800
-          shadow-lg hover:shadow-xl
-          transition-all duration-200
-          border border-green-500/20
-        "
+        className={resetButtonClass}
         onClick={onReset}
       >
-        🔄 New Game
+        New Game
       </motion.button>
 
       {/* Game Status Indicator */}
       <div className="flex items-center gap-2 text-white/80">
-        <div className={`
-          w-3 h-3 rounded-full
-          ${gameStatus === 'playing' ? 'bg-green-500 animate-pulse' :
-            gameStatus === 'won' ? 'bg-yellow-500' :
-            gameStatus === 'lost' ? 'bg-red-500' :
-            'bg-blue-500'}
-        `} />
+        <div
+          className={`w-3 h-3 rounded-full ${
+            gameStatus === 'playing'
+              ? 'bg-green-500 animate-pulse'
+              : gameStatus === 'won'
+                ? 'bg-yellow-500'
+                : gameStatus === 'lost'
+                  ? 'bg-red-500'
+                  : 'bg-blue-500'
+          }`}
+        />
         <span className="text-sm font-medium">
           {gameStatus === 'playing' ? 'Playing' :
            gameStatus === 'won' ? 'Won!' :
