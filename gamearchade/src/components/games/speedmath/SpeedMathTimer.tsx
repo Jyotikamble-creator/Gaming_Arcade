@@ -2,9 +2,10 @@ import React from 'react';
 
 interface Props {
   timeLeft: number;
+  totalTime?: number;
 }
 
-const SpeedMathTimer: React.FC<Props> = ({ timeLeft }) => {
+const SpeedMathTimer: React.FC<Props> = ({ timeLeft, totalTime = 60 }) => {
   const getTimerColor = () => {
     if (timeLeft > 30) return 'text-green-400';
     if (timeLeft > 10) return 'text-yellow-400';
@@ -17,7 +18,7 @@ const SpeedMathTimer: React.FC<Props> = ({ timeLeft }) => {
     return 'bg-red-500';
   };
 
-  const progressPercentage = (timeLeft / 60) * 100;
+  const progressPercentage = (timeLeft / totalTime) * 100;
 
   return (
     <div className="mb-6">

@@ -26,7 +26,7 @@ const SpeedMathProblem: React.FC<Props> = ({
   feedback
 }) => {
   return (
-    <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 shadow-2xl">
+    <div className="bg-transparent backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 shadow-2xl">
       <div className="text-center mb-8">
         <div className="text-6xl md:text-7xl font-bold text-white mb-4 tracking-wider">
           {problem.question} = ?

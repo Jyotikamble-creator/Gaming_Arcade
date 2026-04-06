@@ -136,6 +136,19 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: Plan your path carefully! Think ahead and consider both positive and negative numbers to reach your target efficiently.'
         };
+      case 'speed-math':
+        return {
+          title: 'How to Play Speed Math',
+          rules: [
+            '• Solve as many math problems as you can in 60 seconds',
+            '• Type your answer and press Enter or click Submit',
+            '• Correct answers earn points based on difficulty',
+            '• Build a streak for bonus points',
+            '• Skip problems if you get stuck (breaks your streak)',
+            '• Choose your difficulty: Easy (5 pts), Medium (10 pts), Hard (15 pts)'
+          ],
+          tip: '💡 Tip: Speed and accuracy both matter! Build streaks for bonus points - every 3 correct answers in a row adds extra points!'
+        };
       default:
         return {
           title: 'How to Play',
