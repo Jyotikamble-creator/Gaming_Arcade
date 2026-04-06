@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
-export default function LegacyMinesweeperPage() {
+export default function LegacyGameRoutePage() {
   redirect('/games/minesweeper');
 }

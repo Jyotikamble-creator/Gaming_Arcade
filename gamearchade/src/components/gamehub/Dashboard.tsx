@@ -37,8 +37,10 @@ const defaultGames: GameConfig[] = helperGames.map(g => ({
   difficulty: (g as any).difficulty || 'medium',
   estimatedTime: (g as any).estimatedTime || '5-10 min',
   image: `/images/${(g.id || g.name || 'game').toString().toLowerCase().replace(/[^a-z0-9-]/g, '-')}.jpg`,
-  // Normalize path so it points at the app pages route used in this project
-  path: (g.path && g.path.startsWith('/pages')) ? g.path : `/pages${g.path.startsWith('/') ? g.path : '/' + (g.path || g.id)}`,
+  // Normalize path so all game links resolve to canonical app routes under /games
+  path: g.path && g.path.startsWith('/games')
+    ? g.path
+    : `/games/${(g.id || 'game').toString().toLowerCase().replace(/[^a-z0-9-]/g, '-')}`,
   isNew: !!g.isNew,
   isFeatured: !!g.isFeatured,
   isComingSoon: !!g.isComingSoon

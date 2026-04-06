@@ -1,12 +1,5 @@
-"use client"
-import React from 'react'
-import SpeedMath from '@/components/games/speedmath/SpeedMath'
-import DashboardLayout from '@/components/shared/DashboardLayout'
+import { redirect } from 'next/navigation';
 
-export default function SpeedMathPage() {
-  return (
-    <DashboardLayout>
-      <SpeedMath />
-    </DashboardLayout>
-  )
+export default function LegacyGameRoutePage() {
+  redirect('/games/speed-math');
 }
