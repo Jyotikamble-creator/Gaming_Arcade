@@ -10,9 +10,6 @@ import {
 import { 
   WHACK_MOLE_CONFIG,
   calculateAccuracy,
-  generateRandomMole,
-  calculateFinalScore,
-  validateGameConfig,
   generateGrid,
   isValidHit 
 } from '@/utility/games/whack-a-mole';
@@ -20,10 +17,10 @@ import {
 export const useWhackMole = (): WhackMoleHookReturn => {
   // Game state
   const [gameState, setGameState] = useState<WhackMoleGameState>({
-    grid: generateGrid(WHACK_MOLE_CONFIG.gridSize),
+    grid: generateGrid(9),
     activeMole: null,
     score: 0,
-    timeLeft: WHACK_MOLE_CONFIG.duration,
+    timeLeft: 30,
     gameStarted: false,
     gameEnded: false,
     isLoading: false
@@ -32,7 +29,12 @@ export const useWhackMole = (): WhackMoleHookReturn => {
   // Game statistics
   const [molesHit, setMolesHit] = useState<number>(0);
   const [totalMoles, setTotalMoles] = useState<number>(0);
-  const [config, setConfig] = useState<WhackMoleConfig>(WHACK_MOLE_CONFIG);
+  const [config, setConfig] = useState<WhackMoleConfig>({
+    gridSize: 9,
+    duration: 30,
+    moleInterval: 800,
+    pointsPerHit: 10
+  });
 
   // Refs for timers
   const moleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -46,36 +48,25 @@ export const useWhackMole = (): WhackMoleHookReturn => {
 
   // Initialize game function
   const initializeGame = useCallback(async () => {
-    setGameState(prev => ({ ...prev, isLoading: true }));
+    const newConfig: WhackMoleConfig = {
+      gridSize: 9,
+      duration: 30,
+      moleInterval: 800,
+      pointsPerHit: 10
+    };
     
-    try {
-      // Simulate API call to get game configuration
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const newConfig = validateGameConfig({
-        gridSize: 9,
-        duration: 30,
-        moleInterval: 800,
-        pointsPerHit: 10
-      });
-      
-      setConfig(newConfig);
-      setGameState({
-        grid: generateGrid(newConfig.gridSize),
-        activeMole: null,
-        score: 0,
-        timeLeft: newConfig.duration,
-        gameStarted: false,
-        gameEnded: false,
-        isLoading: false
-      });
-      setMolesHit(0);
-      setTotalMoles(0);
-    } catch (error) {
-      console.error('Failed to initialize whack-a-mole game:', error);
-      // Use default config on error
-      setGameState(prev => ({ ...prev, isLoading: false }));
-    }
+    setConfig(newConfig);
+    setGameState({
+      grid: generateGrid(newConfig.gridSize),
+      activeMole: null,
+      score: 0,
+      timeLeft: newConfig.duration,
+      gameStarted: false,
+      gameEnded: false,
+      isLoading: false
+    });
+    setMolesHit(0);
+    setTotalMoles(0);
   }, []);
 
   // Start game function
@@ -85,21 +76,22 @@ export const useWhackMole = (): WhackMoleHookReturn => {
     // Start mole spawning timer
     moleTimerRef.current = setInterval(() => {
       setGameState(prev => {
-        if (prev.gameStarted && !prev.gameEnded) {
-          const newActiveMole = generateRandomMole(config.gridSize, prev.activeMole || undefined);
+        if (prev.gameStarted && !prev.gameEnded && prev.grid.length > 0) {
+          // Spawn a random mole at a random grid index
+          const randomIndex = Math.floor(Math.random() * prev.grid.length);
           setTotalMoles(count => count + 1);
-          return { ...prev, activeMole: newActiveMole };
+          return { ...prev, activeMole: randomIndex };
         }
         return prev;
       });
-    }, config.moleInterval);
+    }, config.moleInterval || 1000);
 
     // Start game countdown timer
     gameTimerRef.current = setInterval(() => {
       setGameState(prev => {
         if (prev.timeLeft <= 1) {
           endGame();
-          return { ...prev, timeLeft: 0 };
+          return { ...prev, timeLeft: 0, gameEnded: true, gameStarted: false };
         }
         return { ...prev, timeLeft: prev.timeLeft - 1 };
       });
@@ -109,11 +101,12 @@ export const useWhackMole = (): WhackMoleHookReturn => {
   // Whack mole function
   const whackMole = useCallback((index: number) => {
     setGameState(prev => {
-      if (isValidHit(index, prev.activeMole, prev.gameStarted && !prev.gameEnded)) {
+      // Check if the clicked index matches the active mole and game is active
+      if (isValidHit(index, prev.activeMole ?? -1) && prev.gameStarted && !prev.gameEnded && prev.activeMole !== null) {
         setMolesHit(count => count + 1);
         return {
           ...prev,
-          score: prev.score + config.pointsPerHit,
+          score: prev.score + (config.pointsPerHit || 10),
           activeMole: null
         };
       }
@@ -122,7 +115,7 @@ export const useWhackMole = (): WhackMoleHookReturn => {
   }, [config.pointsPerHit]);
 
   // End game function
-  const endGame = useCallback(async () => {
+  const endGame = useCallback(() => {
     cleanup();
     setGameState(prev => ({ 
       ...prev, 
@@ -130,27 +123,7 @@ export const useWhackMole = (): WhackMoleHookReturn => {
       gameStarted: false, 
       activeMole: null 
     }));
-
-    try {
-      // Submit score to API
-      const finalScore = calculateFinalScore(molesHit, calculateAccuracy(molesHit, totalMoles));
-      console.log('Game ended with score:', finalScore);
-      
-      // TODO: Implement actual API call
-      // await submitScore({
-      //   game: 'whack-a-mole',
-      //   score: finalScore,
-      //   meta: { 
-      //     molesHit, 
-      //     totalMoles, 
-      //     accuracy: calculateAccuracy(molesHit, totalMoles),
-      //     duration: config.duration - gameState.timeLeft 
-      //   }
-      // });
-    } catch (error) {
-      console.error('Failed to submit score:', error);
-    }
-  }, [molesHit, totalMoles, config.duration, gameState.timeLeft]);
+  }, []);
 
   // Restart game function
   const restartGame = useCallback(async () => {
@@ -181,13 +154,24 @@ export const useWhackMole = (): WhackMoleHookReturn => {
     accuracy: calculateAccuracy(molesHit, totalMoles)
   };
 
+  // Return hook values flattened for page component compatibility
   return {
     gameState,
     stats,
     config,
     startGame,
     whackMole,
-    restartGame,
-    endGame
-  };
+    restartGame: restartGame as () => void,
+    endGame,
+    // Also include flattened stats for direct destructuring in page component
+    score: gameState.score,
+    timeLeft: gameState.timeLeft,
+    molesHit,
+    totalMoles,
+    accuracy: calculateAccuracy(molesHit, totalMoles),
+    isGameStarted: gameState.gameStarted,
+    isGameOver: gameState.gameEnded,
+    error: null,
+    resetGame: restartGame as () => void
+  } as any;
 };

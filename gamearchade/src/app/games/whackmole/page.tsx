@@ -1,13 +1,53 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { useWhackMole } from '@/hooks/games/useWhackMole';
 import { WhackGameSettings } from '@/types/games/whack-a-mole';
 import DashboardLayout from '@/components/shared/DashboardLayout';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
-import ErrorComponent from '@/components/shared/ErrorComponent';
+
+// Animated emoji component - only renders on client to avoid hydration issues
+const AnimatedEmojis = () => {
+  const [emojis, setEmojis] = useState<Array<{
+    left: string;
+    top: string;
+    delay: string;
+    duration: string;
+  }>>([]);
+
+  useEffect(() => {
+    // Generate random positions only on client side
+    setEmojis([...Array(50)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 2}s`,
+      duration: `${2 + Math.random() * 2}s`
+    })));
+  }, []);
+
+  if (emojis.length === 0) return null;
+
+  return (
+    <>
+      {emojis.map((emoji, i) => (
+        <div
+          key={i}
+          className="absolute animate-pulse"
+          style={{
+            left: emoji.left,
+            top: emoji.top,
+            animationDelay: emoji.delay,
+            animationDuration: emoji.duration
+          }}
+        >
+          🐭
+        </div>
+      ))}
+    </>
+  );
+};
 
 // Dynamic imports for better performance
 const WhackMoleStats = dynamic(() => import('@/components/games/whackmole/WhackMoleStats'), {
@@ -50,7 +90,6 @@ export default function WhackMolePage() {
     accuracy,
     isGameStarted,
     isGameOver,
-    error,
     startGame,
     whackMole,
     resetGame
@@ -67,17 +106,6 @@ export default function WhackMolePage() {
     setGameKey(prev => prev + 1);
   };
 
-  if (error) {
-    return (
-      <DashboardLayout>
-        <ErrorComponent 
-          error={error} 
-          onRetry={handleRestart}
-        />
-      </DashboardLayout>
-    );
-  }
-
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-linear-to-br from-gray-900 via-purple-900 to-violet-900 relative overflow-hidden">
@@ -86,20 +114,7 @@ export default function WhackMolePage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1),transparent_70%)]"></div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(255,255,255,0.1),transparent_70%)]"></div>
           <div className="absolute top-0 left-0 w-full h-full">
-            {[...Array(50)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute animate-pulse"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  animationDuration: `${2 + Math.random() * 2}s`
-                }}
-              >
-                🐭
-              </div>
-            ))}
+            <AnimatedEmojis />
           </div>
         </div>
 
@@ -159,6 +174,7 @@ export default function WhackMolePage() {
             key={`stats-${gameKey}`}
             score={score}
             timeLeft={timeLeft}
+            gameStatus={isGameStarted ? 'playing' : (isGameOver ? 'gameOver' : 'ready')}
             accuracy={accuracy}
             molesHit={molesHit}
             totalMoles={totalMoles}
@@ -181,9 +197,11 @@ export default function WhackMolePage() {
             <div className="flex justify-center mb-8">
               <WhackMoleGrid
                 key={`grid-${gameKey}`}
-                gameState={gameState}
-                gridSize={settings.customGridSize}
-                onMoleClick={whackMole}
+                grid={gameState.grid}
+                active={gameState.activeMole}
+                gameStarted={isGameStarted}
+                gameEnded={isGameOver}
+                onWhack={whackMole}
               />
             </div>
           )}

@@ -26,11 +26,13 @@ const WhackMoleStats: React.FC<WhackMoleStatsProps> = ({
       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center min-w-[100px]">
         <span className="text-sm font-medium text-gray-300 block">STATUS</span>
         <div className={`text-lg font-bold ${
-          gameStatus === 'Playing' ? 'text-green-400' : 
-          gameStatus === 'Game Over' ? 'text-red-400' : 
+          gameStatus === 'playing' ? 'text-green-400' : 
+          gameStatus === 'gameOver' ? 'text-red-400' : 
           'text-blue-400'
         }`}>
-          {gameStatus}
+          {gameStatus === 'ready' && 'Ready'}
+          {gameStatus === 'playing' && 'Playing'}
+          {gameStatus === 'gameOver' && 'Game Over'}
         </div>
       </div>
       
@@ -42,7 +44,7 @@ const WhackMoleStats: React.FC<WhackMoleStatsProps> = ({
             accuracy >= 60 ? 'text-yellow-400' :
             'text-orange-400'
           }`}>
-            {accuracy}%
+            {Math.round(accuracy)}%
           </div>
         </div>
       )}

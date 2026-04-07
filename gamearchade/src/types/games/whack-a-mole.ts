@@ -419,3 +419,79 @@ export interface WhackStatsQuery {
   sortBy?: 'score' | 'accuracy' | 'date' | 'streak';
   sortOrder?: 'asc' | 'desc';
 }
+
+// Game state types
+export type GameStatus = 'ready' | 'playing' | 'gameOver';
+
+export interface WhackMoleGameState {
+  grid: any[];
+  activeMole: any | null;
+  score: number;
+  timeLeft: number;
+  gameStarted: boolean;
+  gameEnded: boolean;
+  isLoading: boolean;
+}
+
+export interface WhackMoleStats {
+  score: number;
+  timeLeft: number;
+  gameStatus: GameStatus;
+  molesHit: number;
+  totalMoles: number;
+  accuracy: number;
+}
+
+export interface WhackMoleConfig {
+  gridSize: number;
+  duration: number;
+  moleInterval: number;
+  pointsPerHit: number;
+}
+
+// Hook return type
+export interface WhackMoleHookReturn {
+  gameState: WhackMoleGameState;
+  stats: WhackMoleStats;
+  config: WhackMoleConfig;
+  startGame: () => void;
+  whackMole: (index: number) => void;
+  restartGame: () => Promise<void>;
+  endGame: () => void;
+  // Flattened properties for direct page access
+  score: number;
+  timeLeft: number;
+  molesHit: number;
+  totalMoles: number;
+  accuracy: number;
+  isGameStarted: boolean;
+  isGameOver: boolean;
+  error: string | null;
+  resetGame: () => Promise<void>;
+}
+
+// Component Props types
+export interface WhackMoleGridProps {
+  grid: any[];
+  active: number | null;
+  gameStarted: boolean;
+  gameEnded: boolean;
+  onWhack: (index: number) => void;
+}
+
+export interface WhackMoleStatsProps {
+  score: number;
+  timeLeft: number;
+  gameStatus: GameStatus;
+  accuracy: number;
+  molesHit?: number;
+  totalMoles?: number;
+}
+
+export interface WhackMoleGameOverModalProps {
+  score: number;
+  accuracy: number;
+  molesHit: number;
+  totalMoles: number;
+  onRestart: () => void;
+}

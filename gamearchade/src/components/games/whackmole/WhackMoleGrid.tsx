@@ -12,24 +12,24 @@ const WhackMoleGrid: React.FC<WhackMoleGridProps> = ({
   const gridCols = Math.ceil(Math.sqrt(grid.length));
   
   return (
-    <div className="bg-green-800/30 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-2xl">
+    <div className="bg-green-800/30 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-2xl max-w-md mx-auto">
       <div 
-        className="grid gap-3 max-w-md mx-auto"
+        className="grid gap-3"
         style={{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }}
       >
-        {grid.map((hole) => (
+        {grid.map((hole, index) => (
           <button
-            key={hole}
-            onClick={() => onWhack(hole)}
+            key={index}
+            onClick={() => onWhack(index)}
             disabled={!gameStarted || gameEnded}
             className={`
-              relative w-20 h-20 rounded-full border-4 border-brown-600 
+              relative w-20 h-20 rounded-full border-4 border-amber-900
               transition-all duration-150 transform
               ${!gameStarted || gameEnded 
                 ? 'bg-gray-700 cursor-not-allowed' 
-                : 'bg-brown-500 hover:bg-brown-400 cursor-pointer hover:scale-105'
+                : 'bg-amber-700 hover:bg-amber-600 cursor-pointer hover:scale-105'
               }
-              ${active === hole 
+              ${active === index 
                 ? 'bg-yellow-500 animate-bounce shadow-lg border-yellow-400' 
                 : ''
               }
@@ -38,15 +38,15 @@ const WhackMoleGrid: React.FC<WhackMoleGridProps> = ({
             {/* Hole opening */}
             <div className="absolute inset-2 bg-black rounded-full shadow-inner">
               {/* Mole */}
-              {active === hole && (
+              {active === index && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-2xl animate-ping">ðŸ­</div>
+                  <div className="text-2xl animate-ping">🐭</div>
                 </div>
               )}
             </div>
             
             {/* Hit effect */}
-            {active === hole && (
+            {active === index && (
               <div className="absolute inset-0 bg-yellow-300 rounded-full opacity-50 animate-pulse" />
             )}
           </button>
@@ -57,7 +57,7 @@ const WhackMoleGrid: React.FC<WhackMoleGridProps> = ({
       <div className="text-center mt-6">
         <p className="text-gray-300 text-sm">
           {!gameStarted && !gameEnded && 'Click "Start Game" to begin!'}
-          {gameStarted && !gameEnded && 'Click the moles as quickly as you can! ðŸ”¨'}
+          {gameStarted && !gameEnded && 'Click the moles as quickly as you can! 🔨'}
           {gameEnded && 'Game Over! Click "Play Again" to restart.'}
         </p>
       </div>
