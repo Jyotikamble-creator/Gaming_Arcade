@@ -163,6 +163,20 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: Time your drop when the block is centered for perfect alignment. Build a long enough combo streak to skyrocket your score!'
         };
+      case 'typing-test':
+        return {
+          title: 'How to Play Typing Test',
+          rules: [
+            '• Read the displayed passage carefully',
+            '• Type the passage in the text area as quickly as possible',
+            '• Your WPM (Words Per Minute) is calculated as you type',
+            '• Accuracy percentage shows how many characters match the original',
+            '• Try to maintain high accuracy while typing quickly',
+            '• The test ends when you finish typing the entire passage',
+            '• Compare your WPM and accuracy across multiple tests'
+          ],
+          tip: '💡 Tip: Prioritize accuracy over speed - maintaining 95%+ accuracy with higher WPM is better than fast but error-prone typing. Use proper finger placement for better speed!'
+        };
       case 'tic-tac-toe':
         return {
           title: 'How to Play Tic Tac Toe',
