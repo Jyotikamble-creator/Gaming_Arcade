@@ -149,6 +149,19 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: Speed and accuracy both matter! Build streaks for bonus points - every 3 correct answers in a row adds extra points!'
         };
+      case 'tic-tac-toe':
+        return {
+          title: 'How to Play Tic Tac Toe',
+          rules: [
+            '• Players alternate turns placing X and O on the 3x3 grid',
+            '• Click any empty square to make your move',
+            '• First player to align 3 marks in a row wins',
+            '• Rows, columns, and diagonals all count as winning lines',
+            '• If all 9 squares fill without a line, the round is a draw',
+            '• Use New Game to start the next round, Reset Scores to clear totals'
+          ],
+          tip: '💡 Tip: Control the center early, then create two threats at once to force a win.'
+        };
       default:
         return {
           title: 'How to Play',
