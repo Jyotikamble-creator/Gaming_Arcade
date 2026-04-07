@@ -32,7 +32,7 @@ const TowerDisplay: React.FC<TowerDisplayProps> = ({
 
   return (
     <div className="mb-6">
-      <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
+      <div className="bg-transparent rounded-lg p-6 border-0">
         {gameState === 'idle' && (
           <div className="text-center py-20">
             <h2 className="text-2xl font-bold text-white mb-4">Ready to Stack?</h2>

@@ -149,6 +149,20 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: Speed and accuracy both matter! Build streaks for bonus points - every 3 correct answers in a row adds extra points!'
         };
+      case 'tower-stacker':
+        return {
+          title: 'How to Play Tower Stacker',
+          rules: [
+            '• Click or press SPACE to drop the block at the perfect time',
+            '• Stack blocks on top of each other to build a tower',
+            '• Perfect alignment (±25px) earns 20 bonus points',
+            '• Speed increases every 5 levels - get ready for a challenge!',
+            '• Blocks must overlap - if no overlap, the game ends',
+            '• Reach level 20 to complete the game and win',
+            '• Build combo streaks for extra points'
+          ],
+          tip: '💡 Tip: Time your drop when the block is centered for perfect alignment. Build a long enough combo streak to skyrocket your score!'
+        };
       case 'tic-tac-toe':
         return {
           title: 'How to Play Tic Tac Toe',
