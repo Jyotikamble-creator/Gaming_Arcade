@@ -141,7 +141,7 @@ export class GameApiClient {
     try {
       logger.debug("Fetching random word", {}, LogTags.WORD_GUESS);
 
-      const response = await this.api.get<WordDefinition[]>("/word");
+      const response = await this.api.get<WordDefinition[]>("/games/word");
       const words = response.data || [];
       const randomWord = words.length
         ? words[Math.floor(Math.random() * words.length)]
@@ -190,7 +190,7 @@ export class GameApiClient {
 
   async searchWords(query: WordSearchQuery): Promise<ApiResponse<WordDefinition[]>> {
     try {
-      const response = await this.api.get<WordDefinition[]>("/word/search", { 
+      const response = await this.api.get<WordDefinition[]>("/games/word/search", { 
         params: query 
       });
       return { 
@@ -207,7 +207,7 @@ export class GameApiClient {
   async startMemoryGame(): Promise<ApiResponse<MemoryGameSession>> {
     try {
       logger.debug("Starting memory game", {}, LogTags.MEMORY_CARD);
-      const response = await this.api.post<MemoryGameSession>("/memory/start");
+      const response = await this.api.post<MemoryGameSession>("/games/memory/start");
       
       return { 
         success: true, 
@@ -223,7 +223,7 @@ export class GameApiClient {
   async fetchMathQuestions(): Promise<ApiResponse<MathQuestion[]>> {
     try {
       logger.debug("Fetching math questions", {}, LogTags.MATH_QUIZ);
-      const response = await this.api.get<MathQuestion[]>("/math/questions");
+      const response = await this.api.get<MathQuestion[]>("/games/math/questions");
       
       return { 
         success: true, 
@@ -239,7 +239,7 @@ export class GameApiClient {
   async fetchTypingPassage(): Promise<ApiResponse<{ passage: string; difficulty: string }>> {
     try {
       logger.debug("Fetching typing passage", {}, LogTags.TYPING_TEST);
-      const response = await this.api.get<{ passage: string; difficulty: string }>("/typing/passage");
+      const response = await this.api.get<{ passage: string; difficulty: string }>("/games/typing/passage");
       
       return { 
         success: true, 
@@ -255,7 +255,7 @@ export class GameApiClient {
   async fetchScrambleWords(): Promise<ApiResponse<WordDefinition[]>> {
     try {
       logger.debug("Fetching scramble words", {}, LogTags.WORD_SCRAMBLE);
-      const response = await this.api.get<WordDefinition[]>("/word-scramble/words");
+      const response = await this.api.get<WordDefinition[]>("/games/word-scramble/words");
       
       return { 
         success: true, 
@@ -271,7 +271,7 @@ export class GameApiClient {
   async fetchQuizQuestions(): Promise<ApiResponse<any[]>> {
     try {
       logger.debug("Fetching quiz questions", {}, LogTags.QUIZ);
-      const response = await this.api.get<any[]>("/quiz/questions");
+      const response = await this.api.get<any[]>("/games/quiz/questions");
       
       return { 
         success: true, 
@@ -287,7 +287,7 @@ export class GameApiClient {
   async fetchEmojiPuzzle(): Promise<ApiResponse<EmojiPuzzle>> {
     try {
       logger.debug("Fetching emoji puzzle", {}, LogTags.EMOJI_GUESS);
-      const response = await this.api.get<EmojiPuzzle>("/emoji/start");
+      const response = await this.api.get<EmojiPuzzle>("/games/emoji/start");
       
       return { 
         success: true, 
@@ -303,7 +303,7 @@ export class GameApiClient {
   async startWhackGame(): Promise<ApiResponse<any>> {
     try {
       logger.debug("Starting whack-a-mole game", {}, LogTags.WHACK_MOLE);
-      const response = await this.api.post<any>("/whack-a-mole/start");
+      const response = await this.api.post<any>("/games/whack-a-mole/start");
       
       return { 
         success: true, 
@@ -319,7 +319,7 @@ export class GameApiClient {
   async startSimonGame(): Promise<ApiResponse<any>> {
     try {
       logger.debug("Starting simon says game", {}, LogTags.SIMON_SAYS);
-      const response = await this.api.post<any>("/simon/start");
+      const response = await this.api.post<any>("/games/simon/start");
       
       return { 
         success: true, 
