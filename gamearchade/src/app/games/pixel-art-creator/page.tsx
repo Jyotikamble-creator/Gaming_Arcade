@@ -4,6 +4,7 @@ import PixelGrid from '@/components/games/pixelartcreator/PixelGrid'
 import ColorPicker from '@/components/games/pixelartcreator/ColorPicker'
 import Tools from '@/components/games/pixelartcreator/Tools'
 import DashboardLayout from '@/components/shared/DashboardLayout'
+import Leaderboard from '@/components/leaderboard/Leaderboard'
 
 const GRID_SIZE = 16
 
@@ -68,6 +69,11 @@ export default function PixelArtCreatorPage() {
             <div className="my-4" />
             <Tools tool={tool} onToolChange={setTool} onClear={clearCanvas} onSave={saveArt} />
           </div>
+        </div>
+
+        {/* Leaderboard */}
+        <div className="mt-12">
+          <Leaderboard gameType="pixel-art-creator" />
         </div>
       </div>
     </DashboardLayout>

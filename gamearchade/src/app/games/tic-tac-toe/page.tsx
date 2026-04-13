@@ -4,6 +4,7 @@ import { TicTacToeBoard, TicTacToeControls, TicTacToeGameStatus } from '@/compon
 import { useTicTacToe } from '@/hooks/games/useTicTacToe'
 import DashboardLayout from '@/components/shared/DashboardLayout'
 import Instructions from '@/components/shared/Instructions'
+import Leaderboard from '@/components/leaderboard/Leaderboard'
 
 export default function TicTacToePage() {
   const { board, isXNext, winner, scores, gamesPlayed, handleClick, resetGame, resetScores } = useTicTacToe()
@@ -50,6 +51,11 @@ export default function TicTacToePage() {
 
             <div className="mt-4">
               <TicTacToeControls onNewGame={resetGame} onResetScores={resetScores} />
+            </div>
+
+            {/* Leaderboard */}
+            <div className="mt-12">
+              <Leaderboard gameType="tic-tac-toe" />
             </div>
           </div>
 

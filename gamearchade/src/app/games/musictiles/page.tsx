@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import DashboardLayout from '@/components/shared/DashboardLayout';
 import MusicTilesPage from '@/components/games/musictiles/MusicTilesPage';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
 
 export default function MusicTiles() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -39,6 +40,11 @@ export default function MusicTiles() {
     <DashboardLayout>
       <div className="min-h-screen bg-linear-to-br from-purple-900 via-pink-900 to-indigo-900 p-8">
         <MusicTilesPage />
+
+        {/* Leaderboard */}
+        <div className="mt-12">
+          <Leaderboard gameType="music-tiles" />
+        </div>
       </div>
     </DashboardLayout>
   );

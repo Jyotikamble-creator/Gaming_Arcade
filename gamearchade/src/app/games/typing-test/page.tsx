@@ -3,6 +3,7 @@ import React from 'react'
 import { useTypingTest } from '@/hooks/games/useTypingTest'
 import DashboardLayout from '@/components/shared/DashboardLayout'
 import Instructions from '@/components/shared/Instructions'
+import Leaderboard from '@/components/leaderboard/Leaderboard'
 
 export default function TypingTestPage() {
   const { text, input, isLoading, done, handleInputChange, resetTest, stats, wpm, accuracy } = useTypingTest()
@@ -83,6 +84,11 @@ export default function TypingTestPage() {
               </div>
             </>
           )}
+
+          {/* Leaderboard */}
+          <div className="mt-12">
+            <Leaderboard gameType="typing-test" />
+          </div>
         </div>
       </div>
     </DashboardLayout>

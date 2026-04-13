@@ -5,7 +5,8 @@ import dynamic from 'next/dynamic';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { useWhackMole } from '@/hooks/games/useWhackMole';
 import { WhackGameSettings } from '@/types/games/whack-a-mole';
-import DashboardLayout from '@/components/shared/DashboardLayout';
+import DashboardLayout from '@/components/shared/DashboardLayout'
+import Leaderboard from '@/components/leaderboard/Leaderboard';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
 // Animated emoji component - only renders on client to avoid hydration issues
@@ -245,6 +246,11 @@ export default function WhackMolePage() {
               onRestart={handleRestart}
             />
           )}
+
+          {/* Leaderboard */}
+          <div className="mt-12">
+            <Leaderboard gameType="whack-a-mole" />
+          </div>
         </div>
       </div>
     </DashboardLayout>

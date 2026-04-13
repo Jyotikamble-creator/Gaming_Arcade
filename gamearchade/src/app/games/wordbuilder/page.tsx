@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth/AuthProvider';
 import { useWordBuilder } from '@/hooks/games/useWordBuilder';
 import { WordBuilderDifficulty } from '@/types/games/word-builder';
 import DashboardLayout from '@/components/shared/DashboardLayout';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorComponent from '@/components/shared/ErrorComponent';
 
@@ -252,7 +253,10 @@ export default function WordBuilderPage() {
               onNewGame={handleNewGame}
             />
           )}
-        </div>
+          {/* Leaderboard */}
+          <div className="mt-12">
+            <Leaderboard gameType="word-builder" />
+          </div>        </div>
       </div>
     </DashboardLayout>
   );

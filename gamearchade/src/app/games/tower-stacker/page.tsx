@@ -5,6 +5,7 @@ import TowerStats from '@/components/games/towerstacker/TowerStats'
 import { useTowerStacker } from '@/hooks/games/useTowerStacker'
 import DashboardLayout from '@/components/shared/DashboardLayout'
 import Instructions from '@/components/shared/Instructions'
+import Leaderboard from '@/components/leaderboard/Leaderboard'
 
 export default function TowerStackerPage() {
   const {
@@ -48,6 +49,10 @@ export default function TowerStackerPage() {
             <TowerStats score={score} level={level} perfectDrops={perfectDrops} highestLevel={highestLevel} />
           </div>
 
+          {/* Leaderboard */}
+          <div className="mt-12">
+            <Leaderboard gameType="tower-stacker" />
+          </div>
 
         </div>
       </div>

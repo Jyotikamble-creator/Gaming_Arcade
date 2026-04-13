@@ -3,6 +3,7 @@ import React from 'react'
 import ReactionTime from '@/components/games/reactiontime/ReactionTime'
 import Instructions from '@/components/shared/Instructions'
 import DashboardLayout from '@/components/shared/DashboardLayout'
+import Leaderboard from '@/components/leaderboard/Leaderboard'
 
 export default function ReactionTimePage() {
   return (
@@ -16,6 +17,11 @@ export default function ReactionTimePage() {
           </div>
 
           <ReactionTime />
+
+          {/* Leaderboard */}
+          <div className="mt-12">
+            <Leaderboard gameType="reaction-time" />
+          </div>
         </div>
       </div>
     </DashboardLayout>

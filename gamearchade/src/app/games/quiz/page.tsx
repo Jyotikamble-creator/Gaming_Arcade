@@ -4,6 +4,7 @@ import QuestionCard from '@/components/games/quiz/QuestionCard'
 import QuizStats from '@/components/games/quiz/QuizStats'
 import Instructions from '@/components/shared/Instructions'
 import QuizCompletedModal from '@/components/games/quiz/QuizCompletedModal'
+import Leaderboard from '@/components/leaderboard/Leaderboard'
 import DashboardLayout from '@/components/shared/DashboardLayout'
 
 interface QuizQuestion {
@@ -114,6 +115,11 @@ export default function QuizPage() {
               onRestart={handleRestart}
             />
           )}
+
+          {/* Leaderboard */}
+          <div className="mt-12">
+            <Leaderboard gameType="quiz" />
+          </div>
         </div>
       </div>
     </DashboardLayout>

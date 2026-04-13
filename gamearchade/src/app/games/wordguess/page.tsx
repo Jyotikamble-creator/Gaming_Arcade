@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { useWordGuess } from '@/hooks/games/useWordGuess';
 import DashboardLayout from '@/components/shared/DashboardLayout';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorComponent from '@/components/shared/ErrorComponent';
 
@@ -267,6 +268,11 @@ export default function WordGuessPage() {
             onClose={() => setShowCompletedModal(false)}
             onNewGame={handleNewGame}
           />
+
+          {/* Leaderboard */}
+          <div className="mt-12">
+            <Leaderboard gameType="word-guess" />
+          </div>
         </div>
       </div>
     </DashboardLayout>

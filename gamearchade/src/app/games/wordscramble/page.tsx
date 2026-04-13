@@ -8,6 +8,7 @@ import WordScrambleDisplay from '@/components/games/wordscramble/WordScrambleDis
 import WordScrambleInput from '@/components/games/wordscramble/WordScrambleInput';
 import WordScrambleAnswer from '@/components/games/wordscramble/WordScrambleAnswer';
 import WordScrambleCompletedModal from '@/components/games/wordscramble/WordScrambleCompletedModal';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
 import DashboardLayout from '@/components/shared/DashboardLayout';
 
 export default function WordScramblePage() {
@@ -242,7 +243,10 @@ export default function WordScramblePage() {
           onClose={handleModalClose}
           onNewGame={handleNewGame}
         />
-        </div>
+        {/* Leaderboard */}
+        <div className="mt-12">
+          <Leaderboard gameType="word-scramble" />
+        </div>        </div>
       </div>
     </DashboardLayout>
   );
