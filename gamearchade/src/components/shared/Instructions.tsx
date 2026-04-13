@@ -204,6 +204,20 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: Take your time to read each question thoroughly before selecting your answer. Think about each option carefully to maximize your score!'
         };
+      case 'reaction-time':
+        return {
+          title: 'How to Play Reaction Time',
+          rules: [
+            '• Wait for the screen to turn green, then click or press SPACE as fast as possible',
+            '• Clicking before it turns green counts as "Too Early" and resets the round',
+            '• Your reaction time is measured in milliseconds (ms)',
+            '• Play multiple rounds to build your average and track your best time',
+            '• Use difficulty modes: Easy has longer delays, Hard has shorter ones',
+            '• Enable audio cues for additional sensory feedback',
+            '• Use the countdown timer assist if you\'re practicing'
+          ],
+          tip: '💡 Tip: Stay relaxed and focused. Tension slows reactions. Try different difficulty modes to challenge yourself and track improvements over time!'
+        };
       default:
         return {
           title: 'How to Play',
