@@ -19,7 +19,6 @@ interface User {
 
 interface Game2048PageProps {
   user: User | null;
-  onBackToDashboard?: () => void;
   className?: string;
 }
 
@@ -39,7 +38,6 @@ type Board = number[][];
 
 const Game2048Page: React.FC<Game2048PageProps> = ({ 
   user, 
-  onBackToDashboard,
   className 
 }) => {
   // State variables
@@ -307,37 +305,9 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
     }
   }, [gameOver, gameWon, score, bestScore]);
 
-  const handleBackToDashboard = (): void => {
-    if (onBackToDashboard) {
-      onBackToDashboard();
-    }
-  };
-
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-yellow-900 via-orange-900 to-red-900 relative overflow-hidden ${className}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden ${className}`}>
       <AnimatedBackground />
-      
-      {/* Header */}
-      <header className="relative z-10 p-6 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={handleBackToDashboard}
-            className="text-white/80 hover:text-white transition-colors duration-200"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-2xl font-bold text-white">2048</h1>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="text-white text-right">
-            <div className="text-sm opacity-70">Welcome back</div>
-            <div className="font-semibold">{user?.name || 'Player'}</div>
-          </div>
-        </div>
-      </header>
 
       <main className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
         {/* Game Title */}
