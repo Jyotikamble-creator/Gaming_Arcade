@@ -337,90 +337,107 @@ export default function Sudoku() {
   // Render the Sudoku game
   return (
     <DashboardLayout>
-      <div className="min-h-screen text-light-text relative overflow-hidden">
+      <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text relative overflow-hidden">
         <AnimatedBackground />
-        <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold bg-linear-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent mb-2">
-            ≡ƒº⌐ Sudoku
-          </h1>
-          <p className="text-subtle-text text-lg">Fill the 9├ù9 grid with numbers 1-9</p>
-        </div>
-
-        {/* Game Stats */}
-        <div className="mb-8">
-          <SudokuStats
-            difficulty={difficulty}
-            time={elapsedTime}
-            mistakes={mistakes}
-            hintsUsed={hintsUsed}
-            maxHints={3}
-          />
-        </div>
-
-        {/* Game Area - Board and Controls Side by Side */}
-        <div className="flex flex-col lg:flex-row gap-8 items-start justify-center mb-8">
-          {/* Game Board */}
-          <div className="flex justify-center">
-            <SudokuBoard
-              board={board}
-              initialBoard={initialBoard}
-              selectedCell={selectedCell}
-              solution={solution}
-              notes={notes}
-              onCellClick={handleCellClick}
-              isPaused={isPaused}
-            />
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Header Section */}
+          <div className="text-center mb-12">
+            <h1 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent mb-3">
+              🧩 Sudoku Master
+            </h1>
+            <p className="text-xl text-gray-200 mb-2">Master the classic number puzzle game</p>
+            <p className="text-gray-400">Fill the 9×9 grid with numbers 1-9, where each row, column, and 3×3 box contains all digits</p>
           </div>
 
-          {/* Controls */}
-          <div className="flex justify-center lg:justify-start">
-            <SudokuControls
-              onNumberSelect={handleNumberInput}
-              onClear={handleClearCell}
-              onHint={handleHint}
-              onNewGame={() => startNewGame(difficulty)}
-              onDifficultyChange={(diff: SudokuDifficulty) => {
-                if (window.confirm('Start a new game with different difficulty?')) {
-                  startNewGame(diff);
-                }
-              }}
-              onPause={togglePause}
-              onResume={togglePause}
-              difficulty={difficulty}
-              isPaused={isPaused}
-              notesMode={notesMode}
-              onNotesToggle={() => setNotesMode(!notesMode)}
+          {/* Instructions Card */}
+          <div className="mb-8 max-w-3xl mx-auto">
+            <Instructions gameType="sudoku" />
+          </div>
+
+          {/* Game Stats Card */}
+          <div className="mb-8">
+            <div className="bg-linear-to-r from-gray-800/80 to-gray-700/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-600/50 shadow-2xl">
+              <div className="mb-2">
+                <h2 className="text-lg font-semibold text-gray-300 uppercase tracking-wide">Game Progress</h2>
+              </div>
+              <SudokuStats
+                difficulty={difficulty}
+                time={elapsedTime}
+                mistakes={mistakes}
+                hintsUsed={hintsUsed}
+                maxHints={3}
+              />
+            </div>
+          </div>
+
+          {/* Main Game Container */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mb-8">
+            {/* Game Board Card - Takes 2 columns on desktop */}
+            <div className="lg:col-span-2">
+              <div className="bg-linear-to-br from-gray-800/80 to-gray-700/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-600/50 shadow-2xl">
+                <h2 className="text-lg font-semibold text-gray-300 uppercase tracking-wide mb-6">Game Board</h2>
+                <div className="flex justify-center">
+                  <SudokuBoard
+                    board={board}
+                    initialBoard={initialBoard}
+                    selectedCell={selectedCell}
+                    solution={solution}
+                    notes={notes}
+                    onCellClick={handleCellClick}
+                    isPaused={isPaused}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Controls Card - Takes 1 column on desktop */}
+            <div>
+              <div className="bg-linear-to-br from-gray-800/80 to-gray-700/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-600/50 shadow-2xl sticky top-8">
+                <h2 className="text-lg font-semibold text-gray-300 uppercase tracking-wide mb-6">Controls</h2>
+                <SudokuControls
+                  onNumberSelect={handleNumberInput}
+                  onClear={handleClearCell}
+                  onHint={handleHint}
+                  onNewGame={() => startNewGame(difficulty)}
+                  onDifficultyChange={(diff: SudokuDifficulty) => {
+                    if (window.confirm('Start a new game with different difficulty?')) {
+                      startNewGame(diff);
+                    }
+                  }}
+                  onPause={togglePause}
+                  onResume={togglePause}
+                  difficulty={difficulty}
+                  isPaused={isPaused}
+                  notesMode={notesMode}
+                  onNotesToggle={() => setNotesMode(!notesMode)}
+                  hintsUsed={hintsUsed}
+                  maxHints={3}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Completion Modal */}
+          {isCompleted && (
+            <SudokuCompletedModal
+              isOpen={isCompleted}
+              score={Math.max(Math.round((1000 * ({ easy: 1, medium: 1.5, hard: 2, expert: 2.5 }[difficulty])) - Math.min(elapsedTime, 600) - (mistakes * 50) - (hintsUsed * 100)), 100)}
+              time={elapsedTime}
+              mistakes={mistakes}
               hintsUsed={hintsUsed}
-              maxHints={3}
+              difficulty={difficulty}
+              onClose={() => setIsCompleted(false)}
+              onNewGame={() => startNewGame(difficulty)}
             />
+          )}
+
+          {/* Leaderboard Section */}
+          <div className="mt-16">
+            <div className="bg-linear-to-r from-gray-800/80 to-gray-700/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-600/50 shadow-2xl">
+              <h2 className="text-lg font-semibold text-gray-300 uppercase tracking-wide mb-6">Leaderboard</h2>
+              <Leaderboard gameType="sudoku" />
+            </div>
           </div>
-        </div>
-
-        {/* Instructions */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <Instructions gameType="sudoku" />
-        </div>
-
-        {/* Completion Modal */}
-        {isCompleted && (
-          <SudokuCompletedModal
-            isOpen={isCompleted}
-            score={Math.max(Math.round((1000 * ({ easy: 1, medium: 1.5, hard: 2, expert: 2.5 }[difficulty])) - Math.min(elapsedTime, 600) - (mistakes * 50) - (hintsUsed * 100)), 100)}
-            time={elapsedTime}
-            mistakes={mistakes}
-            hintsUsed={hintsUsed}
-            difficulty={difficulty}
-            onClose={() => setIsCompleted(false)}
-            onNewGame={() => startNewGame(difficulty)}
-          />
-        )}
-
-        {/* Leaderboard */}
-        <div className="mt-12">
-          <Leaderboard gameType="sudoku" />
-        </div>
         </div>
       </div>
     </DashboardLayout>

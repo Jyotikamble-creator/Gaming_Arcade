@@ -218,6 +218,20 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: Stay relaxed and focused. Tension slows reactions. Try different difficulty modes to challenge yourself and track improvements over time!'
         };
+      case 'sudoku':
+        return {
+          title: 'How to Play Sudoku',
+          rules: [
+            '• Fill every row, column, and 3x3 box with numbers 1-9',
+            '• Each number can appear only once in each row, column, and box',
+            '• Click on a cell to select it, then click a number to place it',
+            '• Use Notes mode to write down possible numbers for a cell',
+            '• Click Clear to erase a cell without affecting notes',
+            '• Use Hints to reveal a cell (limited per game)',
+            '• Choose difficulty: Easy (30 clues) to Expert (65 removed cells)'
+          ],
+          tip: '💡 Tip: Start by finding cells where only one number is possible. Look for rows, columns, or boxes that are almost complete to narrow down options!'
+        };
       default:
         return {
           title: 'How to Play',

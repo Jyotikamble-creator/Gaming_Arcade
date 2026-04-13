@@ -143,10 +143,12 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
           display: inline-grid;
           grid-template-columns: repeat(9, 1fr);
           gap: 0;
-          background: #4a5568;
-          padding: 4px;
+          background: #2d3748;
+          padding: 0;
+          border: 3px solid #1a202c;
           border-radius: 12px;
           box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+          overflow: hidden;
         }
         
         .sudoku-row {
@@ -156,20 +158,46 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
         .sudoku-cell {
           width: 70px;
           height: 70px;
-          background: white;
+          background: #f8f9fa;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.15s ease;
           position: relative;
           font-size: 28px;
           font-weight: 600;
-          color: #2d3748;
+          color: #1a202c;
+          border: 1px solid #cbd5e0;
+          user-select: none;
+        }
+        
+        /* Main grid borders for 3x3 boxes */
+        .sudoku-cell:nth-child(3n) {
+          border-right: 3px solid #1a202c;
+        }
+        
+        .sudoku-cell:nth-child(27n+1),
+        .sudoku-cell:nth-child(27n+2),
+        .sudoku-cell:nth-child(27n+3),
+        .sudoku-cell:nth-child(27n+4),
+        .sudoku-cell:nth-child(27n+5),
+        .sudoku-cell:nth-child(27n+6),
+        .sudoku-cell:nth-child(27n+7),
+        .sudoku-cell:nth-child(27n+8),
+        .sudoku-cell:nth-child(27n+9) {
+          border-bottom: 1px solid #cbd5e0;
+        }
+        
+        .sudoku-cell:nth-child(n+19):nth-child(-n+27),
+        .sudoku-cell:nth-child(n+46):nth-child(-n+54),
+        .sudoku-cell:nth-child(n+73):nth-child(-n+81) {
+          border-bottom: 3px solid #1a202c;
         }
         
         .sudoku-cell:hover {
           background: #edf2f7;
+          transform: translateY(-1px);
         }
         
         .sudoku-cell-initial {
@@ -177,33 +205,49 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
           color: #1a202c;
           font-weight: 700;
           cursor: default;
+          box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
         }
         
         .sudoku-cell-initial:hover {
           background: #e2e8f0;
+          transform: none;
         }
         
         .sudoku-cell-selected {
           background: #bee3f8 !important;
           box-shadow: inset 0 0 0 2px #3182ce;
+          font-weight: 700;
         }
         
         .sudoku-cell-highlighted {
-          background: #f7fafc;
+          background: #f0f7ff;
         }
         
         .sudoku-cell-same-number {
           background: #c6f6d5 !important;
+          font-weight: 600;
         }
         
         .sudoku-cell-wrong {
           background: #fed7d7 !important;
           color: #c53030;
+          font-weight: 700;
+          animation: pulse-error 0.3s ease;
+        }
+        
+        @keyframes pulse-error {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.02);
+          }
         }
         
         .sudoku-number {
           font-size: 32px;
           font-weight: 700;
+          line-height: 1;
         }
         
         .sudoku-notes {
@@ -212,8 +256,8 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
           grid-template-rows: repeat(3, 1fr);
           width: 100%;
           height: 100%;
-          padding: 4px;
-          gap: 2px;
+          padding: 2px;
+          gap: 1px;
         }
         
         .sudoku-note {
@@ -223,44 +267,43 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-        
-        /* Add thick borders for 3x3 boxes */
-        .sudoku-cell:nth-child(3n) {
-          border-right: 2px solid #4a5568;
-        }
-        
-        .sudoku-cell:nth-child(n):nth-child(-n+9) {
-          border-bottom: none;
-        }
-        
-        .sudoku-cell:nth-child(n+19):nth-child(-n+27),
-        .sudoku-cell:nth-child(n+46):nth-child(-n+54) {
-          border-bottom: 2px solid #4a5568;
+          line-height: 1;
         }
         
         /* Responsive design */
         @media (max-width: 768px) {
           .sudoku-cell {
-            width: 40px;
-            height: 40px;
-            font-size: 18px;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            border-width: 0.5px;
+          }
+          
+          .sudoku-cell:nth-child(3n) {
+            border-right-width: 2px;
+          }
+          
+          .sudoku-cell:nth-child(n+19):nth-child(-n+27),
+          .sudoku-cell:nth-child(n+46):nth-child(-n+54),
+          .sudoku-cell:nth-child(n+73):nth-child(-n+81) {
+            border-bottom-width: 2px;
           }
           
           .sudoku-number {
-            font-size: 20px;
+            font-size: 22px;
           }
           
           .sudoku-note {
-            font-size: 8px;
+            font-size: 7px;
           }
         }
         
         @media (max-width: 480px) {
           .sudoku-cell {
-            width: 35px;
-            height: 35px;
+            width: 38px;
+            height: 38px;
             font-size: 16px;
+            border-width: 0.5px;
           }
           
           .sudoku-number {
@@ -268,7 +311,7 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
           }
           
           .sudoku-note {
-            font-size: 7px;
+            font-size: 6px;
           }
         }
       `}</style>

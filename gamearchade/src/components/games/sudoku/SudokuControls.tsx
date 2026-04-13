@@ -137,124 +137,175 @@ const SudokuControls: React.FC<SudokuControlsProps> = ({
         .sudoku-controls {
           display: flex;
           flex-direction: column;
-          gap: 1.5rem;
-          padding: 1.5rem;
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(10px);
-          border-radius: 12px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          gap: 1.75rem;
+          padding: 1.75rem;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%);
+          backdrop-filter: blur(12px);
+          border-radius: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         .control-section {
           display: flex;
           flex-direction: column;
-          gap: 0.75rem;
+          gap: 0.9rem;
         }
 
         .control-label {
-          font-size: 14px;
-          font-weight: 600;
-          color: #e2e8f0;
+          font-size: 11px;
+          font-weight: 700;
+          color: #cbd5e1;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.08em;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         .difficulty-buttons {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 0.5rem;
+          gap: 0.6rem;
         }
 
         .difficulty-btn {
-          padding: 0.5rem 1rem;
-          border-radius: 8px;
-          font-weight: 600;
-          font-size: 14px;
-          transition: all 0.2s;
+          padding: 0.7rem 1rem;
+          border-radius: 10px;
+          font-weight: 700;
+          font-size: 13px;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           border: 2px solid transparent;
           cursor: pointer;
+          text-transform: capitalize;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .difficulty-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.1);
+          transition: left 0.3s;
+          z-index: -1;
+        }
+
+        .difficulty-btn:hover::before {
+          left: 0;
         }
 
         .difficulty-green {
           background: rgba(72, 187, 120, 0.2);
-          color: #68d391;
+          color: #86efac;
+          border-color: rgba(72, 187, 120, 0.3);
         }
 
         .difficulty-green:hover {
-          background: rgba(72, 187, 120, 0.3);
+          background: rgba(72, 187, 120, 0.35);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(72, 187, 120, 0.2);
         }
 
         .difficulty-green.active {
-          background: #48bb78;
+          background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
           color: white;
-          border-color: #38a169;
+          border-color: #2f8659;
+          box-shadow: 0 8px 20px rgba(72, 187, 120, 0.3);
         }
 
         .difficulty-yellow {
-          background: rgba(237, 137, 54, 0.2);
-          color: #ecc94b;
+          background: rgba(251, 191, 36, 0.2);
+          color: #fcd34d;
+          border-color: rgba(251, 191, 36, 0.3);
         }
 
         .difficulty-yellow:hover {
-          background: rgba(237, 137, 54, 0.3);
+          background: rgba(251, 191, 36, 0.35);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
         }
 
         .difficulty-yellow.active {
-          background: #ed8936;
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
           color: white;
-          border-color: #dd6b20;
+          border-color: #d97706;
+          box-shadow: 0 8px 20px rgba(251, 191, 36, 0.3);
         }
 
         .difficulty-red {
           background: rgba(245, 101, 101, 0.2);
-          color: #fc8181;
+          color: #fca5a5;
+          border-color: rgba(245, 101, 101, 0.3);
         }
 
         .difficulty-red:hover {
-          background: rgba(245, 101, 101, 0.3);
+          background: rgba(245, 101, 101, 0.35);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(245, 101, 101, 0.2);
         }
 
         .difficulty-red.active {
-          background: #f56565;
+          background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
           color: white;
-          border-color: #e53e3e;
+          border-color: #c53030;
+          box-shadow: 0 8px 20px rgba(245, 101, 101, 0.3);
         }
 
         .number-pad {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 0.75rem;
+          gap: 0.8rem;
           min-width: 220px;
         }
 
         .number-btn {
           aspect-ratio: 1;
-          min-height: 60px;
-          background: rgba(99, 102, 241, 0.2);
-          color: #a5b4fc;
-          border: 2px solid rgba(99, 102, 241, 0.3);
-          border-radius: 8px;
+          min-height: 65px;
+          background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(79, 70, 229, 0.15) 100%);
+          color: #c7d2fe;
+          border: 2px solid rgba(99, 102, 241, 0.5);
+          border-radius: 12px;
           font-size: 24px;
-          font-weight: 700;
+          font-weight: 800;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+
+        .number-btn::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3), transparent);
+          opacity: 0;
+          transition: opacity 0.3s;
         }
 
         .number-btn:hover:not(:disabled) {
-          background: rgba(99, 102, 241, 0.4);
-          color: #c7d2fe;
-          transform: scale(1.05);
+          background: linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(79, 70, 229, 0.25) 100%);
+          color: #e0e7ff;
+          transform: translateY(-3px) scale(1.05);
+          border-color: rgba(99, 102, 241, 0.7);
+          box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .number-btn::before:hover {
+          opacity: 1;
         }
 
         .number-btn:disabled {
-          opacity: 0.5;
+          opacity: 0.4;
           cursor: not-allowed;
+          transform: none;
         }
 
         .action-buttons {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 0.5rem;
+          gap: 0.6rem;
         }
 
         .action-btn {
@@ -262,45 +313,58 @@ const SudokuControls: React.FC<SudokuControlsProps> = ({
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          border-radius: 8px;
-          font-weight: 600;
-          font-size: 13px;
-          transition: all 0.2s;
+          padding: 0.8rem 0.75rem;
+          border-radius: 10px;
+          font-weight: 700;
+          font-size: 12px;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           cursor: pointer;
           border: none;
+          position: relative;
+          overflow: hidden;
         }
 
         .clear-btn {
-          background: rgba(239, 68, 68, 0.2);
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.15) 100%);
           color: #fca5a5;
+          border: 1px solid rgba(239, 68, 68, 0.4);
         }
 
         .clear-btn:hover:not(:disabled) {
-          background: rgba(239, 68, 68, 0.3);
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.4) 0%, rgba(220, 38, 38, 0.25) 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
         }
 
         .notes-btn {
-          background: rgba(168, 85, 247, 0.2);
-          color: #c4b5fd;
+          background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(147, 51, 234, 0.15) 100%);
+          color: #d8b4fe;
+          border: 1px solid rgba(168, 85, 247, 0.4);
         }
 
         .notes-btn:hover:not(:disabled) {
-          background: rgba(168, 85, 247, 0.3);
+          background: linear-gradient(135deg, rgba(168, 85, 247, 0.4) 0%, rgba(147, 51, 234, 0.25) 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
         }
 
         .notes-btn.active {
-          background: #a855f7;
+          background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
           color: white;
+          border-color: #7e22ce;
+          box-shadow: 0 6px 16px rgba(168, 85, 247, 0.3);
         }
 
         .hint-btn {
-          background: rgba(251, 191, 36, 0.2);
-          color: #fcd34d;
+          background: linear-gradient(135deg, rgba(251, 191, 36, 0.25) 0%, rgba(245, 158, 11, 0.15) 100%);
+          color: #fde047;
+          border: 1px solid rgba(251, 191, 36, 0.4);
         }
 
         .hint-btn:hover:not(:disabled) {
-          background: rgba(251, 191, 36, 0.3);
+          background: linear-gradient(135deg, rgba(251, 191, 36, 0.4) 0%, rgba(245, 158, 11, 0.25) 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
         }
 
         .action-btn:disabled {
@@ -311,53 +375,66 @@ const SudokuControls: React.FC<SudokuControlsProps> = ({
         .game-controls {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 0.5rem;
+          gap: 0.6rem;
         }
 
         .game-btn {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          border-radius: 8px;
-          font-weight: 600;
-          font-size: 14px;
-          transition: all 0.2s;
+          gap: 0.6rem;
+          padding: 0.85rem 1rem;
+          border-radius: 10px;
+          font-weight: 700;
+          font-size: 13px;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           cursor: pointer;
           border: none;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .pause-btn {
-          background: rgba(245, 158, 11, 0.2);
-          color: #fbbf24;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(217, 119, 6, 0.2) 100%);
+          color: #fcd34d;
+          border: 1px solid rgba(245, 158, 11, 0.4);
         }
 
         .pause-btn:hover {
-          background: rgba(245, 158, 11, 0.3);
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.45) 0%, rgba(217, 119, 6, 0.3) 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25);
         }
 
         .resume-btn {
-          background: rgba(34, 197, 94, 0.2);
+          background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(5, 150, 105, 0.2) 100%);
           color: #86efac;
+          border: 1px solid rgba(34, 197, 94, 0.4);
         }
 
         .resume-btn:hover {
-          background: rgba(34, 197, 94, 0.3);
+          background: linear-gradient(135deg, rgba(34, 197, 94, 0.45) 0%, rgba(5, 150, 105, 0.3) 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(34, 197, 94, 0.25);
         }
 
         .new-game-btn {
-          background: rgba(59, 130, 246, 0.2);
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.2) 100%);
           color: #93c5fd;
+          border: 1px solid rgba(59, 130, 246, 0.4);
         }
 
         .new-game-btn:hover {
-          background: rgba(59, 130, 246, 0.3);
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.45) 0%, rgba(37, 99, 235, 0.3) 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
         }
 
         @media (max-width: 768px) {
           .sudoku-controls {
-            padding: 1rem;
+            padding: 1.25rem;
+            gap: 1.25rem;
           }
 
           .action-buttons {
@@ -366,6 +443,11 @@ const SudokuControls: React.FC<SudokuControlsProps> = ({
 
           .game-controls {
             grid-template-columns: 1fr;
+          }
+
+          .number-btn {
+            min-height: 55px;
+            font-size: 20px;
           }
         }
       `}</style>

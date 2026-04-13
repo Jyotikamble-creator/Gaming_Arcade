@@ -161,14 +161,14 @@ const SudokuCompletedModal: React.FC<SudokuCompletedModalProps> = ({
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             padding: 1rem;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
           @keyframes fadeIn {
@@ -178,25 +178,43 @@ const SudokuCompletedModal: React.FC<SudokuCompletedModalProps> = ({
 
           .modal-content {
             position: relative;
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border-radius: 24px;
-            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            border-radius: 28px;
+            padding: 3.5rem 2.5rem;
             max-width: 500px;
             width: 100%;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: slideUp 0.4s ease;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             outline: none;
+            overflow: hidden;
+          }
+
+          .modal-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+            animation: rotate 8s linear infinite;
+            pointer-events: none;
+          }
+
+          @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
           }
 
           @keyframes slideUp {
             from {
               opacity: 0;
-              transform: translateY(20px);
+              transform: translateY(30px) scale(0.95);
             }
             to {
               opacity: 1;
-              transform: translateY(0);
+              transform: translateY(0) scale(1);
             }
           }
 
@@ -208,73 +226,101 @@ const SudokuCompletedModal: React.FC<SudokuCompletedModalProps> = ({
             bottom: 0;
             pointer-events: none;
             overflow: hidden;
-            border-radius: 24px;
+            border-radius: 28px;
+            z-index: 0;
           }
 
           .confetti {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            top: -10px;
+            width: 12px;
+            height: 12px;
+            top: -20px;
+            border-radius: 50%;
             animation: fall 3s linear infinite;
           }
 
           @keyframes fall {
             to {
-              transform: translateY(600px) rotate(360deg);
+              transform: translateY(700px) rotate(400deg);
+              opacity: 0;
             }
           }
 
           .trophy-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1.5rem;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
-            animation: bounce 1s ease infinite;
+            box-shadow: 0 15px 40px rgba(251, 191, 36, 0.4), inset 0 -2px 10px rgba(0, 0, 0, 0.2);
+            animation: bounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            z-index: 1;
+          }
+
+          .trophy-icon::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.3), transparent 70%);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
           }
 
           @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
+            0% { transform: translateY(-30px) scale(0); }
             50% { transform: translateY(-10px); }
+            100% { transform: translateY(0) scale(1); }
+          }
+
+          @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.7; }
           }
 
           .modal-title {
-            font-size: 32px;
-            font-weight: 700;
+            font-size: 36px;
+            font-weight: 800;
             color: white;
             text-align: center;
             margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
           }
 
           .rating-container {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 1;
           }
 
           .stars {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
             justify-content: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
           }
 
           .star {
-            width: 32px;
-            height: 32px;
-            color: #334155;
+            width: 40px;
+            height: 40px;
+            color: rgba(99, 102, 241, 0.2);
             transition: all 0.3s;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
           }
 
           .star.filled {
             color: #fbbf24;
-            filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
-            animation: starPop 0.5s ease backwards;
+            filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.8));
+            animation: starPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
           }
 
           .star.filled:nth-child(1) { animation-delay: 0.1s; }
@@ -285,168 +331,220 @@ const SudokuCompletedModal: React.FC<SudokuCompletedModalProps> = ({
 
           @keyframes starPop {
             0% {
-              transform: scale(0);
+              transform: scale(0) rotate(-180deg);
               opacity: 0;
             }
             50% {
-              transform: scale(1.2);
+              transform: scale(1.3);
             }
             100% {
-              transform: scale(1);
+              transform: scale(1) rotate(0deg);
               opacity: 1;
             }
           }
 
           .rating-label {
-            font-size: 20px;
-            font-weight: 700;
-          }
-
-          .score-display {
-            text-align: center;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-          }
-
-          .score-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 0.5rem;
-          }
-
-          .score-value {
-            font-size: 48px;
-            font-weight: 700;
+            font-size: 22px;
+            font-weight: 800;
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
           }
 
+          .score-display {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border-radius: 18px;
+            margin-bottom: 2rem;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+          }
+
+          .score-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+          }
+
+          .score-value {
+            font-size: 56px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
+            line-height: 1;
+          }
+
           .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 1;
           }
 
           .stat-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 1rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(8px);
+          }
+
+          .stat-item:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15);
           }
 
           .stat-emoji {
-            font-size: 32px;
-            margin-bottom: 0.5rem;
+            font-size: 40px;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+            animation: bounce 0.8s ease-in-out infinite;
           }
 
           .stat-svg {
-            width: 32px;
-            height: 32px;
-            margin: 0 auto 0.5rem;
+            width: 36px;
+            height: 36px;
+            margin: 0 auto 0.75rem;
             color: #94a3b8;
+            transition: all 0.3s;
           }
 
           .difficulty-green .stat-emoji,
           .difficulty-green .stat-svg {
-            color: #48bb78;
+            color: #86efac;
           }
 
           .difficulty-yellow .stat-emoji,
           .difficulty-yellow .stat-svg {
-            color: #ed8936;
+            color: #fcd34d;
           }
 
           .difficulty-red .stat-emoji,
           .difficulty-red .stat-svg {
-            color: #f56565;
+            color: #fca5a5;
           }
 
           .stat-name {
-            font-size: 12px;
-            font-weight: 600;
-            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            color: #cbd5e1;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
           }
 
           .stat-number {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
             color: #e2e8f0;
           }
 
           .modal-actions {
             display: flex;
             gap: 1rem;
+            position: relative;
+            z-index: 1;
           }
 
           .btn-primary,
           .btn-secondary {
             flex: 1;
-            padding: 1rem 1.5rem;
+            padding: 1.1rem 1.5rem;
             border-radius: 12px;
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 15px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
+            position: relative;
+            overflow: hidden;
           }
 
           .btn-primary {
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 0%, #3730a3 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+          }
+
+          .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.4s;
           }
 
           .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.6);
+          }
+
+          .btn-primary:hover::before {
+            left: 100%;
           }
 
           .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
             color: #e2e8f0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
           }
 
           .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-color: rgba(255, 255, 255, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15);
           }
 
           @media (max-width: 640px) {
             .modal-content {
-              padding: 2rem 1.5rem;
+              padding: 2.5rem 1.5rem;
             }
 
             .modal-title {
-              font-size: 24px;
+              font-size: 28px;
             }
 
             .score-value {
-              font-size: 36px;
+              font-size: 42px;
             }
 
             .stats-grid {
               grid-template-columns: 1fr;
+              gap: 1rem;
             }
 
             .modal-actions {
               flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+              padding: 1rem 1.25rem;
+              font-size: 14px;
             }
           }
         `}</style>
