@@ -190,6 +190,20 @@ const Instructions: React.FC<InstructionsProps> = ({ gameType }) => {
           ],
           tip: '💡 Tip: Control the center early, then create two threats at once to force a win.'
         };
+      case 'quiz':
+        return {
+          title: 'How to Play Quiz',
+          rules: [
+            '• Answer multiple-choice questions on various topics',
+            '• Read each question carefully and select your answer',
+            '• Each correct answer earns you points (default 10 pts per question)',
+            '• You can only select one answer per question',
+            '• Correct answers are highlighted in green, wrong answers in red',
+            '• Progress through the quiz by answering all questions',
+            '• Your final score is displayed at the end'
+          ],
+          tip: '💡 Tip: Take your time to read each question thoroughly before selecting your answer. Think about each option carefully to maximize your score!'
+        };
       default:
         return {
           title: 'How to Play',

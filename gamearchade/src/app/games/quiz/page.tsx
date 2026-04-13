@@ -2,6 +2,8 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import QuestionCard from '@/components/games/quiz/QuestionCard'
 import QuizStats from '@/components/games/quiz/QuizStats'
+import Instructions from '@/components/shared/Instructions'
+import QuizCompletedModal from '@/components/games/quiz/QuizCompletedModal'
 import DashboardLayout from '@/components/shared/DashboardLayout'
 
 interface QuizQuestion {
@@ -18,6 +20,7 @@ export default function QuizPage() {
   const [score, setScore] = useState(0)
   const [showResult, setShowResult] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
+  const [isCompleted, setIsCompleted] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -37,6 +40,9 @@ export default function QuizPage() {
   }, [])
 
   const handleAnswer = useCallback((answer: string) => {
+    // Prevent answering when quiz is completed
+    if (isCompleted) return
+
     const q = questions[currentIndex]
     setSelectedAnswer(answer)
     setShowResult(true)
@@ -48,9 +54,25 @@ export default function QuizPage() {
     setTimeout(() => {
       setShowResult(false)
       setSelectedAnswer(null)
-      setCurrentIndex(i => Math.min(i + 1, questions.length - 1))
+      
+      // Check if this is the last question
+      if (currentIndex >= questions.length - 1) {
+        // Quiz is complete, show completion modal
+        setIsCompleted(true)
+      } else {
+        // Move to next question
+        setCurrentIndex(i => i + 1)
+      }
     }, 800)
-  }, [questions, currentIndex])
+  }, [questions, currentIndex, isCompleted])
+
+  const handleRestart = useCallback(() => {
+    setCurrentIndex(0)
+    setScore(0)
+    setShowResult(false)
+    setSelectedAnswer(null)
+    setIsCompleted(false)
+  }, [])
 
   if (questions.length === 0) {
     return (
@@ -68,16 +90,30 @@ export default function QuizPage() {
         <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold mb-6">Quiz</h1>
 
+          <div className="mb-6">
+            <Instructions gameType="quiz" />
+          </div>
+
           <QuizStats current={currentIndex + 1} total={questions.length} score={score} progress={Math.round(((currentIndex+1)/questions.length)*100)} />
 
-          <QuestionCard
-            question={current.q}
-            options={current.options}
-            onAnswer={handleAnswer}
-            showResult={showResult}
-            selectedAnswer={selectedAnswer}
-            correctAnswer={current.ans}
-          />
+          {!isCompleted && (
+            <QuestionCard
+              question={current.q}
+              options={current.options}
+              onAnswer={handleAnswer}
+              showResult={showResult}
+              selectedAnswer={selectedAnswer}
+              correctAnswer={current.ans}
+            />
+          )}
+
+          {isCompleted && (
+            <QuizCompletedModal
+              score={score}
+              totalQuestions={questions.length}
+              onRestart={handleRestart}
+            />
+          )}
         </div>
       </div>
     </DashboardLayout>
