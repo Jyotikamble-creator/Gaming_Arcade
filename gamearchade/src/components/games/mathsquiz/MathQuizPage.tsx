@@ -193,7 +193,7 @@ const MathQuizPage: React.FC<MathQuizPageProps> = ({
   // Render loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <AnimatedBackground />
         <div className="text-center relative z-10">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -206,7 +206,7 @@ const MathQuizPage: React.FC<MathQuizPageProps> = ({
   // Render error state if no questions
   if (!questions.length) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center px-4">
         <AnimatedBackground />
         <div className="bg-slate-800/90 backdrop-blur-lg rounded-xl p-8 border border-slate-700 max-w-md w-full text-center relative z-10 shadow-2xl">
           <h2 className="text-xl font-bold text-white mb-4">Failed to Load Questions</h2>
@@ -234,7 +234,7 @@ const MathQuizPage: React.FC<MathQuizPageProps> = ({
 
   if (!q) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-white">No question found</p>
         </div>
@@ -245,24 +245,10 @@ const MathQuizPage: React.FC<MathQuizPageProps> = ({
   // Render the quiz
   return (
     <div className={`min-h-screen text-white relative overflow-hidden ${className || ''}`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
+      <div className="absolute inset-0 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
       <AnimatedBackground />
       
       <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">🧮 Math Quiz</h1>
-          <p className="text-slate-400 text-lg">Test your math skills!</p>
-          {onBackToDashboard && (
-            <button
-              onClick={onBackToDashboard}
-              className="mt-4 bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
-            >
-              ← Back to Dashboard
-            </button>
-          )}
-        </div>
-
         {/* Instructions */}
         <div className="max-w-md mx-auto mb-6">
           <Instructions gameType="math-quiz" />
@@ -272,11 +258,11 @@ const MathQuizPage: React.FC<MathQuizPageProps> = ({
         <div className="flex justify-center gap-6 mb-8 flex-wrap">
           <div className="bg-slate-800/80 backdrop-blur-lg rounded-xl p-4 text-center border border-slate-700 shadow-lg">
             <span className="text-sm text-slate-400 uppercase tracking-wider">QUESTION</span>
-            <div className="text-2xl font-bold text-white">{index + 1}/{questions.length}</div>
+            <div className="text-2xl font-bold text-white">{index}/{questions.length}</div>
           </div>
           <div className="bg-slate-800/80 backdrop-blur-lg rounded-xl p-4 text-center border border-slate-700 shadow-lg">
             <span className="text-sm text-slate-400 uppercase tracking-wider">SCORE</span>
-            <div className="text-2xl font-bold text-white">{score}</div>
+            <div className="text-2xl font-bold text-green-400">{score}</div>
           </div>
           <div className="bg-slate-800/80 backdrop-blur-lg rounded-xl p-4 text-center border border-slate-700 shadow-lg">
             <span className="text-sm text-slate-400 uppercase tracking-wider">TIME</span>
@@ -286,7 +272,7 @@ const MathQuizPage: React.FC<MathQuizPageProps> = ({
 
         {/* Progress Bar */}
         <div className="max-w-md mx-auto mb-8">
-          <ProgressBar current={index + 1} total={questions.length} />
+          <ProgressBar current={index} total={questions.length} />
         </div>
 
         {/* Question Card */}
@@ -313,12 +299,15 @@ const MathQuizPage: React.FC<MathQuizPageProps> = ({
       {/* Quiz Completed Modal */}
       {quizCompleted && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 text-center shadow-2xl max-w-md w-full">
-            <h2 className="text-3xl font-bold text-green-600 mb-4">🎉 Quiz Completed!</h2>
-            <p className="text-slate-600 mb-2">Your final score:</p>
-            <p className="text-4xl font-bold text-blue-600 mb-4">{score} points</p>
-            <p className="text-sm text-slate-500 mb-6">
-              Questions answered: {index + 1}/{questions.length}
+          <div className="bg-slate-800/90 backdrop-blur-lg rounded-2xl p-8 text-center shadow-2xl max-w-md w-full border border-slate-700">
+            <h2 className="text-3xl font-bold text-green-400 mb-4">🎉 Quiz Completed!</h2>
+            <p className="text-slate-300 mb-2">Your final score:</p>
+            <div className="bg-slate-900/50 rounded-xl p-6 mb-6 border border-slate-600">
+              <p className="text-5xl font-bold text-green-400">{score}</p>
+              <p className="text-slate-400 text-sm mt-2">points</p>
+            </div>
+            <p className="text-sm text-slate-400 mb-6">
+              Questions answered: <span className="text-white font-semibold">{index + 1}/{questions.length}</span>
             </p>
             <div className="flex gap-3">
               <button
