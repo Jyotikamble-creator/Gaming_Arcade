@@ -229,6 +229,11 @@ const NumberMazePage: React.FC<NumberMazePageProps> = ({
         finalSum: newSum,
         score: finalScore
       });
+
+      // Auto-load next maze after showing completion modal
+      setTimeout(() => {
+        generateMaze();
+      }, 2000);
     }
   }, [playerPos, grid, currentSum, targetNumber, visited, moves, timeElapsed, gameStarted, gameCompleted]);
 
@@ -290,7 +295,7 @@ const NumberMazePage: React.FC<NumberMazePageProps> = ({
   // Render loading state
   if (isGenerating) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <AnimatedBackground />
         <div className="text-center relative z-10">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -302,23 +307,9 @@ const NumberMazePage: React.FC<NumberMazePageProps> = ({
 
   // Render the game
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden ${className || ''}`}>
+    <div className={`min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden ${className || ''}`}>
       <AnimatedBackground />
       <div className="max-w-6xl mx-auto relative z-10">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-4xl font-bold text-white mb-2">🔢 Number Maze</h1>
-          <p className="text-blue-200 text-lg">Navigate the maze to reach the target number!</p>
-          {onBackToDashboard && (
-            <button
-              onClick={onBackToDashboard}
-              className="mt-4 bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
-            >
-              ← Back to Dashboard
-            </button>
-          )}
-        </div>
-
         {/* Instructions */}
         <div className="max-w-md mx-auto mb-6">
           <Instructions gameType="number-maze" />
