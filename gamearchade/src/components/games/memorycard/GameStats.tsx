@@ -42,8 +42,8 @@ const GameStats: React.FC<GameStatsProps> = ({
           <div 
             className={`h-full rounded-full transition-all duration-500 ease-out ${
               isGameWon 
-                ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
-                : 'bg-gradient-to-r from-blue-500 to-purple-500'
+                ? 'bg-linear-to-r from-green-500 to-emerald-500' 
+                : 'bg-linear-to-r from-blue-500 to-purple-500'
             }`}
             style={{ width: `${progress}%` }}
           />

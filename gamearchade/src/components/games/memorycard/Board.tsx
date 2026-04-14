@@ -75,7 +75,7 @@ const CardComponent: React.FC<CardComponentProps> = ({
               animate={{ rotateY: 0 }}
               exit={{ rotateY: 90 }}
               transition={{ duration: 0.3 }}
-              className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg"
+              className="absolute inset-0 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg"
             >
               <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                 <div className="w-4 h-4 bg-white/40 rounded-full"></div>

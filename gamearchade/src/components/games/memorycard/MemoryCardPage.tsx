@@ -258,20 +258,6 @@ const MemoryCardPage: React.FC<MemoryCardPageProps> = ({
       <AnimatedBackground />
       
       <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">🧠 Memory Cards</h1>
-          <p className="text-slate-400 text-lg">Find all matching pairs to win!</p>
-          {onBackToDashboard && (
-            <button
-              onClick={onBackToDashboard}
-              className="mt-4 bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
-            >
-              ← Back to Dashboard
-            </button>
-          )}
-        </div>
-
         {/* Game Stats */}
         <GameStats 
           moves={moves} 
@@ -319,17 +305,17 @@ const MemoryCardPage: React.FC<MemoryCardPageProps> = ({
             <p className="text-slate-600 mb-2">You completed the game!</p>
             <div className="bg-slate-100 rounded-lg p-4 mb-6">
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-semibold">Moves:</span> {moves}
+                <div className="text-slate-800">
+                  <span className="font-semibold">Moves:</span> <span className="text-slate-700 font-bold">{moves}</span>
                 </div>
-                <div>
-                  <span className="font-semibold">Time:</span> {gameTime}s
+                <div className="text-slate-800">
+                  <span className="font-semibold">Time:</span> <span className="text-slate-700 font-bold">{gameTime}s</span>
                 </div>
-                <div>
-                  <span className="font-semibold">Pairs:</span> {cards.length / 2}
+                <div className="text-slate-800">
+                  <span className="font-semibold">Pairs:</span> <span className="text-slate-700 font-bold">{cards.length / 2}</span>
                 </div>
-                <div>
-                  <span className="font-semibold">Score:</span> {calculateScore(moves, gameTime, cards.length / 2)}
+                <div className="text-slate-800">
+                  <span className="font-semibold">Score:</span> <span className="text-slate-700 font-bold">{calculateScore(moves, gameTime, cards.length / 2)}</span>
                 </div>
               </div>
             </div>
