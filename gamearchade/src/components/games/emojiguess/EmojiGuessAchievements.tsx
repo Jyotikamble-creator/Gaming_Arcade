@@ -67,7 +67,7 @@ export default function EmojiGuessAchievements({ achievements }: EmojiGuessAchie
               initial={{ scale: 0, rotate: -10 }}
               animate={{ scale: 1, rotate: 0 }}
               exit={{ scale: 0, rotate: 10 }}
-              className="bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-500/50 rounded-lg p-3 text-center min-w-[120px]"
+              className="bg-linear-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-500/50 rounded-lg p-3 text-center min-w-[120px]"
             >
               <div className="text-2xl mb-1">{achievement.icon}</div>
               <div className="text-yellow-200 text-sm font-medium">

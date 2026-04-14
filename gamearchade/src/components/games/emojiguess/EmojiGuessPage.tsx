@@ -70,7 +70,7 @@ async function submitScore(scoreData: {
   };
 }): Promise<void> {
   try {
-    const response = await fetch('/api/scores/submit', {
+    const response = await fetch('/api/games/emoji/score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -80,9 +80,9 @@ async function submitScore(scoreData: {
     if (!response.ok) {
       throw new Error('Failed to submit score');
     }
+    console.log('Score submitted successfully:', scoreData);
   } catch (error) {
     console.error('Error submitting score:', error);
-    throw error;
   }
 }
 
@@ -195,8 +195,11 @@ export default function EmojiGuessPage({ user, className = "" }: EmojiGuessPageP
       setMessage(`🎉 Correct! You earned ${points} points!${bonusMessage}`);
       setMessageType('success');
 
-      // Hide confetti after animation
-      setTimeout(() => setShowConfetti(false), 3000);
+      // Hide confetti after animation and load next puzzle
+      setTimeout(() => {
+        setShowConfetti(false);
+        loadPuzzle();
+      }, 2000);
 
       try {
         await submitScore({
@@ -261,32 +264,7 @@ export default function EmojiGuessPage({ user, className = "" }: EmojiGuessPageP
       <AnimatedBackground />
       <Confetti show={showConfetti} />
 
-      {/* Header */}
-      <header className="relative z-10 p-6 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={handleBackToDashboard}
-            className="text-white/80 hover:text-white transition-colors duration-200"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-2xl font-bold text-white">Emoji Guess</h1>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <div className="text-white text-right">
-            <div className="text-sm opacity-70">Welcome back</div>
-            <div className="font-semibold">{user?.name || 'Player'}</div>
-          </div>
-        </div>
-      </header>
-
       <main className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
-        {/* Header */}
-        <EmojiGuessHeader streak={streak} />
-
         {/* Achievement Badges */}
         <EmojiGuessAchievements achievements={achievements} />
 

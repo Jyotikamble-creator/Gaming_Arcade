@@ -9,7 +9,7 @@ interface EmojiGuessErrorProps {
 
 export default function EmojiGuessError({ message, onRetry }: EmojiGuessErrorProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden flex items-center justify-center">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden flex items-center justify-center">
       <AnimatedBackground />
       
       <motion.div
