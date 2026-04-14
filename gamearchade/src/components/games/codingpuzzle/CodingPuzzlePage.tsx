@@ -21,13 +21,38 @@ type CodingPuzzlePageProps = {
 type GameState = "menu" | "playing" | "paused" | "completed" | "instructions";
 type PuzzleCategory = "logic" | "patterns" | "algorithms" | "data-structures";
 
+const CODING_PUZZLES: { [key in PuzzleCategory]: any[] } = {
+  logic: [
+    { id: 1, question: "Write a function that returns true if a number is even", code: "function isEven(n) { // Your code here }", answer: "return n % 2 === 0;", hint: "Use the modulo operator" },
+    { id: 2, question: "Write a function to check if a string is a palindrome", code: "function isPalindrome(str) { // Your code here }", answer: "return str === str.split('').reverse().join('');", hint: "Reverse the string and compare" },
+    { id: 3, question: "Write a function to find the largest of two numbers", code: "function max(a, b) { // Your code here }", answer: "return a > b ? a : b;", hint: "Use a ternary operator" },
+  ],
+  patterns: [
+    { id: 1, question: "Write a function that returns the next number in the sequence: 1, 1, 2, 3, 5, 8...", code: "function fibonacci(n) { // Your code here }", answer: "if (n <= 1) return n; return fibonacci(n-1) + fibonacci(n-2);", hint: "Each number is the sum of the previous two" },
+    { id: 2, question: "Write a function to find the pattern in array [1, 2, 4, 8, 16...]", code: "function nextPower(arr) { // Your code here }", answer: "return arr[arr.length - 1] * 2;", hint: "Each number is double the previous" },
+  ],
+  algorithms: [
+    { id: 1, question: "Write a function to perform binary search on a sorted array", code: "function binarySearch(arr, target) { // Your code here }", answer: "let left = 0, right = arr.length - 1; while (left <= right) { const mid = Math.floor((left + right) / 2); if (arr[mid] === target) return mid; if (arr[mid] < target) left = mid + 1; else right = mid - 1; } return -1;", hint: "Divide the search space in half each time" },
+    { id: 2, question: "Write a function to merge two sorted arrays", code: "function merge(arr1, arr2) { // Your code here }", answer: "return [...arr1, ...arr2].sort((a, b) => a - b);", hint: "Combine arrays and sort them" },
+  ],
+  "data-structures": [
+    { id: 1, question: "Write a function to find the length of the longest substring without repeating characters", code: "function lengthOfLongestSubstring(s) { // Your code here }", answer: "const seen = new Set(); let max = 0, start = 0; for (let i = 0; i < s.length; i++) { while (seen.has(s[i])) { seen.delete(s[start++]); } seen.add(s[i]); max = Math.max(max, i - start + 1); } return max;", hint: "Use a sliding window technique" },
+    { id: 2, question: "Write a function to find the first non-repeating character in a string", code: "function firstNonRepeating(s) { // Your code here }", answer: "const count = {}; for (const char of s) { count[char] = (count[char] || 0) + 1; } for (const char of s) { if (count[char] === 1) return char; } return null;", hint: "Count character frequencies first" },
+  ]
+};
+
+function getRandomPuzzle(category: PuzzleCategory) {
+  const puzzles = CODING_PUZZLES[category];
+  return puzzles[Math.floor(Math.random() * puzzles.length)];
+}
+
 export default function CodingPuzzlePage({ 
   initialPuzzle, 
   user, 
   className = "" 
 }: CodingPuzzlePageProps) {
   const router = useRouter();
-  const [gameState, setGameState] = useState<GameState>("menu");
+  const [gameState, setGameState] = useState<GameState>("playing");
   const [currentPuzzle, setCurrentPuzzle] = useState(initialPuzzle);
   const [selectedCategory, setSelectedCategory] = useState<PuzzleCategory>("logic");
   const [score, setScore] = useState(0);
@@ -35,6 +60,8 @@ export default function CodingPuzzlePage({
   const [showStats, setShowStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [message, setMessage] = useState<string>("");
+  const [messageType, setMessageType] = useState<"success" | "error" | "info" | "">("");
 
   const categories: { id: PuzzleCategory; label: string; description: string }[] = [
     { id: "logic", label: "Logic", description: "Boolean logic and reasoning puzzles" },
@@ -43,6 +70,13 @@ export default function CodingPuzzlePage({
     { id: "data-structures", label: "Data Structures", description: "Array, object, and tree problems" }
   ];
 
+  // Initialize puzzle on mount
+  useEffect(() => {
+    if (!currentPuzzle && gameState === "playing") {
+      setCurrentPuzzle(getRandomPuzzle(selectedCategory));
+    }
+  }, [gameState, currentPuzzle, selectedCategory]);
+
   const handleStartGame = (category?: PuzzleCategory) => {
     if (category) {
       setSelectedCategory(category);
@@ -50,7 +84,6 @@ export default function CodingPuzzlePage({
     setGameState("playing");
     setScore(0);
     setTimeElapsed(0);
-    // Load first puzzle for selected category
   };
 
   const handlePauseGame = () => {
@@ -66,6 +99,10 @@ export default function CodingPuzzlePage({
     setGameState("completed");
   };
 
+  const handleNextPuzzle = () => {
+    setCurrentPuzzle(getRandomPuzzle(selectedCategory));
+  };
+
   const handleBackToMenu = () => {
     setGameState("menu");
   };
@@ -75,46 +112,46 @@ export default function CodingPuzzlePage({
   };
 
   const handlePuzzleSubmit = (solution: string) => {
-    // Validate solution and award points
-    console.log("Solution submitted:", solution);
+    // Validate solution against the correct answer
+    if (!currentPuzzle || !solution.trim()) {
+      setMessage("Please enter a solution!");
+      setMessageType("error");
+      return;
+    }
+
+    // Check if the answer is correct (simple validation)
+    const isCorrect = currentPuzzle.answer.toLowerCase().includes(solution.toLowerCase().trim()) || 
+                     solution.toLowerCase().trim().includes(currentPuzzle.answer.toLowerCase());
+    
+    if (isCorrect) {
+      const points = 10;
+      setScore(prev => prev + points);
+      setMessage(`🎉 Correct! You earned ${points} points!`);
+      setMessageType("success");
+      console.log("Correct answer! Score awarded.");
+      
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+        handleNextPuzzle();
+      }, 2000);
+    } else {
+      setMessage(`❌ Incorrect! The answer was: ${currentPuzzle.answer.split(";")[0]}`);
+      setMessageType("error");
+      console.log("Incorrect answer. No points awarded.");
+      
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+        handleNextPuzzle();
+      }, 2000);
+    }
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden ${className}`}>
+    <div className={`min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden ${className}`}>
       <AnimatedBackground />
-      
-      {/* Header */}
-      <header className="relative z-10 p-6 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={handleBackToDashboard}
-            className="text-white/80 hover:text-white transition-colors duration-200"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-2xl font-bold text-white">Coding Puzzle</h1>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => setShowStats(!showStats)}
-            className="bg-white/10 backdrop-blur-lg text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-colors duration-200"
-          >
-            Stats
-          </button>
-          <button
-            onClick={() => setShowLeaderboard(!showLeaderboard)}
-            className="bg-white/10 backdrop-blur-lg text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-colors duration-200"
-          >
-            Leaderboard
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="relative z-10 flex-1 p-6">
+      <main className="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
         <AnimatePresence mode="wait">
           {gameState === "menu" && (
             <motion.div
@@ -189,6 +226,22 @@ export default function CodingPuzzlePage({
                     onSubmit={handlePuzzleSubmit}
                     disabled={gameState === "paused"}
                   />
+
+                  {message && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`p-4 rounded-lg text-center font-semibold text-lg ${
+                        messageType === "success"
+                          ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                          : messageType === "error"
+                          ? "bg-red-500/20 text-red-300 border border-red-500/30"
+                          : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                      }`}
+                    >
+                      {message}
+                    </motion.div>
+                  )}
                 </div>
                 
                 <div className="space-y-6">
