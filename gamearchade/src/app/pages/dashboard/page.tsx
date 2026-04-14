@@ -13,7 +13,7 @@ export default function Dashboard() {
   useEffect(() => {
     // Redirect to auth if not authenticated
     if (!user && !loading) {
-      router.push("/auth");
+      router.push("/pages/auth");
     }
   }, [user, loading, router]);
 

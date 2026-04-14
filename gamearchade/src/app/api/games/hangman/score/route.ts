@@ -14,26 +14,28 @@ export async function POST(request: NextRequest) {
     const body: ScoreSubmission = await request.json();
     
     // Validate the request body
-    if (!body.score || typeof body.score !== 'number') {
+    if (body.score === undefined || body.score === null || typeof body.score !== 'number') {
       return NextResponse.json(
         { error: 'Invalid score provided' },
         { status: 400 }
       );
     }
 
-    if (!body.meta?.category) {
+    if (!body.meta) {
       return NextResponse.json(
-        { error: 'Category is required' },
+        { error: 'Meta data is required' },
         { status: 400 }
       );
     }
+
+    const category = body.meta?.category || 'general';
 
     // Here you would typically save to a database
     // For now, we'll just log it and return success
     console.log('Hangman Score submitted:', {
       score: body.score,
       wordsCompleted: body.meta.wordsCompleted || 0,
-      category: body.meta.category,
+      category,
       timestamp: new Date().toISOString()
     });
 
@@ -44,10 +46,20 @@ export async function POST(request: NextRequest) {
       data: {
         score: body.score,
         gameType: 'hangman',
-        category: body.meta.category,
+        category,
         submittedAt: new Date().toISOString()
       }
-    });
+    }, { status: 200 });
+  } catch (error) {
+    console.error('Error submitting hangman score:', error);
+    
+    // Return error response
+    return NextResponse.json(
+      { error: 'Failed to submit score', details: String(error) },
+      { status: 500 }
+    );
+  }
+}
 
   } catch (error) {
     console.error('Error submitting hangman score:', error);

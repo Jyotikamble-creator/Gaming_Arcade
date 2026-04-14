@@ -209,16 +209,19 @@ const HangmanPage: React.FC<HangmanPageProps> = ({
           score: score,
           meta: {
             wordsCompleted,
-            category
+            category: category || 'general'
           }
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit score');
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(errorData.error || 'Failed to submit score');
       }
 
-      console.log('Hangman score submitted successfully');
+      const data = await response.json();
+      console.log('Hangman score submitted successfully:', data);
     } catch (error) {
       console.error('Failed to submit hangman score:', error);
     }
@@ -262,31 +265,9 @@ const HangmanPage: React.FC<HangmanPageProps> = ({
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden ${className}`}>
+    <div className={`min-h-screen bg-linear-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden ${className}`}>
       <AnimatedBackground />
       
-      {/* Header */}
-      <header className="relative z-10 p-6 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={handleBackToDashboard}
-            className="text-white/80 hover:text-white transition-colors duration-200"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-2xl font-bold text-white">Word Puzzle</h1>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="text-white text-right">
-            <div className="text-sm opacity-70">Welcome back</div>
-            <div className="font-semibold">{user?.name || 'Player'}</div>
-          </div>
-        </div>
-      </header>
-
       <main className="relative z-10 container mx-auto px-4 py-8 max-w-5xl">
         {/* Game Title */}
         <div className="text-center mb-8">
@@ -310,48 +291,42 @@ const HangmanPage: React.FC<HangmanPageProps> = ({
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <button
                   onClick={() => startGame('animals')}
-                  className="bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
-                >
+                  className="bg-linear-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105">
                   <div className="text-3xl mb-2">🦁</div>
                   Animals
                 </button>
 
                 <button
                   onClick={() => startGame('countries')}
-                  className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
-                >
+                  className="bg-linear-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105">
                   <div className="text-3xl mb-2">🌍</div>
                   Countries
                 </button>
 
                 <button
                   onClick={() => startGame('fruits')}
-                  className="bg-gradient-to-br from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
-                >
+                  className="bg-linear-to-br from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105">
                   <div className="text-3xl mb-2">🍎</div>
                   Fruits
                 </button>
 
                 <button
                   onClick={() => startGame('technology')}
-                  className="bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
-                >
+                  className="bg-linear-to-br from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105">
                   <div className="text-3xl mb-2">💻</div>
                   Technology
                 </button>
 
                 <button
                   onClick={() => startGame('sports')}
-                  className="bg-gradient-to-br from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
-                >
+                  className="bg-linear-to-br from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105">
                   <div className="text-3xl mb-2">⚽</div>
                   Sports
                 </button>
 
                 <button
                   onClick={() => startGame('nature')}
-                  className="bg-gradient-to-br from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
-                >
+                  className="bg-linear-to-br from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold py-6 px-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105">
                   <div className="text-3xl mb-2">🌲</div>
                   Nature
                 </button>
@@ -382,7 +357,7 @@ const HangmanPage: React.FC<HangmanPageProps> = ({
                 <WordDisplay word={word} guessedLetters={guessedLetters} />
 
                 {/* Clue Section */}
-                <div className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 backdrop-blur-sm rounded-xl p-6 border-2 border-yellow-500/40">
+                <div className="bg-linear-to-r from-yellow-600/20 to-orange-600/20 backdrop-blur-sm rounded-xl p-6 border-2 border-yellow-500/40">
                   <div className="flex items-start gap-3">
                     <div className="text-3xl">💡</div>
                     <div className="flex-1">

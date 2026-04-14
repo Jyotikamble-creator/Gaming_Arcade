@@ -62,7 +62,7 @@ const HangmanWinModal: React.FC<HangmanWinModalProps> = ({
             <motion.button
               onClick={onNextWord}
               className="
-                px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600
+                px-6 py-3 bg-linear-to-r from-green-500 to-emerald-600
                 text-white font-semibold rounded-lg
                 hover:from-green-600 hover:to-emerald-700
                 transition-all duration-200
@@ -76,7 +76,7 @@ const HangmanWinModal: React.FC<HangmanWinModalProps> = ({
             <motion.button
               onClick={onBackToMenu}
               className="
-                px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600
+                px-6 py-3 bg-linear-to-r from-blue-500 to-purple-600
                 text-white font-semibold rounded-lg
                 hover:from-blue-600 hover:to-purple-700
                 transition-all duration-200
