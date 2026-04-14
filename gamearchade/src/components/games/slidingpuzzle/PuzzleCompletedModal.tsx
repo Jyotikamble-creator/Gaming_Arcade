@@ -1,4 +1,6 @@
-﻿// Modal displayed when the sliding puzzle is completed, showing performance stats and achievements.
+﻿"use client";
+
+// Modal displayed when the sliding puzzle is completed, showing performance stats and achievements.
 interface PuzzleCompletedModalProps {
   moves: number;
   timeElapsed: number;

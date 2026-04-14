@@ -1,4 +1,6 @@
-﻿// Displays statistics for the sliding puzzle game including moves, time, status, and efficiency.
+﻿"use client";
+
+// Displays statistics for the sliding puzzle game including moves, time, status, and efficiency.
 interface PuzzleStatsProps {
   moves: number;
   timeElapsed: number;

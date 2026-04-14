@@ -174,52 +174,104 @@ export default function SlidingPuzzle() {
   // Render
   return (
     <DashboardLayout>
-      <div className="min-h-screen text-light-text relative overflow-hidden">
+      <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
         <AnimatedBackground />
-        <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Sliding Puzzle</h1>
-          <p className="text-subtle-text">Slide tiles to arrange them in numerical order!</p>
-        </div>
+        <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-white mb-2">🎮 Sliding Puzzle</h1>
+            <p className="text-white/70 text-lg">Slide tiles to arrange them in numerical order!</p>
+          </div>
 
-        {/* Instructions */}
-        <div className="max-w-md mx-auto mb-6">
-          <Instructions gameType="sliding-puzzle" />
-        </div>
+          {/* Main Game Container */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Game Grid - Left side (2 columns) */}
+            <div className="lg:col-span-2">
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <h2 className="text-white font-semibold mb-6">Game Board</h2>
+                <div className="flex justify-center">
+                  <PuzzleGrid
+                    tiles={tiles}
+                    gridSize={GRID_SIZE}
+                    onTileClick={moveTile}
+                    isShuffling={isShuffling}
+                    gameCompleted={gameCompleted}
+                    onShuffle={shufflePuzzle}
+                    onReset={resetGame}
+                  />
+                </div>
+              </div>
+            </div>
 
-        {/* Game Stats */}
-        <PuzzleStats
-          moves={moves}
-          timeElapsed={timeElapsed}
-          gameStarted={gameStarted}
-          gameCompleted={gameCompleted}
-        />
+            {/* Right Sidebar - Stats */}
+            <div className="space-y-6">
+              {/* Moves Card */}
+              <div className="bg-linear-to-br from-blue-500/20 to-cyan-600/20 backdrop-blur-lg rounded-xl p-4 border border-blue-400/30">
+                <h3 className="text-white/70 text-sm font-medium mb-2">Moves</h3>
+                <p className="text-3xl font-bold text-blue-300">{moves}</p>
+              </div>
 
-        {/* Game Grid */}
-        <PuzzleGrid
-          tiles={tiles}
-          gridSize={GRID_SIZE}
-          onTileClick={moveTile}
-          isShuffling={isShuffling}
-          gameCompleted={gameCompleted}
-          onShuffle={shufflePuzzle}
-          onReset={resetGame}
-        />
+              {/* Time Card */}
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                <h3 className="text-white/70 text-sm font-medium mb-2">Time</h3>
+                <p className="text-2xl font-bold text-white font-mono">
+                  {Math.floor(timeElapsed / 60)}:{String(timeElapsed % 60).padStart(2, '0')}
+                </p>
+              </div>
 
-        {/* Completion Modal */}
-        {gameCompleted && (
-          <PuzzleCompletedModal
-            moves={moves}
-            timeElapsed={timeElapsed}
-            onPlayAgain={shufflePuzzle}
-          />
-        )}
+              {/* Status Card */}
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                <h3 className="text-white/70 text-sm font-medium mb-2">Status</h3>
+                <p className="text-lg font-bold">
+                  {gameCompleted ? (
+                    <span className="text-green-400">✅ Solved!</span>
+                  ) : gameStarted ? (
+                    <span className="text-yellow-400">⏱️ Playing</span>
+                  ) : (
+                    <span className="text-gray-400">⏸️ Ready</span>
+                  )}
+                </p>
+              </div>
 
-        {/* Leaderboard */}
-        <div className="mt-12">
-          <Leaderboard gameType="sliding-puzzle" />
-        </div>
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <button
+                  onClick={shufflePuzzle}
+                  disabled={isShuffling}
+                  className="w-full px-4 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-semibold rounded-lg transition-colors"
+                >
+                  {isShuffling ? '🔀 Shuffling...' : '🎲 New Game'}
+                </button>
+                <button
+                  onClick={resetGame}
+                  className="w-full px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-colors"
+                >
+                  🔄 Reset
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 mb-8">
+            <h2 className="text-white font-semibold mb-4">📖 How to Play</h2>
+            <Instructions gameType="sliding-puzzle" />
+          </div>
+
+          {/* Leaderboard Section */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+            <h2 className="text-white font-semibold mb-6">🏆 Leaderboard</h2>
+            <Leaderboard gameType="sliding-puzzle" />
+          </div>
+
+          {/* Completion Modal */}
+          {gameCompleted && (
+            <PuzzleCompletedModal
+              moves={moves}
+              timeElapsed={timeElapsed}
+              onPlayAgain={shufflePuzzle}
+            />
+          )}
         </div>
       </div>
     </DashboardLayout>

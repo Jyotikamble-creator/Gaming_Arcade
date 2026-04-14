@@ -1,4 +1,6 @@
-﻿// Renders the sliding puzzle grid and handles tile interactions, shuffling, and game status display.
+﻿"use client";
+
+// Renders the sliding puzzle grid and handles tile interactions, shuffling, and game status display.
 interface PuzzleGridProps {
   tiles: (number | null)[];
   gridSize: number;

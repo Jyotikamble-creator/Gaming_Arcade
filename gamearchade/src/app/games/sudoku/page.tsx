@@ -337,45 +337,21 @@ export default function Sudoku() {
   // Render the Sudoku game
   return (
     <DashboardLayout>
-      <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-light-text relative overflow-hidden">
+      <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
         <AnimatedBackground />
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
           {/* Header Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent mb-3">
-              🧩 Sudoku Master
-            </h1>
-            <p className="text-xl text-gray-200 mb-2">Master the classic number puzzle game</p>
-            <p className="text-gray-400">Fill the 9×9 grid with numbers 1-9, where each row, column, and 3×3 box contains all digits</p>
-          </div>
-
-          {/* Instructions Card */}
-          <div className="mb-8 max-w-3xl mx-auto">
-            <Instructions gameType="sudoku" />
-          </div>
-
-          {/* Game Stats Card */}
-          <div className="mb-8">
-            <div className="bg-linear-to-r from-gray-800/80 to-gray-700/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-600/50 shadow-2xl">
-              <div className="mb-2">
-                <h2 className="text-lg font-semibold text-gray-300 uppercase tracking-wide">Game Progress</h2>
-              </div>
-              <SudokuStats
-                difficulty={difficulty}
-                time={elapsedTime}
-                mistakes={mistakes}
-                hintsUsed={hintsUsed}
-                maxHints={3}
-              />
-            </div>
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-white mb-2">🧩 Sudoku Master</h1>
+            <p className="text-white/70 text-lg">Master the classic number puzzle game</p>
           </div>
 
           {/* Main Game Container */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mb-8">
-            {/* Game Board Card - Takes 2 columns on desktop */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Game Board - Left side (2 columns) */}
             <div className="lg:col-span-2">
-              <div className="bg-linear-to-br from-gray-800/80 to-gray-700/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-600/50 shadow-2xl">
-                <h2 className="text-lg font-semibold text-gray-300 uppercase tracking-wide mb-6">Game Board</h2>
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <h2 className="text-white font-semibold mb-6">Game Board</h2>
                 <div className="flex justify-center">
                   <SudokuBoard
                     board={board}
@@ -390,10 +366,43 @@ export default function Sudoku() {
               </div>
             </div>
 
-            {/* Controls Card - Takes 1 column on desktop */}
-            <div>
-              <div className="bg-linear-to-br from-gray-800/80 to-gray-700/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-600/50 shadow-2xl sticky top-8">
-                <h2 className="text-lg font-semibold text-gray-300 uppercase tracking-wide mb-6">Controls</h2>
+            {/* Right Sidebar - Stats & Controls */}
+            <div className="space-y-6">
+              {/* Score Card */}
+              <div className="bg-linear-to-br from-green-500/20 to-emerald-600/20 backdrop-blur-lg rounded-xl p-4 border border-green-400/30">
+                <h3 className="text-white/70 text-sm font-medium mb-2">Score</h3>
+                <p className="text-3xl font-bold text-green-300">
+                  {Math.max(Math.round((1000 * ({ easy: 1, medium: 1.5, hard: 2, expert: 2.5 }[difficulty])) - Math.min(elapsedTime, 600) - (mistakes * 50) - (hintsUsed * 100)), 100)}
+                </p>
+              </div>
+
+              {/* Time Card */}
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                <h3 className="text-white/70 text-sm font-medium mb-2">Time</h3>
+                <p className="text-2xl font-bold text-white font-mono">{formatTime(elapsedTime)}</p>
+              </div>
+
+              {/* Mistakes Card */}
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                <h3 className="text-white/70 text-sm font-medium mb-2">Mistakes</h3>
+                <p className="text-2xl font-bold text-red-400">{mistakes} / 3</p>
+              </div>
+
+              {/* Hints Card */}
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                <h3 className="text-white/70 text-sm font-medium mb-2">Hints Used</h3>
+                <p className="text-2xl font-bold text-blue-300">{hintsUsed} / 3</p>
+              </div>
+
+              {/* Difficulty Card */}
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                <h3 className="text-white/70 text-sm font-medium mb-2">Difficulty</h3>
+                <p className="text-xl font-bold text-white capitalize">{difficulty}</p>
+              </div>
+
+              {/* Controls Card */}
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                <h2 className="text-white font-semibold mb-4 text-sm">Controls</h2>
                 <SudokuControls
                   onNumberSelect={handleNumberInput}
                   onClear={handleClearCell}
@@ -417,6 +426,18 @@ export default function Sudoku() {
             </div>
           </div>
 
+          {/* Instructions */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 mb-8">
+            <h2 className="text-white font-semibold mb-4">📖 How to Play</h2>
+            <Instructions gameType="sudoku" />
+          </div>
+
+          {/* Leaderboard Section */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 mb-8">
+            <h2 className="text-white font-semibold mb-6">🏆 Leaderboard</h2>
+            <Leaderboard gameType="sudoku" />
+          </div>
+
           {/* Completion Modal */}
           {isCompleted && (
             <SudokuCompletedModal
@@ -430,14 +451,6 @@ export default function Sudoku() {
               onNewGame={() => startNewGame(difficulty)}
             />
           )}
-
-          {/* Leaderboard Section */}
-          <div className="mt-16">
-            <div className="bg-linear-to-r from-gray-800/80 to-gray-700/80 backdrop-blur-lg rounded-2xl p-8 border border-gray-600/50 shadow-2xl">
-              <h2 className="text-lg font-semibold text-gray-300 uppercase tracking-wide mb-6">Leaderboard</h2>
-              <Leaderboard gameType="sudoku" />
-            </div>
-          </div>
         </div>
       </div>
     </DashboardLayout>
