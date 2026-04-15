@@ -61,16 +61,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-  } catch (error) {
-    console.error('Error submitting hangman score:', error);
-    
-    return NextResponse.json(
-      { error: 'Failed to submit score' },
-      { status: 500 }
-    );
-  }
-}
-
 export async function GET() {
   // Return top hangman scores (mock data for now)
   const mockScores = [

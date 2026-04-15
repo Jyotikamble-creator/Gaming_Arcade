@@ -1,4 +1,6 @@
 // WordGuess game type definitions
+export type WordDifficulty = 'easy' | 'medium' | 'hard';
+
 export interface WordGuessData {
   id?: number;
   word: string;
@@ -17,6 +19,11 @@ export interface WordGuessGameState {
   isLoading: boolean;
   isGameOver: boolean;
   isWon: boolean;
+  currentRound: number;
+  totalRounds: number;
+  difficulty: WordDifficulty | null;
+  roundsCompleted: number[];
+  gameStarted: boolean;
 }
 
 export interface WordGuessSettings {
@@ -110,6 +117,12 @@ export interface UseWordGuessReturn {
   checkWin: () => void;
   loadNewWord: () => Promise<void>;
   resetGame: () => void;
+  startGame: (difficulty: WordDifficulty) => void;
+  nextRound: () => void;
+  currentRound: number;
+  totalRounds: number;
+  difficulty: WordDifficulty | null;
+  gameStarted: boolean;
 }
 
 // API Types
@@ -133,7 +146,29 @@ export const WORD_GUESS_CONSTANTS = {
   SCORE_PER_WRONG_LETTER: -2,
   SCORE_PER_HINT: -5,
   WIN_BONUS: 50,
-  ALPHABET: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+  ALPHABET: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+  TOTAL_ROUNDS: 5
+} as const;
+
+export const DIFFICULTY_CONFIG = {
+  easy: {
+    label: 'Easy',
+    maxHints: 5,
+    maxWrongGuesses: 5,
+    winBonus: 100
+  },
+  medium: {
+    label: 'Medium',
+    maxHints: 3,
+    maxWrongGuesses: 3,
+    winBonus: 200
+  },
+  hard: {
+    label: 'Hard',
+    maxHints: 1,
+    maxWrongGuesses: 2,
+    winBonus: 300
+  }
 } as const;
 
 export default WordGuessGameState;
