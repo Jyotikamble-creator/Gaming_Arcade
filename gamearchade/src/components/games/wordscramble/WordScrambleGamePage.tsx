@@ -355,7 +355,7 @@ const WordScrambleGamePage: React.FC<WordScramblePageProps> = ({
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-gray-300">
             <span>Difficulty: <span className="font-bold text-yellow-400 capitalize">{difficulty}</span></span>
             <span className="hidden sm:inline text-gray-500">•</span>
-            <span>Question: <span className="font-bold text-blue-400">{currentQuestionIndex + 1}/5</span></span>
+            <span>Question: <span className="font-bold text-blue-400">{currentQuestionIndex}/5</span></span>
             <span className="hidden sm:inline text-gray-500">•</span>
             <span>Score: <span className="font-bold text-green-400">{totalScore}</span></span>
           </div>
@@ -364,7 +364,7 @@ const WordScrambleGamePage: React.FC<WordScramblePageProps> = ({
           <div className="mt-4 w-full bg-gray-700 rounded-full h-2 overflow-hidden">
             <div 
               className="bg-linear-to-r from-blue-500 to-purple-600 h-full transition-all duration-300 rounded-full"
-              style={{ width: `${((currentQuestionIndex + 1) / 5) * 100}%` }}
+              style={{ width: `${(currentQuestionIndex / 5) * 100}%` }}
             ></div>
           </div>
         </div>
@@ -419,7 +419,7 @@ const WordScrambleGamePage: React.FC<WordScramblePageProps> = ({
                 onClick={handleNextQuestion}
                 className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-all duration-200"
               >
-                {currentQuestionIndex + 1 >= wordSequence.length ? '📊 View Results' : 'Next Question →'}
+                {currentQuestionIndex >= wordSequence.length - 1 ? '📊 View Results' : 'Next Question →'}
               </button>
             </div>
           )}
