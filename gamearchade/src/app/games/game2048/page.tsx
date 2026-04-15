@@ -32,7 +32,6 @@ export default function Game2048() {
     <DashboardLayout>
       <Game2048Page 
         user={user} 
-        onBackToDashboard={handleBackToDashboard}
       />
     </DashboardLayout>
   );

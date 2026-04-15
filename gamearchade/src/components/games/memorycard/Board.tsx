@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getGridColsForDifficulty, MemoryCardDifficulty } from '@/lib/games/memory-card';
 
 interface Card {
   id: number;
@@ -16,6 +17,7 @@ interface BoardProps {
   onCardClick: (id: number) => void;
   disabled: boolean;
   className?: string;
+  difficulty?: MemoryCardDifficulty;
 }
 
 interface CardComponentProps {
@@ -99,23 +101,21 @@ const Board: React.FC<BoardProps> = ({
   matched, 
   onCardClick, 
   disabled,
-  className 
+  className,
+  difficulty = 'medium'
 }) => {
-  const gridSize = Math.ceil(Math.sqrt(cards.length));
-  const isSmallGrid = cards.length <= 16;
+  const gridCols = getGridColsForDifficulty(difficulty);
 
   return (
     <div className={`flex justify-center mb-8 ${className || ''}`}>
       <div 
         className={`
-          grid gap-3 md:gap-4 max-w-2xl w-full
-          ${isSmallGrid 
-            ? 'grid-cols-4' 
-            : `grid-cols-${Math.min(gridSize, 6)}`
-          }
+          grid gap-3 md:gap-4
+          ${difficulty === 'easy' ? 'max-w-sm' : difficulty === 'medium' ? 'max-w-2xl' : 'max-w-4xl'}
+          w-full
         `}
         style={{
-          gridTemplateColumns: `repeat(${isSmallGrid ? 4 : Math.min(gridSize, 6)}, 1fr)`
+          gridTemplateColumns: `repeat(${gridCols}, 1fr)`
         }}
       >
         {cards.map((card) => (

@@ -15,6 +15,180 @@ import {
   WORD_SCRAMBLE_CONSTANTS
 } from '@/types/games/word-scramble';
 
+// ============================================
+// Simplified Difficulty-Based Word Sets
+// ============================================
+
+export type GameDifficulty = 'easy' | 'medium' | 'hard';
+
+export interface WordSet {
+  difficulty: GameDifficulty;
+  theme: string;
+  words: Array<{ word: string; category: string }>;
+}
+
+export const WORD_SETS: Record<GameDifficulty, WordSet> = {
+  easy: {
+    difficulty: 'easy',
+    theme: '🌱 Beginner',
+    words: [
+      { word: 'CAT', category: 'Animals' },
+      { word: 'DOG', category: 'Animals' },
+      { word: 'BOOK', category: 'Objects' },
+      { word: 'TREE', category: 'Nature' },
+      { word: 'STAR', category: 'Sky' },
+      { word: 'RAIN', category: 'Weather' },
+      { word: 'FISH', category: 'Animals' },
+      { word: 'BIRD', category: 'Animals' },
+      { word: 'MOON', category: 'Sky' },
+      { word: 'ROCK', category: 'Nature' },
+      { word: 'SAND', category: 'Nature' },
+      { word: 'SNOW', category: 'Weather' },
+    ],
+  },
+  medium: {
+    difficulty: 'medium',
+    theme: '⚡ Intermediate',
+    words: [
+      { word: 'ELEPHANT', category: 'Animals' },
+      { word: 'MOUNTAIN', category: 'Geography' },
+      { word: 'LIBRARY', category: 'Places' },
+      { word: 'COMPUTER', category: 'Technology' },
+      { word: 'BUTTERFLY', category: 'Insects' },
+      { word: 'KEYBOARD', category: 'Technology' },
+      { word: 'CHOCOLATE', category: 'Food' },
+      { word: 'TELEPHONE', category: 'Technology' },
+      { word: 'HOSPITAL', category: 'Places' },
+      { word: 'DINOSAUR', category: 'Animals' },
+      { word: 'UNIVERSE', category: 'Space' },
+      { word: 'BIRTHDAY', category: 'Events' },
+    ],
+  },
+  hard: {
+    difficulty: 'hard',
+    theme: '🔥 Advanced',
+    words: [
+      { word: 'JAVASCRIPT', category: 'Programming' },
+      { word: 'ALGORITHM', category: 'Computing' },
+      { word: 'ARCHITECTURE', category: 'Engineering' },
+      { word: 'PHOTOGRAPH', category: 'Art' },
+      { word: 'MATHEMATICS', category: 'Science' },
+      { word: 'PSYCHOLOGY', category: 'Science' },
+      { word: 'TECHNOLOGY', category: 'Innovation' },
+      { word: 'HYPOTHESIS', category: 'Science' },
+      { word: 'TELEPHONE', category: 'Communication' },
+      { word: 'EARTHQUAKE', category: 'Nature' },
+      { word: 'VOCABULARY', category: 'Language' },
+      { word: 'FRIENDSHIP', category: 'Social' },
+    ],
+  },
+};
+
+/**
+ * Get a random word from specified difficulty level
+ */
+export function getRandomWordByDifficulty(difficulty: GameDifficulty) {
+  const wordSet = WORD_SETS[difficulty];
+  if (!wordSet) {
+    console.error(`[WORD_SCRAMBLE] Invalid difficulty: ${difficulty}`);
+    return getRandomWordByDifficulty('medium');
+  }
+
+  const words = wordSet.words;
+  if (!words || words.length === 0) {
+    console.error(`[WORD_SCRAMBLE] No words found for difficulty: ${difficulty}`);
+    return { word: 'WORD', scrambled: 'DROQ', category: 'General' };
+  }
+
+  const selectedWord = words[Math.floor(Math.random() * words.length)];
+  
+  let scrambled = shuffleWordSimple(selectedWord.word);
+  while (scrambled === selectedWord.word && selectedWord.word.length > 1) {
+    scrambled = shuffleWordSimple(selectedWord.word);
+  }
+
+  return {
+    word: selectedWord.word,
+    scrambled,
+    category: selectedWord.category,
+    difficulty,
+  };
+}
+
+/**
+ * Get 5 unique words for a round
+ */
+export function getWordSequenceForRound(difficulty: GameDifficulty, count: number = 5) {
+  const wordSet = WORD_SETS[difficulty];
+  if (!wordSet) {
+    console.error(`[WORD_SCRAMBLE] Invalid difficulty: ${difficulty}`);
+    return [];
+  }
+
+  const words = [...wordSet.words];
+  const selectedWords = [];
+  const actualCount = Math.min(count, words.length);
+
+  for (let i = 0; i < actualCount; i++) {
+    const randomIndex = Math.floor(Math.random() * words.length);
+    const selectedWord = words[randomIndex];
+    
+    let scrambled = shuffleWordSimple(selectedWord.word);
+    while (scrambled === selectedWord.word && selectedWord.word.length > 1) {
+      scrambled = shuffleWordSimple(selectedWord.word);
+    }
+
+    selectedWords.push({
+      word: selectedWord.word,
+      scrambled,
+      category: selectedWord.category,
+      difficulty,
+    });
+
+    words.splice(randomIndex, 1);
+  }
+
+  return selectedWords;
+}
+
+/**
+ * Shuffle word characters using Fisher-Yates algorithm
+ */
+function shuffleWordSimple(word: string): string {
+  const chars = word.toUpperCase().split('');
+  
+  if (chars.length <= 2) return word;
+  
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  
+  return chars.join('');
+}
+
+/**
+ * Calculate score based on word length, difficulty, and attempts
+ */
+export function calculateSimpleScore(
+  difficulty: GameDifficulty,
+  attempts: number,
+  wordLength: number
+): number {
+  const difficultyMultiplier = {
+    easy: 1,
+    medium: 2,
+    hard: 3,
+  };
+
+  const multiplier = difficultyMultiplier[difficulty] || 1;
+  const baseScore = wordLength * 10;
+  const penaltyPerAttempt = 5;
+  const score = (baseScore * multiplier) - (attempts * penaltyPerAttempt);
+  
+  return Math.max(score, 10);
+}
+
 /**
  * Generate word sequence for the game
  */
