@@ -16,6 +16,12 @@ import {
   shuffleArray
 } from '@/utility/games/word-builder';
 
+const DIFFICULTY_CONFIG = {
+  easy: { scoreMultiplier: 1, maxHints: 5 },
+  medium: { scoreMultiplier: 2, maxHints: 3 },
+  hard: { scoreMultiplier: 3, maxHints: 1 }
+};
+
 const initialGameState: WordBuilderGameState = {
   difficulty: 'easy',
   currentChallenge: null,
@@ -32,7 +38,8 @@ const initialGameState: WordBuilderGameState = {
 };
 
 export function useWordBuilder(
-  initialDifficulty: WordBuilderDifficulty = 'easy'
+  initialDifficulty: WordBuilderDifficulty = 'easy',
+  user?: any
 ): UseWordBuilderReturn {
   const [gameState, setGameState] = useState<WordBuilderGameState>(initialGameState);
   const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
@@ -50,6 +57,39 @@ export function useWordBuilder(
       return () => clearInterval(timer);
     }
   }, [gameState.startTime, gameState.isCompleted]);
+
+  // Submit score to leaderboard
+  const submitScore = useCallback(async (finalScore: number, difficulty: WordBuilderDifficulty, elapsedTime: number, wordsFoundCount: number) => {
+    if (!user) return;
+
+    try {
+      const scoreData = {
+        game: "word-builder",
+        score: finalScore,
+        meta: {
+          difficulty,
+          wordsFound: wordsFoundCount,
+          time: elapsedTime,
+          hintsUsed: gameState.hintsUsed
+        },
+        player: user.displayName || user.name
+      };
+
+      const response = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(scoreData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to submit score: ${response.statusText}`);
+      }
+
+      console.log("[WORD_BUILDER] Score submitted successfully");
+    } catch (error) {
+      console.error("[WORD_BUILDER] Error submitting score:", error);
+    }
+  }, [user, gameState.hintsUsed]);
 
   // Start new game
   const startNewGame = useCallback((difficulty: WordBuilderDifficulty = initialDifficulty) => {
@@ -150,7 +190,11 @@ export function useWordBuilder(
     const timeBonusThreshold = { easy: 180, medium: 240, hard: 300 }[gameState.difficulty];
     const timeBonus = finalTime < timeBonusThreshold ? Math.floor((timeBonusThreshold - finalTime) * 2) : 0;
     const hintPenalty = gameState.hintsUsed * 50;
-    const finalScore = Math.max(gameState.score + timeBonus - hintPenalty, 0);
+    const baseScore = Math.max(gameState.score + timeBonus - hintPenalty, 0);
+    
+    // Apply difficulty multiplier
+    const difficultyMultiplier = DIFFICULTY_CONFIG[gameState.difficulty].scoreMultiplier;
+    const finalScore = Math.round(baseScore * difficultyMultiplier);
 
     setGameState(prevState => ({
       ...prevState,
@@ -159,9 +203,9 @@ export function useWordBuilder(
       elapsedTime: finalTime
     }));
 
-    // Submit score logic would go here
-    // submitScore({...})
-  }, [gameState.currentChallenge, gameState.startTime, gameState.difficulty, gameState.score, gameState.hintsUsed]);
+    // Submit score to API
+    submitScore(finalScore, gameState.difficulty, finalTime, gameState.foundWords.length);
+  }, [gameState.currentChallenge, gameState.startTime, gameState.difficulty, gameState.score, gameState.hintsUsed, gameState.foundWords.length, submitScore]);
 
   // Handle submit word
   const handleSubmitWord = useCallback(() => {
@@ -223,6 +267,12 @@ export function useWordBuilder(
   const handleHint = useCallback(() => {
     if (gameState.isCompleted || !gameState.currentChallenge) return;
 
+    const maxHints = DIFFICULTY_CONFIG[gameState.difficulty].maxHints;
+    if (gameState.hintsUsed >= maxHints) {
+      showMessage(`No more hints available for this difficulty!`, 'error');
+      return;
+    }
+
     const unfoundWords = gameState.currentChallenge.targetWords.filter(w => 
       !gameState.foundWords.includes(w)
     );
@@ -236,7 +286,7 @@ export function useWordBuilder(
       ...prevState,
       hintsUsed: prevState.hintsUsed + 1
     }));
-  }, [gameState.isCompleted, gameState.currentChallenge, gameState.foundWords, showMessage]);
+  }, [gameState.isCompleted, gameState.currentChallenge, gameState.foundWords, gameState.difficulty, gameState.hintsUsed, showMessage]);
 
   // Reset game
   const resetGame = useCallback(() => {
@@ -244,11 +294,6 @@ export function useWordBuilder(
     setIsGameStarted(false);
     setError(null);
   }, []);
-
-  // Initialize game on mount
-  useEffect(() => {
-    startNewGame(initialDifficulty);
-  }, [startNewGame, initialDifficulty]);
 
   return {
     gameState,

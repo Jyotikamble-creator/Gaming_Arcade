@@ -58,7 +58,7 @@ export default function WordBuilderPage() {
     handleHint,
     clearCurrentWord,
     resetGame
-  } = useWordBuilder();
+  } = useWordBuilder('easy', user);
 
   const handleRestart = (): void => {
     resetGame();
@@ -76,6 +76,127 @@ export default function WordBuilderPage() {
     startNewGame(difficulty);
     setGameKey(prev => prev + 1);
   };
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <ErrorComponent 
+          error={error} 
+          onRetry={handleRestart}
+        />
+      </DashboardLayout>
+    );
+  }
+
+  // Difficulty Selection Screen
+  if (!isGameStarted) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen bg-linear-to-br from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden flex items-center justify-center">
+          {/* Animated Background */}
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+          </div>
+
+          <div className="relative z-10 container mx-auto px-4 py-8">
+            <div className="max-w-2xl mx-auto">
+              {/* Title */}
+              <div className="text-center mb-12">
+                <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-linear-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+                  📝 Word Builder Challenge
+                </h1>
+                <p className="text-gray-300 text-xl mb-4">
+                  Build words from letters and prove your skill!
+                </p>
+                <p className="text-gray-400 text-lg">
+                  Select a difficulty level to begin
+                </p>
+              </div>
+
+              {/* Difficulty Cards */}
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Easy */}
+                <button
+                  onClick={() => {
+                    startNewGame('easy');
+                    setGameKey(prev => prev + 1);
+                  }}
+                  className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-600/20 border border-green-500/50 p-8 hover:border-green-400 hover:from-green-500/30 hover:to-emerald-600/30 transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative z-10 text-center">
+                    <div className="text-5xl mb-4">🌱</div>
+                    <h3 className="text-3xl font-bold text-green-400 mb-3">Easy</h3>
+                    <ul className="text-sm text-gray-300 space-y-2">
+                      <li>✓ 5 Hints available</li>
+                      <li>✓ Simple 4-letter words</li>
+                      <li>✓ Points: 100 per word</li>
+                    </ul>
+                  </div>
+                </button>
+
+                {/* Medium */}
+                <button
+                  onClick={() => {
+                    startNewGame('medium');
+                    setGameKey(prev => prev + 1);
+                  }}
+                  className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-600/20 border border-yellow-500/50 p-8 hover:border-yellow-400 hover:from-yellow-500/30 hover:to-orange-600/30 transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative z-10 text-center">
+                    <div className="text-5xl mb-4">⚡</div>
+                    <h3 className="text-3xl font-bold text-yellow-400 mb-3">Medium</h3>
+                    <ul className="text-sm text-gray-300 space-y-2">
+                      <li>✓ 3 Hints available</li>
+                      <li>✓ Mix of 4-6 letter words</li>
+                      <li>✓ Points: 200 per word</li>
+                    </ul>
+                  </div>
+                </button>
+
+                {/* Hard */}
+                <button
+                  onClick={() => {
+                    startNewGame('hard');
+                    setGameKey(prev => prev + 1);
+                  }}
+                  className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-red-500/20 to-pink-600/20 border border-red-500/50 p-8 hover:border-red-400 hover:from-red-500/30 hover:to-pink-600/30 transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative z-10 text-center">
+                    <div className="text-5xl mb-4">🔥</div>
+                    <h3 className="text-3xl font-bold text-red-400 mb-3">Hard</h3>
+                    <ul className="text-sm text-gray-300 space-y-2">
+                      <li>✓ 1 Hint available</li>
+                      <li>✓ Challenging 6+ letter words</li>
+                      <li>✓ Points: 300 per word</li>
+                    </ul>
+                  </div>
+                </button>
+              </div>
+
+              {/* Instructions */}
+              <div className="mt-12 bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                <h3 className="text-white font-semibold mb-4 text-center text-lg">How to Play</h3>
+                <div className="grid md:grid-cols-2 gap-4 text-gray-300">
+                  <div className="space-y-2">
+                    <p>🔤 Click letters to build words</p>
+                    <p>✅ Find minimum words to complete</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p>💡 Use hints when stuck</p>
+                    <p>🎯 Discover all hidden words!</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   if (error) {
     return (

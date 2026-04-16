@@ -69,10 +69,19 @@ const WordBuilderCompletedModal: React.FC<WordBuilderCompletedModalProps> = ({
         {/* Header */}
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-white mb-2">ðŸŽ‰ Game Complete!</h2>
-          <div className={`text-2xl font-bold ${rating.color} mb-2`}>
+          <div className={`text-2xl font-bold ${rating.color} mb-3`}>
             {rating.text}
           </div>
           <p className="text-gray-400">{rating.description}</p>
+          <div className="mt-3 inline-block">
+            <span className={`text-sm font-semibold px-3 py-1 rounded-full ${
+              difficulty === 'easy' ? 'bg-green-500/20 text-green-400 border border-green-500/50' :
+              difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' :
+              'bg-red-500/20 text-red-400 border border-red-500/50'
+            }`}>
+              {difficulty === 'easy' ? '🌱 Easy' : difficulty === 'medium' ? '⚡ Medium' : '🔥 Hard'}
+            </span>
+          </div>
         </div>
 
         {/* Stats Grid */}
