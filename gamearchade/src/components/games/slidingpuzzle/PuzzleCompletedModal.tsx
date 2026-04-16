@@ -4,10 +4,11 @@
 interface PuzzleCompletedModalProps {
   moves: number;
   timeElapsed: number;
+  difficulty?: 'easy' | 'medium' | 'hard';
   onPlayAgain: () => void;
 }
 
-const PuzzleCompletedModal: React.FC<PuzzleCompletedModalProps> = ({ moves, timeElapsed, onPlayAgain }) => {
+const PuzzleCompletedModal: React.FC<PuzzleCompletedModalProps> = ({ moves, timeElapsed, difficulty, onPlayAgain }) => {
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -41,6 +42,17 @@ const PuzzleCompletedModal: React.FC<PuzzleCompletedModalProps> = ({ moves, time
               {rating.text}
             </h2>
             <p className="text-subtle-text">{rating.desc}</p>
+            {difficulty && (
+              <div className="mt-3 inline-block">
+                <span className={`text-sm font-semibold px-3 py-1 rounded-full ${
+                  difficulty === 'easy' ? 'bg-green-500/20 text-green-400 border border-green-500/50' :
+                  difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' :
+                  'bg-red-500/20 text-red-400 border border-red-500/50'
+                }`}>
+                  {difficulty === 'easy' ? '🌱 Easy' : difficulty === 'medium' ? '⚡ Medium' : '🔥 Hard'}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="bg-gray-900/50 rounded-lg p-6 mb-6 border border-gray-700">
