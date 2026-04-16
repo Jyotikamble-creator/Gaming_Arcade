@@ -21,9 +21,6 @@ export default function ReactionTime() {
     try { return Number(localStorage.getItem('reaction-best')) || null } catch { return null }
   })
   const [difficulty, setDifficulty] = useState<Difficulty>('normal')
-  const [soundEnabled, setSoundEnabled] = useState(true)
-  const [countdownEnabled, setCountdownEnabled] = useState(true)
-  const [showSettings, setShowSettings] = useState(true)
   const [gameStarted, setGameStarted] = useState(false)
 
   const timerRef = useRef<number | null>(null)
@@ -45,7 +42,6 @@ export default function ReactionTime() {
   }, [status])
 
   const playSound = (type: 'ready' | 'too-early' | 'click') => {
-    if (!soundEnabled) return
     // Using Web Audio API to generate sounds
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
     const oscillator = audioContext.createOscillator()
@@ -82,10 +78,6 @@ export default function ReactionTime() {
     
     setStatus('waiting')
     const delay = getRandomDelay()
-    
-    if (countdownEnabled && delay > 3000) {
-      // Show countdown for longer delays
-    }
     
     timerRef.current = window.setTimeout(() => {
       startRef.current = performance.now()
@@ -131,20 +123,20 @@ export default function ReactionTime() {
     }
 
     // idle/result/tooSoon -> start
-    if (!gameStarted) {
-      setGameStarted(true)
-      setShowSettings(false)
-    }
     start()
   }
 
   const startGame = () => {
     setGameStarted(true)
-    setShowSettings(false)
     setReactionTimes([])
     setBest(null)
     setStatus('idle')
     setTimeout(() => handleClick(), 500)
+  }
+
+  const handleDifficultySelect = (selectedDifficulty: Difficulty) => {
+    setDifficulty(selectedDifficulty)
+    startGame()
   }
 
   const resetBest = () => {
@@ -154,7 +146,6 @@ export default function ReactionTime() {
 
   const resetGame = () => {
     setGameStarted(false)
-    setShowSettings(true)
     setReactionTimes([])
     setStatus('idle')
   }
@@ -169,71 +160,107 @@ export default function ReactionTime() {
     return { text: 'Keep Practicing!', color: 'text-orange-300', emoji: '💪' }
   }
 
+  // Difficulty Selection Screen
+  if (!gameStarted) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-gray-900 via-purple-900 to-indigo-900 relative overflow-hidden flex items-center justify-center -mx-8 -my-8">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            {/* Title */}
+            <div className="text-center mb-12">
+              <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-linear-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                ⚡ Reaction Time Challenge
+              </h1>
+              <p className="text-gray-300 text-xl mb-4">
+                Test your reflexes with 5 rounds!
+              </p>
+              <p className="text-gray-400 text-lg">
+                Select a difficulty level to begin
+              </p>
+            </div>
+
+            {/* Difficulty Cards */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Easy */}
+              <button
+                onClick={() => handleDifficultySelect('easy')}
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-600/20 border border-green-500/50 p-8 hover:border-green-400 hover:from-green-500/30 hover:to-emerald-600/30 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-5xl mb-4">🌱</div>
+                  <h3 className="text-3xl font-bold text-green-400 mb-3">Easy</h3>
+                  <ul className="text-sm text-gray-300 space-y-2">
+                    <li>✓ Longer delays</li>
+                    <li>✓ Score multiplier: 1x</li>
+                    <li>✓ Great for practice</li>
+                  </ul>
+                </div>
+              </button>
+
+              {/* Normal */}
+              <button
+                onClick={() => handleDifficultySelect('normal')}
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-600/20 border border-yellow-500/50 p-8 hover:border-yellow-400 hover:from-yellow-500/30 hover:to-orange-600/30 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-5xl mb-4">⚡</div>
+                  <h3 className="text-3xl font-bold text-yellow-400 mb-3">Normal</h3>
+                  <ul className="text-sm text-gray-300 space-y-2">
+                    <li>✓ Balanced challenge</li>
+                    <li>✓ Score multiplier: 2x</li>
+                    <li>✓ Recommended for all</li>
+                  </ul>
+                </div>
+              </button>
+
+              {/* Hard */}
+              <button
+                onClick={() => handleDifficultySelect('hard')}
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-red-500/20 to-pink-600/20 border border-red-500/50 p-8 hover:border-red-400 hover:from-red-500/30 hover:to-pink-600/30 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-5xl mb-4">🔥</div>
+                  <h3 className="text-3xl font-bold text-red-400 mb-3">Hard</h3>
+                  <ul className="text-sm text-gray-300 space-y-2">
+                    <li>✓ Quick rounds</li>
+                    <li>✓ Score multiplier: 3x</li>
+                    <li>✓ Test your true speed</li>
+                  </ul>
+                </div>
+              </button>
+            </div>
+
+            {/* Instructions */}
+            <div className="mt-12 bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+              <h3 className="text-white font-semibold mb-4 text-center text-lg">How to Play</h3>
+              <div className="grid md:grid-cols-2 gap-4 text-gray-300">
+                <div className="space-y-2">
+                  <p>👁️ Wait for the green box to appear</p>
+                  <p>🖱️ Click as fast as you can</p>
+                </div>
+                <div className="space-y-2">
+                  <p>⏱️ Your reaction time is measured</p>
+                  <p>🎯 Complete all 5 rounds!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-3xl mx-auto">
-      {/* Settings Panel */}
-      {showSettings && !gameStarted && (
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 mb-8 border border-white/20">
-          <h3 className="text-2xl font-bold mb-6">Game Settings</h3>
-          
-          {/* Difficulty Selection */}
-          <div className="mb-8">
-            <label className="block text-sm font-semibold mb-4">Difficulty Level</label>
-            <div className="grid grid-cols-3 gap-3">
-              {(['easy', 'normal', 'hard'] as Difficulty[]).map(d => (
-                <button
-                  key={d}
-                  onClick={() => setDifficulty(d)}
-                  className={`py-3 px-4 rounded-lg font-semibold transition-all ${
-                    difficulty === d
-                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
-                      : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                  }`}
-                >
-                  {DIFFICULTY_SETTINGS[d].label}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-gray-400 mt-2">
-              {difficulty === 'easy' && 'Longer delays between rounds - great for practice'}
-              {difficulty === 'normal' && 'Balanced challenge - recommended for all'}
-              {difficulty === 'hard' && 'Quick rounds - test your true speed!'}
-            </p>
-          </div>
-
-          {/* Assists */}
-          <div className="mb-8">
-            <label className="block text-sm font-semibold mb-4">Game Assists</label>
-            <div className="space-y-3">
-              <label className="flex items-center gap-3 cursor-pointer hover:bg-white/5 p-3 rounded-lg transition">
-                <input
-                  type="checkbox"
-                  checked={soundEnabled}
-                  onChange={(e) => setSoundEnabled(e.target.checked)}
-                  className="w-5 h-5 rounded"
-                />
-                <span className="text-sm">🔊 Sound Feedback</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer hover:bg-white/5 p-3 rounded-lg transition">
-                <input
-                  type="checkbox"
-                  checked={countdownEnabled}
-                  onChange={(e) => setCountdownEnabled(e.target.checked)}
-                  className="w-5 h-5 rounded"
-                />
-                <span className="text-sm">⏱️ Countdown Timer</span>
-              </label>
-            </div>
-          </div>
-
-          <button
-            onClick={startGame}
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:scale-105 text-lg"
-          >
-            Start Game - {TOTAL_ROUNDS} Rounds
-          </button>
-        </div>
-      )}
 
       {/* Game Area */}
       {gameStarted && status !== 'gameComplete' && (
