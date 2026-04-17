@@ -45,7 +45,17 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body: SimonStartRequest = await request.json();
+    let body: SimonStartRequest = {};
+    
+    // Try to parse body, but don't fail if empty
+    try {
+      if (request.headers.get('content-length') && request.headers.get('content-length') !== '0') {
+        body = await request.json();
+      }
+    } catch (e) {
+      // Body is empty or invalid, use defaults
+      console.log('Simon POST body empty or invalid, using defaults');
+    }
     
     // Create Simon session with custom config
     const session = createSimonSession(body);

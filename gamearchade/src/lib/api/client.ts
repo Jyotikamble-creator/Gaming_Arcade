@@ -319,7 +319,7 @@ export class GameApiClient {
   async startSimonGame(): Promise<ApiResponse<any>> {
     try {
       logger.debug("Starting simon says game", {}, LogTags.SIMON_SAYS);
-      const response = await this.api.post<any>("/games/simon/start");
+      const response = await this.api.get<any>("/games/simon/start");
       
       return { 
         success: true, 

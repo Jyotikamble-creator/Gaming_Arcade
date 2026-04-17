@@ -252,17 +252,37 @@ export class ClientLogger implements IClientLogger {
 
     switch (entry.level) {
       case 'debug':
-        console.debug(message, data);
+        // eslint-disable-next-line no-console
+        console.debug(message);
+        if (data && Object.keys(data).length > 0) {
+          // eslint-disable-next-line no-console
+          console.debug(data);
+        }
         break;
       case 'info':
-        console.info(message, data);
+        // eslint-disable-next-line no-console
+        console.info(message);
+        if (data && Object.keys(data).length > 0) {
+          // eslint-disable-next-line no-console
+          console.info(data);
+        }
         break;
       case 'warn':
-        console.warn(message, data);
+        // eslint-disable-next-line no-console
+        console.warn(message);
+        if (data && Object.keys(data).length > 0) {
+          // eslint-disable-next-line no-console
+          console.warn(data);
+        }
         break;
       case 'error':
       case 'critical':
-        console.error(message, data);
+        // eslint-disable-next-line no-console
+        console.error(message);
+        if (data && Object.keys(data).length > 0) {
+          // eslint-disable-next-line no-console
+          console.error(data);
+        }
         break;
     }
   }
