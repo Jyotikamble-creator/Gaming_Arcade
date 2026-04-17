@@ -495,3 +495,24 @@ export interface WhackMoleGameOverModalProps {
   totalMoles: number;
   onRestart: () => void;
 }
+
+export const DIFFICULTY_CONFIG = {
+  easy: {
+    label: 'Easy',
+    basePoints: 50,
+    gridSize: 9,
+    duration: 60
+  },
+  normal: {
+    label: 'Normal',
+    basePoints: 75,
+    gridSize: 9,
+    duration: 60
+  },
+  hard: {
+    label: 'Hard',
+    basePoints: 100,
+    gridSize: 16,
+    duration: 60
+  }
+} as const;

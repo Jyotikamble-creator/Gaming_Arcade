@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { useWhackMole } from '@/hooks/games/useWhackMole';
-import { WhackGameSettings } from '@/types/games/whack-a-mole';
+import { WhackGameSettings, WhackDifficulty, DIFFICULTY_CONFIG } from '@/types/games/whack-a-mole';
 import DashboardLayout from '@/components/shared/DashboardLayout'
 import Leaderboard from '@/components/leaderboard/Leaderboard';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
@@ -65,6 +65,8 @@ const WhackMoleGameOverModal = dynamic(() => import('@/components/games/whackmol
 
 export default function WhackMolePage() {
   const { user } = useAuth();
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<WhackDifficulty>('normal');
   const [settings, setSettings] = useState<WhackGameSettings>({
     soundEnabled: true,
     vibrationEnabled: true,
@@ -96,6 +98,17 @@ export default function WhackMolePage() {
     resetGame
   } = useWhackMole();
 
+  const handleDifficultySelect = (difficulty: WhackDifficulty): void => {
+    setSelectedDifficulty(difficulty);
+    setGameStarted(true);
+    setSettings(prev => ({
+      ...prev,
+      difficulty,
+      customGridSize: DIFFICULTY_CONFIG[difficulty].gridSize as 9 | 16,
+      customDuration: DIFFICULTY_CONFIG[difficulty].duration
+    }));
+  };
+
   const handleRestart = (): void => {
     resetGame();
     setGameKey(prev => prev + 1);
@@ -120,58 +133,104 @@ export default function WhackMolePage() {
         </div>
 
         <div className="relative z-10 container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-linear-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
-              🔨 Whack-a-Mole
-            </h1>
-            <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-              Test your reflexes! Hit the moles as they pop up, but be careful not to miss!
-            </p>
-          </div>
+          {/* Difficulty Selection Screen */}
+          {!gameStarted ? (
+            <>
+              {/* Title */}
+              <div className="text-center mb-12">
+                <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-linear-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
+                  🔨 Whack-a-Mole Challenge
+                </h1>
+                <p className="text-gray-300 text-xl mb-4">
+                  Test your reflexes and accuracy!
+                </p>
+                <p className="text-gray-400 text-lg">
+                  Select a difficulty level to begin
+                </p>
+              </div>
 
-          {/* Game Settings */}
-          {!isGameStarted && (
-            <div className="max-w-md mx-auto mb-8 bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
-              <h3 className="text-white font-semibold mb-4 text-center">Game Settings</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-gray-300 text-sm mb-2">Grid Size</label>
-                  <select
-                    value={settings.customGridSize || 9}
-                    onChange={(e) => handleSettingsChange({ 
-                      ...settings, 
-                      customGridSize: Number(e.target.value) as 9 | 16 
-                    })}
-                    className="w-full p-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                  >
-                    <option value={9}>3x3 (Easy)</option>
-                    <option value={16}>4x4 (Hard)</option>
-                  </select>
-                </div>
+              {/* Difficulty Cards */}
+              <div className="grid md:grid-cols-3 gap-6 max-w-2xl mx-auto mb-12">
+                {/* Easy */}
+                <button
+                  onClick={() => handleDifficultySelect('easy')}
+                  className="group relative overflow-hidden rounded-xl bg-linear-to-br from-green-500/20 to-emerald-600/20 border border-green-500/50 p-8 hover:border-green-400 hover:from-green-500/30 hover:to-emerald-600/30 transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="absolute inset-0 bg-linear-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative z-10 text-center">
+                    <div className="text-5xl mb-4">🌱</div>
+                    <h3 className="text-3xl font-bold text-green-400 mb-3">Easy</h3>
+                    <ul className="text-sm text-gray-300 space-y-2">
+                      <li>✓ 3x3 Grid</li>
+                      <li>✓ {DIFFICULTY_CONFIG.easy.basePoints} Points per hit</li>
+                      <li>✓ {DIFFICULTY_CONFIG.easy.duration}s duration</li>
+                    </ul>
+                  </div>
+                </button>
 
-                <div>
-                  <label className="block text-gray-300 text-sm mb-2">Game Time (seconds)</label>
-                  <select
-                    value={settings.customDuration || 60}
-                    onChange={(e) => handleSettingsChange({ 
-                      ...settings, 
-                      customDuration: Number(e.target.value) 
-                    })}
-                    className="w-full p-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                  >
-                    <option value={30}>30 seconds</option>
-                    <option value={60}>60 seconds</option>
-                    <option value={90}>90 seconds</option>
-                  </select>
+                {/* Normal */}
+                <button
+                  onClick={() => handleDifficultySelect('normal')}
+                  className="group relative overflow-hidden rounded-xl bg-linear-to-br from-yellow-500/20 to-orange-600/20 border border-yellow-500/50 p-8 hover:border-yellow-400 hover:from-yellow-500/30 hover:to-orange-600/30 transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="absolute inset-0 bg-linear-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative z-10 text-center">
+                    <div className="text-5xl mb-4">⚡</div>
+                    <h3 className="text-3xl font-bold text-yellow-400 mb-3">Normal</h3>
+                    <ul className="text-sm text-gray-300 space-y-2">
+                      <li>✓ 3x3 Grid</li>
+                      <li>✓ {DIFFICULTY_CONFIG.normal.basePoints} Points per hit</li>
+                      <li>✓ {DIFFICULTY_CONFIG.normal.duration}s duration</li>
+                    </ul>
+                  </div>
+                </button>
+
+                {/* Hard */}
+                <button
+                  onClick={() => handleDifficultySelect('hard')}
+                  className="group relative overflow-hidden rounded-xl bg-linear-to-br from-red-500/20 to-pink-600/20 border border-red-500/50 p-8 hover:border-red-400 hover:from-red-500/30 hover:to-pink-600/30 transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="absolute inset-0 bg-linear-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative z-10 text-center">
+                    <div className="text-5xl mb-4">🔥</div>
+                    <h3 className="text-3xl font-bold text-red-400 mb-3">Hard</h3>
+                    <ul className="text-sm text-gray-300 space-y-2">
+                      <li>✓ 4x4 Grid</li>
+                      <li>✓ {DIFFICULTY_CONFIG.hard.basePoints} Points per hit</li>
+                      <li>✓ {DIFFICULTY_CONFIG.hard.duration}s duration</li>
+                    </ul>
+                  </div>
+                </button>
+              </div>
+
+              {/* Instructions */}
+              <div className="max-w-2xl mx-auto bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                <h3 className="text-white font-semibold mb-4 text-center">How to Play</h3>
+                <div className="grid md:grid-cols-2 gap-4 text-gray-300">
+                  <div className="space-y-2">
+                    <p>🔨 Click on moles when they appear</p>
+                    <p>⏱️ Race against the clock</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p>❌ Avoid clicking empty holes</p>
+                    <p>🎯 Aim for high accuracy</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Game Stats */}
-          <WhackMoleStats
+            </>
+          ) : (
+            <>
+              {/* Game Header */}
+              <div className="text-center mb-8">
+                <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-linear-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
+                  🔨 Whack-a-Mole
+                </h1>
+                <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+                  Difficulty: <span className="text-white font-semibold capitalize">{selectedDifficulty}</span>
+                </p>
+              </div>
+              {/* Game Stats */}
+              <WhackMoleStats
             key={`stats-${gameKey}`}
             score={score}
             timeLeft={timeLeft}
@@ -182,7 +241,7 @@ export default function WhackMolePage() {
           />
 
           {/* Start Game Button */}
-          {!isGameStarted && !isGameOver && (
+          {!isGameStarted && gameStarted && !isGameOver && (
             <div className="text-center mb-8">
               <button
                 onClick={() => startGame()}
@@ -194,7 +253,7 @@ export default function WhackMolePage() {
           )}
 
           {/* Game Grid */}
-          {isGameStarted && !isGameOver && (
+          {isGameStarted && gameStarted && !isGameOver && (
             <div className="flex justify-center mb-8">
               <WhackMoleGrid
                 key={`grid-${gameKey}`}
@@ -208,7 +267,7 @@ export default function WhackMolePage() {
           )}
 
           {/* Instructions */}
-          {!isGameStarted && (
+          {!gameStarted && (
             <div className="max-w-2xl mx-auto bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
               <h3 className="text-white font-semibold mb-4 text-center">How to Play</h3>
               <div className="grid md:grid-cols-2 gap-4 text-gray-300">
@@ -251,6 +310,8 @@ export default function WhackMolePage() {
           <div className="mt-12">
             <Leaderboard gameType="whack-a-mole" />
           </div>
+            </>
+          )}
         </div>
       </div>
     </DashboardLayout>
