@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import AnimatedBackground from '@/components/AnimatedBackground';
+import DashboardLayout from '@/components/shared/DashboardLayout';
 import Instructions from '@/components/shared/Instructions';
 import Leaderboard from '@/components/leaderboard/Leaderboard';
 import WordScrambleStats from '@/components/games/wordscramble/WordScrambleStats';
@@ -220,29 +221,30 @@ const WordScrambleGamePage: React.FC<WordScramblePageProps> = ({
   // Difficulty Selection Screen
   if (!gameStarted) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1),transparent_70%)]"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(255,255,255,0.1),transparent_70%)]"></div>
-        </div>
+      <DashboardLayout showBackButton={true} backLink="/dashboard">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+          </div>
 
-        <div className="relative z-10 container mx-auto px-4 py-8">
-          <div className="max-w-3xl mx-auto">
-            {/* Title */}
-            <div className="text-center mb-12">
-              <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-linear-to-r from-yellow-400 via-pink-500 to-red-500 bg-clip-text text-transparent">
-                🔤 Word Scramble
-              </h1>
-              <p className="text-gray-300 text-xl mb-4">
-                Unscramble the letters and find the hidden word!
-              </p>
-              <p className="text-gray-400 text-lg">
-                Select a difficulty level to begin
-              </p>
-            </div>
+          <div className="relative z-10 container mx-auto px-4 py-8">
+            <div className="max-w-3xl mx-auto">
+              {/* Title */}
+              <div className="text-center mb-12">
+                <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-linear-to-r from-yellow-400 via-pink-500 to-red-500 bg-clip-text text-transparent">
+                  🔤 Word Scramble
+                </h1>
+                <p className="text-gray-300 text-xl mb-4">
+                  Unscramble the letters and find the hidden word!
+                </p>
+                <p className="text-gray-400 text-lg">
+                  Select a difficulty level to begin
+                </p>
+              </div>
 
-            {/* Difficulty Cards */}
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              {/* Difficulty Cards */}
+              <div className="grid md:grid-cols-3 gap-6 mb-12">
               {/* Easy */}
               <button
                 onClick={() => startGame('easy')}
@@ -324,35 +326,35 @@ const WordScrambleGamePage: React.FC<WordScramblePageProps> = ({
           </div>
         </div>
       </div>
+      </DashboardLayout>
     );
   }
 
   // Game Screen
   if (!wordData) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-        <AnimatedBackground />
-        <div className="text-center relative z-10">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading word...</p>
+      <DashboardLayout showBackButton={true} backLink="/dashboard">
+        <div className="min-h-screen flex items-center justify-center">
+          <AnimatedBackground />
+          <div className="text-center relative z-10">
+            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-white text-lg">Loading word...</p>
+          </div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   // Main game view
   return (
-    <div className={`min-h-screen text-white relative overflow-hidden ${className || ''}`}>
-      <div className="absolute inset-0 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
-      <AnimatedBackground />
+    <DashboardLayout showBackButton={true} backLink="/dashboard">
+      <div className={`min-h-screen text-white relative overflow-hidden ${className || ''}`}>
+        <div className="absolute inset-0 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
+        <AnimatedBackground />
       
       <div className="container mx-auto px-4 py-8 max-w-3xl relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold mb-2 bg-linear-to-r from-yellow-400 to-pink-500 bg-clip-text text-transparent">
-            🔤 Word Scramble
-          </h1>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-gray-300">
+          {/* Progress and Score */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-gray-300 mb-8">
             <span>Difficulty: <span className="font-bold text-yellow-400 capitalize">{difficulty}</span></span>
             <span className="hidden sm:inline text-gray-500">•</span>
             <span>Question: <span className="font-bold text-blue-400">{currentQuestionIndex}/5</span></span>
@@ -361,14 +363,12 @@ const WordScrambleGamePage: React.FC<WordScramblePageProps> = ({
           </div>
           
           {/* Progress Bar */}
-          <div className="mt-4 w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+          <div className="mb-4 w-full bg-gray-700 rounded-full h-2 overflow-hidden">
             <div 
               className="bg-linear-to-r from-blue-500 to-purple-600 h-full transition-all duration-300 rounded-full"
               style={{ width: `${(currentQuestionIndex / 5) * 100}%` }}
             ></div>
           </div>
-        </div>
-
         {/* Game Stats */}
         <WordScrambleStats 
           attempts={attempts}
@@ -462,7 +462,8 @@ const WordScrambleGamePage: React.FC<WordScramblePageProps> = ({
           }}
         />
       )}
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
