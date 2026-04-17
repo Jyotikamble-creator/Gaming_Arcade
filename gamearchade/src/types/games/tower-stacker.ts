@@ -210,3 +210,29 @@ export interface TowerStackerStatsQuery {
   sortBy?: 'score' | 'level' | 'accuracy' | 'time' | 'date';
   sortOrder?: 'asc' | 'desc';
 }
+
+export type TowerStackerGameDifficulty = 'easy' | 'medium' | 'hard';
+
+export interface TowerStackerDifficultyConfig {
+  basePoints: number;
+  initialWidth: number;
+  baseSpeed: number;
+}
+
+export const DIFFICULTY_CONFIG: Record<TowerStackerGameDifficulty, TowerStackerDifficultyConfig> = {
+  easy: {
+    basePoints: 50,
+    initialWidth: 120,
+    baseSpeed: 2,
+  },
+  medium: {
+    basePoints: 75,
+    initialWidth: 100,
+    baseSpeed: 3,
+  },
+  hard: {
+    basePoints: 100,
+    initialWidth: 80,
+    baseSpeed: 4,
+  },
+};
