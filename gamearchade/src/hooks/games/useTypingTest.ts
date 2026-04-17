@@ -3,7 +3,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { 
   TypingTestStats, 
   TypingTestHookReturn, 
-  TypingPassage 
+  TypingPassage,
+  TypingTestDifficulty
 } from '@/types/games/typing-test';
 import { 
   calculateWPM, 
@@ -14,7 +15,7 @@ import {
   TYPING_CONFIG 
 } from '@/utility/games/typing-test';
 
-export const useTypingTest = (): TypingTestHookReturn => {
+export const useTypingTest = (initialDifficulty: TypingTestDifficulty = 'medium'): TypingTestHookReturn => {
   const [text, setText] = useState<string>('');
   const [input, setInput] = useState<string>('');
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -22,10 +23,11 @@ export const useTypingTest = (): TypingTestHookReturn => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [wpm, setWpm] = useState<number>(0);
   const [accuracy, setAccuracy] = useState<number>(100);
+  const [difficulty, setDifficulty] = useState<TypingTestDifficulty>(initialDifficulty);
 
   // Initialize with a random passage
   useEffect(() => {
-    resetTest();
+    resetTest(initialDifficulty);
   }, []);
 
   // Update stats in real-time
@@ -59,12 +61,14 @@ export const useTypingTest = (): TypingTestHookReturn => {
     }
   }, [startTime, text.length]);
 
-  const resetTest = useCallback((): void => {
+  const resetTest = useCallback((newDifficulty?: TypingTestDifficulty): void => {
     setIsLoading(true);
     
     // Simulate loading delay for better UX
     setTimeout(() => {
-      const passages = generateTypingPassages();
+      const diffToUse = newDifficulty || difficulty;
+      setDifficulty(diffToUse);
+      const passages = generateTypingPassages(diffToUse);
       const randomPassage = passages[Math.floor(Math.random() * passages.length)];
       
       setText(randomPassage);
@@ -75,7 +79,7 @@ export const useTypingTest = (): TypingTestHookReturn => {
       setAccuracy(100);
       setIsLoading(false);
     }, 300);
-  }, []);
+  }, [difficulty]);
 
   const stats: TypingTestStats = {
     wpm,

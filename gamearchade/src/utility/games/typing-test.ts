@@ -167,15 +167,33 @@ export const getTypingErrors = (input: string, sourceText: string) => {
   return errors;
 };
 
-export const generateTypingPassages = (): string[] => {
-  return [
+export const generateTypingPassages = (difficulty: 'easy' | 'medium' | 'hard' = 'medium'): string[] => {
+  const easyPassages = [
+    "The quick brown fox jumps over the lazy dog.",
+    "Hello world. This is a simple typing test.",
+    "Programming is fun and rewarding."
+  ];
+
+  const mediumPassages = [
     "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet at least once.",
     "Programming is not about what you know; it's about what you can figure out. The best code is written when you understand the problem deeply.",
     "TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale.",
-    "React is a JavaScript library for building user interfaces. It lets you compose complex UIs from small and isolated pieces of code called components.",
+    "React is a JavaScript library for building user interfaces. It lets you compose complex UIs from small and isolated pieces of code called components."
+  ];
+
+  const hardPassages = [
     "The art of programming is the art of organizing complexity, of mastering multitude and avoiding its bastard chaos as effectively as possible.",
     "In the world of software development, debugging is twice as hard as writing the code in the first place.",
     "Good software, like wine, takes time to mature. The best programs are written not grown.",
-    "Code is like humor. When you have to explain it, it's bad. Clean code always looks like it was written by someone who cares."
+    "Code is like humor. When you have to explain it, it's bad. Clean code always looks like it was written by someone who cares.",
+    "Innovation distinguishes between a leader and a follower. The only thing that matters is whether the code works and solves real problems for real people."
   ];
+
+  if (difficulty === 'easy') {
+    return easyPassages;
+  } else if (difficulty === 'hard') {
+    return hardPassages;
+  }
+  
+  return mediumPassages;
 };

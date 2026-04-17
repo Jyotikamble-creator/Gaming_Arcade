@@ -1,5 +1,7 @@
 // TypeScript types for Typing Test game
 
+export type TypingTestDifficulty = 'easy' | 'medium' | 'hard';
+
 export interface TypingTestStats {
   wpm: number;
   accuracy: number;
@@ -118,3 +120,24 @@ export interface TypingTestConfiguration {
   timeLimit?: number;
   showLiveStats: boolean;
 }
+
+export const DIFFICULTY_CONFIG = {
+  easy: {
+    label: 'Easy',
+    basePoints: 50,
+    passageLength: 'short',
+    timeLimit: 120
+  },
+  medium: {
+    label: 'Medium',
+    basePoints: 75,
+    passageLength: 'medium',
+    timeLimit: 120
+  },
+  hard: {
+    label: 'Hard',
+    basePoints: 100,
+    passageLength: 'long',
+    timeLimit: 120
+  }
+} as const;
