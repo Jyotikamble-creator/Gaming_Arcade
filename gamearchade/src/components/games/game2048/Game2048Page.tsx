@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect, useCallback } from 'react';
 import GameBoard from './GameBoard';
 import ScoreDisplay from './ScoreDisplay';
@@ -8,6 +6,7 @@ import GameStatus from './GameStatus';
 import Instructions from '@/components/shared/Instructions';
 import Leaderboard from '@/components/leaderboard/Leaderboard';
 import AnimatedBackground from '@/components/AnimatedBackground';
+import { Game2048Difficulty, DIFFICULTY_CONFIG } from '@/types/games/game2048';
 
 // TypeScript interfaces
 interface User {
@@ -20,6 +19,7 @@ interface User {
 interface Game2048PageProps {
   user: User | null;
   className?: string;
+  difficulty?: Game2048Difficulty;
 }
 
 interface Position {
@@ -38,14 +38,18 @@ type Board = number[][];
 
 const Game2048Page: React.FC<Game2048PageProps> = ({ 
   user, 
-  className 
+  className,
+  difficulty: initialDifficulty = 'medium'
 }) => {
+  const [difficulty, setDifficulty] = useState<Game2048Difficulty>(initialDifficulty);
+  const diffConfig = DIFFICULTY_CONFIG[difficulty];
+  
   // State variables
-  const [board, setBoard] = useState<Board>(() => initBoard());
+  const [board, setBoard] = useState<Board>(() => initBoard(diffConfig.gridSize));
   const [score, setScore] = useState<number>(0);
   const [bestScore, setBestScore] = useState<number>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('game2048-best-score');
+      const saved = localStorage.getItem(`game2048-best-score-${difficulty}`);
       return saved ? parseInt(saved, 10) : 0;
     }
     return 0;
@@ -57,9 +61,9 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
   const [newTiles, setNewTiles] = useState<Position[]>([]);
   const [mergedTiles, setMergedTiles] = useState<Position[]>([]);
 
-  // Initialize empty 4x4 board and add two random tiles
-  function initBoard(): Board {
-    const board: Board = Array(4).fill(null).map(() => Array(4).fill(0));
+  // Initialize empty board with gridSize and add two random tiles
+  function initBoard(gridSize: number): Board {
+    const board: Board = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
     addRandomTile(board);
     addRandomTile(board);
     return board;
@@ -68,8 +72,8 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
   // Add a random tile (2 or 4) to an empty cell
   function addRandomTile(board: Board): Position | null {
     const empty: Position[] = [];
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] === 0) {
           empty.push({ row: i, col: j });
         }
@@ -89,8 +93,9 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
     let moved = false;
     let newScore = 0;
     const merged: Position[] = [];
+    const size = board.length;
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < size; i++) {
       const row = board[i].filter(val => val !== 0);
       
       // Merge adjacent tiles
@@ -104,12 +109,12 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
       }
 
       // Fill remaining cells with zeros
-      while (row.length < 4) {
+      while (row.length < size) {
         row.push(0);
       }
 
       // Check if row changed
-      for (let j = 0; j < 4; j++) {
+      for (let j = 0; j < size; j++) {
         if (board[i][j] !== row[j]) {
           moved = true;
         }
@@ -138,7 +143,7 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
       // Adjust merged positions for reversed board
       result.merged = result.merged.map(pos => ({ 
         row: pos.row, 
-        col: 3 - pos.col 
+        col: diffConfig.gridSize - 1 - pos.col 
       }));
     } else if (direction === 'up') {
       // Rotate board 90° clockwise, move left, rotate back
@@ -164,7 +169,7 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
       );
       // Adjust merged positions for rotation
       result.merged = result.merged.map(pos => ({ 
-        row: 3 - pos.col, 
+        row: diffConfig.gridSize - 1 - pos.col, 
         col: pos.row 
       }));
     }
@@ -183,8 +188,8 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
         setMergedTiles([]);
       }, 300);
 
-      // Check win condition (2048 tile)
-      if (newBoard.some(row => row.some(cell => cell === 2048))) {
+      // Check win condition (target tile for the difficulty)
+      if (newBoard.some(row => row.some(cell => cell === diffConfig.winTarget))) {
         setGameWon(true);
       }
 
@@ -197,29 +202,45 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
 
   // Check if any moves are possible on the board
   function canMove(board: Board): boolean {
+    const size = board.length;
     // Check for empty cells
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < size; j++) {
         if (board[i][j] === 0) return true;
       }
     }
 
     // Check for possible horizontal merges
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 3; j++) {
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < size - 1; j++) {
         if (board[i][j] === board[i][j + 1]) return true;
       }
     }
 
     // Check for possible vertical merges
-    for (let j = 0; j < 4; j++) {
-      for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < size; j++) {
+      for (let i = 0; i < size - 1; i++) {
         if (board[i][j] === board[i + 1][j]) return true;
       }
     }
 
     return false;
   }
+
+  // Reset game when difficulty changes
+  useEffect(() => {
+    setBoard(initBoard(diffConfig.gridSize));
+    setScore(0);
+    setGameOver(false);
+    setGameWon(false);
+    setNewTiles([]);
+    setMergedTiles([]);
+    // Load best score for the new difficulty
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(`game2048-best-score-${difficulty}`);
+      setBestScore(saved ? parseInt(saved, 10) : 0);
+    }
+  }, [difficulty]);
 
   // Handle keyboard input for game controls
   useEffect(() => {
@@ -252,14 +273,14 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
     if (score > bestScore) {
       setBestScore(score);
       if (typeof window !== 'undefined') {
-        localStorage.setItem('game2048-best-score', score.toString());
+        localStorage.setItem(`game2048-best-score-${difficulty}`, score.toString());
       }
     }
   }, [score, bestScore]);
 
   // Reset game to initial state
   const restart = (): void => {
-    setBoard(initBoard());
+    setBoard(initBoard(diffConfig.gridSize));
     setScore(0);
     setGameOver(false);
     setGameWon(false);
@@ -315,12 +336,35 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
           <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-2">
             🎮 2048
           </h1>
-          <p className="text-white/70 text-lg">Combine tiles to reach 2048!</p>
+          <p className="text-white/70 text-lg">Combine tiles to reach {diffConfig.winTarget}!</p>
         </div>
 
-        {/* Score Display */}
+        {/* Score and Difficulty Section */}
         <div className="mb-8">
-          <ScoreDisplay score={score} bestScore={bestScore} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-4">
+            {/* Score Display */}
+            <ScoreDisplay score={score} bestScore={bestScore} />
+            
+            {/* Difficulty Selector */}
+            <div className="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/20">
+              <label className="block text-white/70 text-sm font-semibold mb-2">Difficulty:</label>
+              <div className="flex gap-2">
+                {(['easy', 'medium', 'hard'] as const).map(diff => (
+                  <button
+                    key={diff}
+                    onClick={() => setDifficulty(diff)}
+                    className={`flex-1 py-2 px-3 rounded font-semibold transition-all ${
+                      difficulty === diff
+                        ? 'bg-gradient-to-r from-yellow-400 to-pink-500 text-white shadow-lg'
+                        : 'bg-white/10 text-white/70 hover:bg-white/20'
+                    }`}
+                  >
+                    {diff.charAt(0).toUpperCase() + diff.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Game Board */}
