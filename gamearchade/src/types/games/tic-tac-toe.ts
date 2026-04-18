@@ -54,3 +54,37 @@ export interface TicTacToeHookReturn {
   resetGame: () => void;
   resetScores: () => void;
 }
+
+export type TicTacToeGameDifficulty = 'easy' | 'medium' | 'hard';
+
+export interface TicTacToeDifficultyConfig {
+  basePoints: number;
+  aiLevel: string;
+  timeLimit: number | null;
+  winCondition: 'single' | 'bestOf3' | 'bestOf5';
+  maxGames: number;
+}
+
+export const DIFFICULTY_CONFIG: Record<TicTacToeGameDifficulty, TicTacToeDifficultyConfig> = {
+  easy: {
+    basePoints: 50,
+    aiLevel: 'easy',
+    timeLimit: null,
+    winCondition: 'single',
+    maxGames: 1,
+  },
+  medium: {
+    basePoints: 75,
+    aiLevel: 'medium',
+    timeLimit: 30,
+    winCondition: 'bestOf3',
+    maxGames: 3,
+  },
+  hard: {
+    basePoints: 100,
+    aiLevel: 'hard',
+    timeLimit: 10,
+    winCondition: 'bestOf5',
+    maxGames: 5,
+  },
+};
