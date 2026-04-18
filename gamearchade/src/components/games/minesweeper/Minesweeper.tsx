@@ -21,15 +21,17 @@ const Minesweeper: React.FC = () => {
   } = useMinesweeper();
 
   const [selectedDifficulty, setSelectedDifficulty] = useState<MinesweeperDifficulty>('beginner');
-
-  // Start game on mount
-  useEffect(() => {
-    startNewGame(selectedDifficulty);
-  }, []);
+  const [gameStarted, setGameStarted] = useState(false);
 
   const handleDifficultyChange = (difficulty: MinesweeperDifficulty) => {
     setSelectedDifficulty(difficulty);
     startNewGame(difficulty);
+  };
+
+  const handleDifficultySelect = (difficulty: MinesweeperDifficulty) => {
+    setSelectedDifficulty(difficulty);
+    startNewGame(difficulty);
+    setGameStarted(true);
   };
 
   const handleCellClick = (row: number, col: number, isRightClick: boolean = false) => {
@@ -130,6 +132,111 @@ const Minesweeper: React.FC = () => {
             Try Again
           </button>
         </motion.div>
+      </div>
+    );
+  }
+
+  // Difficulty Selection Screen
+  if (!gameStarted) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden flex items-center justify-center">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            {/* Title */}
+            <div className="text-center mb-12">
+              <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-linear-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                💣 Minesweeper
+              </h1>
+              <p className="text-gray-300 text-xl mb-4">
+                Find all the mines without detonating any!
+              </p>
+              <p className="text-gray-400 text-lg">
+                Select a difficulty level to begin
+              </p>
+            </div>
+
+            {/* Difficulty Cards */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Beginner */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleDifficultySelect('beginner')}
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-600/20 border border-green-500/50 p-8 hover:border-green-400 hover:from-green-500/30 hover:to-emerald-600/30 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-5xl mb-4">🌱</div>
+                  <h3 className="text-3xl font-bold text-green-400 mb-3">Beginner</h3>
+                  <ul className="text-sm text-gray-300 space-y-2">
+                    <li>✓ 9×9 Board</li>
+                    <li>✓ 10 Mines</li>
+                    <li>✓ 71 Safe Cells</li>
+                  </ul>
+                </div>
+              </motion.button>
+
+              {/* Intermediate */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleDifficultySelect('intermediate')}
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-600/20 border border-yellow-500/50 p-8 hover:border-yellow-400 hover:from-yellow-500/30 hover:to-orange-600/30 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-5xl mb-4">⚡</div>
+                  <h3 className="text-2xl font-bold text-yellow-400 mb-3">Intermediate</h3>
+                  <ul className="text-sm text-gray-300 space-y-2">
+                    <li>✓ 16×16 Board</li>
+                    <li>✓ 40 Mines</li>
+                    <li>✓ 216 Safe Cells</li>
+                  </ul>
+                </div>
+              </motion.button>
+
+              {/* Expert */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleDifficultySelect('expert')}
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-red-500/20 to-pink-600/20 border border-red-500/50 p-8 hover:border-red-400 hover:from-red-500/30 hover:to-pink-600/30 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-5xl mb-4">🔥</div>
+                  <h3 className="text-3xl font-bold text-red-400 mb-3">Expert</h3>
+                  <ul className="text-sm text-gray-300 space-y-2">
+                    <li>✓ 16×30 Board</li>
+                    <li>✓ 99 Mines</li>
+                    <li>✓ 381 Safe Cells</li>
+                  </ul>
+                </div>
+              </motion.button>
+            </div>
+
+            {/* Instructions */}
+            <div className="mt-12 bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+              <h3 className="text-white font-semibold mb-4 text-center text-lg">How to Play</h3>
+              <div className="grid md:grid-cols-2 gap-4 text-gray-300">
+                <div className="space-y-2">
+                  <p>🖱️ Left Click to reveal a cell</p>
+                  <p>🚩 Right Click to flag a mine</p>
+                </div>
+                <div className="space-y-2">
+                  <p>🔢 Numbers show adjacent mines</p>
+                  <p>🎯 Reveal all non-mine cells to win</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
