@@ -200,6 +200,45 @@ export interface NumberMazeLeaderboardEntry {
 }
 
 /**
+ * Simple difficulty type for game selection
+ */
+export type NumberMazeDifficulty = 'easy' | 'medium' | 'hard';
+
+/**
+ * Difficulty configuration for game generation
+ */
+export interface NumberMazeDifficultyConfig {
+  label: string;
+  gridSize: number;
+  pathLength: { min: number; max: number };
+  targetRange: { min: number; max: number };
+}
+
+/**
+ * Difficulty configurations for each level
+ */
+export const DIFFICULTY_CONFIG: Record<NumberMazeDifficulty, NumberMazeDifficultyConfig> = {
+  easy: {
+    label: 'Easy',
+    gridSize: 4,
+    pathLength: { min: 5, max: 8 },
+    targetRange: { min: -20, max: 50 }
+  },
+  medium: {
+    label: 'Medium',
+    gridSize: 5,
+    pathLength: { min: 8, max: 12 },
+    targetRange: { min: -50, max: 100 }
+  },
+  hard: {
+    label: 'Hard',
+    gridSize: 6,
+    pathLength: { min: 12, max: 18 },
+    targetRange: { min: -100, max: 200 }
+  }
+} as const;
+
+/**
  * Maze configuration
  */
 export interface MazeConfig {
