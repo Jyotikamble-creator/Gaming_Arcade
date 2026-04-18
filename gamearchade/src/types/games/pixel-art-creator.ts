@@ -64,3 +64,15 @@ export interface PixelArtApiResponse<T = any> {
   error?: string;
   message?: string;
 }
+
+export type PixelArtDifficulty = 'easy' | 'medium' | 'hard';
+
+export interface PixelArtDifficultyConfig {
+  gridSize: number;
+}
+
+export const DIFFICULTY_CONFIG: Record<PixelArtDifficulty, PixelArtDifficultyConfig> = {
+  easy: { gridSize: 8 },
+  medium: { gridSize: 16 },
+  hard: { gridSize: 24 }
+};
