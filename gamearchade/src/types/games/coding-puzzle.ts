@@ -140,3 +140,34 @@ export interface LeaderboardEntry {
   accuracy: number;
   createdAt: Date;
 }
+
+// Difficulty configuration for game modes
+export type CodingPuzzleDifficulty = 'easy' | 'medium' | 'hard';
+
+export interface CodingPuzzleDifficultyConfig {
+  label: string;
+  puzzlesToSolve: number;
+  pointsPerPuzzle: number;
+  timeLimit: number | null; // in seconds, null for no limit
+}
+
+export const DIFFICULTY_CONFIG: Record<CodingPuzzleDifficulty, CodingPuzzleDifficultyConfig> = {
+  easy: {
+    label: 'Easy',
+    puzzlesToSolve: 3,
+    pointsPerPuzzle: 10,
+    timeLimit: null
+  },
+  medium: {
+    label: 'Medium',
+    puzzlesToSolve: 5,
+    pointsPerPuzzle: 20,
+    timeLimit: 600 // 10 minutes
+  },
+  hard: {
+    label: 'Hard',
+    puzzlesToSolve: 7,
+    pointsPerPuzzle: 30,
+    timeLimit: 300 // 5 minutes
+  }
+} as const;

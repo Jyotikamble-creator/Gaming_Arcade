@@ -11,6 +11,7 @@ import PuzzleStats from "./PuzzleStats";
 import PuzzleHint from "./PuzzleHint";
 import PuzzleCompletedModal from "./PuzzleCompletedModal";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import { CodingPuzzleDifficulty, DIFFICULTY_CONFIG } from "@/types/games/coding-puzzle";
 
 type CodingPuzzlePageProps = {
   initialPuzzle?: any;
@@ -52,7 +53,9 @@ export default function CodingPuzzlePage({
   className = "" 
 }: CodingPuzzlePageProps) {
   const router = useRouter();
-  const [gameState, setGameState] = useState<GameState>("playing");
+  const [difficulty, setDifficulty] = useState<CodingPuzzleDifficulty>('medium');
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [gameState, setGameState] = useState<GameState>("menu");
   const [currentPuzzle, setCurrentPuzzle] = useState(initialPuzzle);
   const [selectedCategory, setSelectedCategory] = useState<PuzzleCategory>("logic");
   const [score, setScore] = useState(0);
@@ -84,6 +87,11 @@ export default function CodingPuzzlePage({
     setGameState("playing");
     setScore(0);
     setTimeElapsed(0);
+  };
+
+  const handleDifficultySelect = (selectedDifficulty: CodingPuzzleDifficulty) => {
+    setDifficulty(selectedDifficulty);
+    setGameStarted(true);
   };
 
   const handlePauseGame = () => {
@@ -148,9 +156,108 @@ export default function CodingPuzzlePage({
     }
   };
 
+  if (!gameStarted) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden flex items-center justify-center">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            {/* Title */}
+            <div className="text-center mb-12">
+              <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-linear-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                💻 Coding Puzzle
+              </h1>
+              <p className="text-gray-300 text-xl mb-4">
+                Solve coding challenges and test your skills!
+              </p>
+              <p className="text-gray-400 text-lg">
+                Select a difficulty level to begin
+              </p>
+            </div>
+
+            {/* Difficulty Cards */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Easy */}
+              <button
+                onClick={() => handleDifficultySelect('easy')}
+                className="group relative overflow-hidden rounded-xl bg-linear-to-br from-green-500/20 to-emerald-600/20 border border-green-500/50 p-8 hover:border-green-400 hover:from-green-500/30 hover:to-emerald-600/30 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-linear-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-5xl mb-4">🌱</div>
+                  <h3 className="text-3xl font-bold text-green-400 mb-3">Easy</h3>
+                  <ul className="text-sm text-gray-300 space-y-2">
+                    <li>✓ 3 Puzzles</li>
+                    <li>✓ 10 Points Each</li>
+                    <li>✓ No Time Limit</li>
+                  </ul>
+                </div>
+              </button>
+
+              {/* Medium */}
+              <button
+                onClick={() => handleDifficultySelect('medium')}
+                className="group relative overflow-hidden rounded-xl bg-linear-to-br from-yellow-500/20 to-orange-600/20 border border-yellow-500/50 p-8 hover:border-yellow-400 hover:from-yellow-500/30 hover:to-orange-600/30 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-linear-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-5xl mb-4">⚡</div>
+                  <h3 className="text-3xl font-bold text-yellow-400 mb-3">Medium</h3>
+                  <ul className="text-sm text-gray-300 space-y-2">
+                    <li>✓ 5 Puzzles</li>
+                    <li>✓ 20 Points Each</li>
+                    <li>✓ 10 Min Limit</li>
+                  </ul>
+                </div>
+              </button>
+
+              {/* Hard */}
+              <button
+                onClick={() => handleDifficultySelect('hard')}
+                className="group relative overflow-hidden rounded-xl bg-linear-to-br from-red-500/20 to-pink-600/20 border border-red-500/50 p-8 hover:border-red-400 hover:from-red-500/30 hover:to-pink-600/30 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-linear-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-5xl mb-4">🔥</div>
+                  <h3 className="text-3xl font-bold text-red-400 mb-3">Hard</h3>
+                  <ul className="text-sm text-gray-300 space-y-2">
+                    <li>✓ 7 Puzzles</li>
+                    <li>✓ 30 Points Each</li>
+                    <li>✓ 5 Min Limit</li>
+                  </ul>
+                </div>
+              </button>
+            </div>
+
+            {/* Instructions */}
+            <div className="mt-12 bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+              <h3 className="text-white font-semibold mb-4 text-center text-lg">How to Play</h3>
+              <div className="grid md:grid-cols-2 gap-4 text-gray-300">
+                <div className="space-y-2">
+                  <p>💻 Solve coding challenges and puzzles</p>
+                  <p>✅ Complete each puzzle to earn points</p>
+                </div>
+                <div className="space-y-2">
+                  <p>💡 Use hints if you get stuck</p>
+                  <p>🎯 Solve all puzzles to complete the challenge!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden ${className}`}>
       <AnimatedBackground />
+
       <main className="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
         <AnimatePresence mode="wait">
           {gameState === "menu" && (
@@ -184,14 +291,7 @@ export default function CodingPuzzlePage({
                 ))}
               </div>
               
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={() => setGameState("instructions")}
-                  className="bg-white/10 backdrop-blur-lg text-white px-8 py-3 rounded-xl text-lg font-semibold hover:bg-white/20 transition-colors duration-200"
-                >
-                  How to Play
-                </button>
-              </div>
+              
             </motion.div>
           )}
 
