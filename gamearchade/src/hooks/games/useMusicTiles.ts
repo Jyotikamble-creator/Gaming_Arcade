@@ -7,37 +7,8 @@ import {
   MusicTilesDifficulty,
   MusicTile,
   MusicTilesStats,
+  DIFFICULTY_CONFIG,
 } from '@/types/games/music-tiles';
-
-const DIFFICULTY_CONFIGS: Record<MusicTilesDifficulty, MusicTilesConfig> = {
-  easy: {
-    numLanes: 3,
-    tileSpeed: 1.5,
-    spawnRate: 1200,
-    hitZoneStart: 80,
-    hitZoneEnd: 95,
-    perfectZoneStart: 85,
-    perfectZoneEnd: 90,
-  },
-  medium: {
-    numLanes: 4,
-    tileSpeed: 2.5,
-    spawnRate: 800,
-    hitZoneStart: 80,
-    hitZoneEnd: 95,
-    perfectZoneStart: 86,
-    perfectZoneEnd: 90,
-  },
-  hard: {
-    numLanes: 4,
-    tileSpeed: 3.5,
-    spawnRate: 600,
-    hitZoneStart: 80,
-    hitZoneEnd: 95,
-    perfectZoneStart: 87,
-    perfectZoneEnd: 92,
-  },
-};
 
 export function useMusicTiles(): MusicTilesHookReturn {
   const [gameState, setGameState] = useState<MusicTilesGameState>({
@@ -55,7 +26,7 @@ export function useMusicTiles(): MusicTilesHookReturn {
     timeElapsed: 0,
   });
 
-  const [config, setConfig] = useState<MusicTilesConfig>(DIFFICULTY_CONFIGS.medium);
+  const [config, setConfig] = useState<MusicTilesConfig>(DIFFICULTY_CONFIG.medium);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,7 +65,7 @@ export function useMusicTiles(): MusicTilesHookReturn {
 
   // Start game
   const startGame = useCallback((difficulty: MusicTilesDifficulty) => {
-    const newConfig = DIFFICULTY_CONFIGS[difficulty];
+    const newConfig = DIFFICULTY_CONFIG[difficulty];
     setConfig(newConfig);
     setGameState({
       tiles: [],

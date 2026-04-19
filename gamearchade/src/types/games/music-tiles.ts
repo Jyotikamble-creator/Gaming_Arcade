@@ -47,6 +47,43 @@ export interface MusicTilesStats {
   performance: 'S' | 'A' | 'B' | 'C' | 'D' | 'F';
 }
 
+export interface MusicTilesDifficultyConfig extends MusicTilesConfig {
+  basePoints: number;
+}
+
+export const DIFFICULTY_CONFIG: Record<MusicTilesDifficulty, MusicTilesDifficultyConfig> = {
+  easy: {
+    numLanes: 3,
+    tileSpeed: 2,
+    spawnRate: 800,
+    hitZoneStart: 80,
+    hitZoneEnd: 100,
+    perfectZoneStart: 90,
+    perfectZoneEnd: 100,
+    basePoints: 10
+  },
+  medium: {
+    numLanes: 4,
+    tileSpeed: 3,
+    spawnRate: 600,
+    hitZoneStart: 80,
+    hitZoneEnd: 100,
+    perfectZoneStart: 90,
+    perfectZoneEnd: 100,
+    basePoints: 15
+  },
+  hard: {
+    numLanes: 4,
+    tileSpeed: 4,
+    spawnRate: 400,
+    hitZoneStart: 80,
+    hitZoneEnd: 100,
+    perfectZoneStart: 90,
+    perfectZoneEnd: 100,
+    basePoints: 25
+  }
+};
+
 export interface MusicTilesHookReturn {
   gameState: MusicTilesGameState;
   stats: MusicTilesStats;
