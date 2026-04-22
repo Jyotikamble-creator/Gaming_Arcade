@@ -33,9 +33,10 @@ const SudokuCompletedModal: React.FC<SudokuCompletedModalProps> = ({
 
   // Difficulty configuration
   const difficultyConfig: Record<SudokuDifficulty, { color: string, label: string, emoji: string }> = {
-    easy: { color: 'green', label: 'Easy', emoji: 'ðŸ˜Š' },
-    medium: { color: 'yellow', label: 'Medium', emoji: 'ðŸ¤”' },
-    hard: { color: 'red', label: 'Hard', emoji: 'ðŸ˜¤' }
+    easy: { color: 'green', label: 'Easy', emoji: '😊' },
+    medium: { color: 'yellow', label: 'Medium', emoji: '🤔' },
+    hard: { color: 'red', label: 'Hard', emoji: '😤' },
+    expert: { color: 'purple', label: 'Expert', emoji: '🧠' }
   };
 
   const config = difficultyConfig[difficulty] || difficultyConfig.easy;
@@ -438,6 +439,11 @@ const SudokuCompletedModal: React.FC<SudokuCompletedModalProps> = ({
           .difficulty-red .stat-emoji,
           .difficulty-red .stat-svg {
             color: #fca5a5;
+          }
+
+          .difficulty-purple .stat-emoji,
+          .difficulty-purple .stat-svg {
+            color: #d8b4fe;
           }
 
           .stat-name {

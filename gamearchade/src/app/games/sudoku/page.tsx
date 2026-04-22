@@ -1,458 +1,460 @@
-// Main page component for the Sudoku game
-"use client";
+'use client';
 
-import React, { useState, useEffect } from 'react';
-// API and logging imports
-import { submitScore } from '@/lib/api/client';
-// Logger
-import { logger } from '@/lib/logger';
-// Component imports
-import Instructions from '@/components/shared/Instructions';
-import Leaderboard from '@/components/leaderboard/Leaderboard';
+import React, { useState, useEffect, useCallback } from 'react';
 import SudokuBoard from '@/components/games/sudoku/SudokuBoard';
 import SudokuControls from '@/components/games/sudoku/SudokuControls';
 import SudokuStats from '@/components/games/sudoku/SudokuStats';
 import SudokuCompletedModal from '@/components/games/sudoku/SudokuCompletedModal';
-import AnimatedBackground from '@/components/AnimatedBackground';
-import DashboardLayout from '@/components/shared/DashboardLayout';
-// Types
-import type {
-  SudokuDifficulty,
-  SudokuBoard as BoardGrid,
-  ISudokuCell,
-  ISudokuSession
-} from '@/types/games/sudoku';
+import type { SudokuDifficulty } from '@/types/games/sudoku';
 
-// Local type definitions
-type SudokuCellPosition = { row: number; col: number };
-type SudokuNotes = Record<string, number[]>; // "row,col" -> array of numbers
-
-// Generate a complete valid Sudoku board
-function generateCompleteBoard(): BoardGrid {
-  const board: BoardGrid = Array(9).fill(null).map(() => Array(9).fill(0));
-
-  function isValid(board: BoardGrid, row: number, col: number, num: number): boolean {
-    // Check row
-    for (let x = 0; x < 9; x++) {
-      if (board[row][x] === num) return false;
-    }
-
-    // Check column
-    for (let x = 0; x < 9; x++) {
-      if (board[x][col] === num) return false;
-    }
-
-    // Check 3x3 box
-    const startRow = row - (row % 3);
-    const startCol = col - (col % 3);
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        if (board[i + startRow][j + startCol] === num) return false;
-      }
-    }
-
-    return true;
-  }
-
-  // Backtracking function to fill the board
-  function fillBoard(board: BoardGrid): boolean {
-    for (let row = 0; row < 9; row++) {
-      for (let col = 0; col < 9; col++) {
-        if (board[row][col] === 0) {
-          const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
-          for (let num of numbers) {
-            if (isValid(board, row, col, num)) {
-              board[row][col] = num;
-              if (fillBoard(board)) return true;
-              board[row][col] = 0;
-            }
-          }
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  fillBoard(board);
-  return board;
+interface GameState {
+  board: number[][];
+  initialBoard: number[][];
+  solution: number[][];
+  selectedCell: { row: number; col: number } | null;
+  notes: Record<string, number[]>;
+  notesMode: boolean;
+  difficulty: SudokuDifficulty;
+  isPaused: boolean;
+  isComplete: boolean;
+  time: number;
+  mistakes: number;
+  hintsUsed: number;
+  score: number;
 }
 
-// Create a puzzle by removing numbers from a complete board
-function createPuzzle(difficulty: SudokuDifficulty = 'medium'): { puzzle: BoardGrid, solution: BoardGrid } {
-  const completeBoard = generateCompleteBoard();
-  const puzzle: BoardGrid = completeBoard.map(row => [...row]);
+const INITIAL_STATE: GameState = {
+  board: Array(9).fill(null).map(() => Array(9).fill(0)),
+  initialBoard: Array(9).fill(null).map(() => Array(9).fill(0)),
+  solution: Array(9).fill(null).map(() => Array(9).fill(0)),
+  selectedCell: null,
+  notes: {},
+  notesMode: false,
+  difficulty: 'medium',
+  isPaused: false,
+  isComplete: false,
+  time: 0,
+  mistakes: 0,
+  hintsUsed: 0,
+  score: 0,
+};
 
-  // Difficulty settings: number of cells to remove
-  const cellsToRemove: Record<SudokuDifficulty, number> = {
-    easy: 30,
-    medium: 45,
-    hard: 55,
-    expert: 65
-  };
+const MAX_HINTS = 5;
+const MAX_MISTAKES = 3;
 
-  const toRemove = cellsToRemove[difficulty] || 45;
-  let removed = 0;
+/**
+ * Enhanced Sudoku Game Component with improved features
+ * - Multiple difficulty levels (Easy, Medium, Hard, Expert)
+ * - Intelligent hint system
+ * - Notes/pencil marks mode
+ * - Real-time validation
+ * - Score tracking
+ * - Pause/Resume functionality
+ */
+export default function SudokuGame() {
+  const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
+  const [loading, setLoading] = useState(true);
+  const [showCompletedModal, setShowCompletedModal] = useState(false);
+  const [validationMessage, setValidationMessage] = useState<string>('');
 
-  while (removed < toRemove) {
-    const row = Math.floor(Math.random() * 9);
-    const col = Math.floor(Math.random() * 9);
-
-    if (puzzle[row][col] !== 0) {
-      puzzle[row][col] = 0;
-      removed++;
-    }
-  }
-
-  return { puzzle, solution: completeBoard };
-}
-
-// Main component
-export default function Sudoku() {
-  const [difficulty, setDifficulty] = useState<SudokuDifficulty>('medium');
-  const [puzzle, setPuzzle] = useState<BoardGrid | null>(null);
-  const [solution, setSolution] = useState<BoardGrid | null>(null);
-  const [board, setBoard] = useState<BoardGrid | null>(null);
-  const [initialBoard, setInitialBoard] = useState<BoardGrid | null>(null);
-  const [selectedCell, setSelectedCell] = useState<SudokuCellPosition | null>(null);
-  const [mistakes, setMistakes] = useState<number>(0);
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [elapsedTime, setElapsedTime] = useState<number>(0);
-  const [isCompleted, setIsCompleted] = useState<boolean>(false);
-  const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [hintsUsed, setHintsUsed] = useState<number>(0);
-  const [notes, setNotes] = useState<SudokuNotes>({});
-  const [notesMode, setNotesMode] = useState<boolean>(false);
-
+  // Initialize game
   useEffect(() => {
-    startNewGame(difficulty);
+    const initializeGame = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `/api/games/sudoku/puzzle?difficulty=${gameState.difficulty}`
+        );
+        const data = await response.json();
+
+        setGameState(prev => ({
+          ...prev,
+          board: data.puzzle,
+          initialBoard: data.puzzle.map((row: number[]) => [...row]),
+          solution: data.solution,
+        }));
+      } catch (error) {
+        console.error('Failed to load puzzle:', error);
+        setValidationMessage('Failed to load puzzle. Please refresh.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeGame();
   }, []);
 
   // Timer effect
   useEffect(() => {
-    if (startTime && !isCompleted && !isPaused) {
-      const timer = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [startTime, isCompleted, isPaused]);
+    if (gameState.isPaused || gameState.isComplete) return;
 
-  // Start a new game
-  function startNewGame(diff: SudokuDifficulty): void {
-    logger.info('Starting new Sudoku game', { difficulty: diff });
-    const { puzzle: newPuzzle, solution: newSolution } = createPuzzle(diff);
-    setPuzzle(newPuzzle);
-    setSolution(newSolution);
-    setBoard(newPuzzle.map(row => [...row]));
-    setInitialBoard(newPuzzle.map(row => [...row]));
-    setSelectedCell(null);
-    setMistakes(0);
-    setStartTime(Date.now());
-    setElapsedTime(0);
-    setIsCompleted(false);
-    setIsPaused(false);
-    setHintsUsed(0);
-    setNotes({});
-    setNotesMode(false);
-    setDifficulty(diff);
-  }
+    const interval = setInterval(() => {
+      setGameState(prev => ({
+        ...prev,
+        time: prev.time + 1,
+      }));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [gameState.isPaused, gameState.isComplete]);
+
+  // Auto-hide validation message
+  useEffect(() => {
+    if (validationMessage) {
+      const timer = setTimeout(() => setValidationMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [validationMessage]);
+
+  // Check if puzzle is complete
+  const checkCompletion = useCallback((board: number[][], solution: number[][]) => {
+    for (let i = 0; i < 9; i++) {
+      for (let j = 0; j < 9; j++) {
+        if (board[i][j] !== solution[i][j]) return false;
+      }
+    }
+    return true;
+  }, []);
 
   // Handle cell click
-  function handleCellClick(row: number, col: number): void {
-    if (isCompleted || isPaused) return;
-    if (initialBoard && initialBoard[row][col] !== 0) return; // Can't select initial cells
+  const handleCellClick = useCallback((row: number, col: number) => {
+    if (gameState.isPaused || gameState.isComplete) return;
+    if (gameState.initialBoard[row][col] !== 0) return;
 
-    setSelectedCell({ row, col });
-  }
+    setGameState(prev => ({
+      ...prev,
+      selectedCell: { row, col },
+    }));
+  }, [gameState.isPaused, gameState.isComplete, gameState.initialBoard]);
 
-  // Handle number input
-  function handleNumberInput(num: number): void {
-    if (!selectedCell || isCompleted || isPaused) return;
+  // Handle number selection
+  const handleNumberSelect = useCallback((num: number) => {
+    if (!gameState.selectedCell || gameState.isPaused) return;
 
-    const { row, col } = selectedCell;
-    if (initialBoard && initialBoard[row][col] !== 0) return; // Can't modify initial cells
+    const { row, col } = gameState.selectedCell;
+    const newBoard = gameState.board.map(r => [...r]);
 
-    const newBoard = board ? board.map(r => [...r]) : [];
-
-    if (notesMode) {
-      // Toggle note
+    if (gameState.notesMode) {
+      // Toggle note mode
       const key = `${row}-${col}`;
-      const currentNotes = notes[key] || [];
-      const newNotes: SudokuNotes = { ...notes };
+      const notes = gameState.notes[key] || [];
+      const updatedNotes = notes.includes(num)
+        ? notes.filter(n => n !== num)
+        : [...notes, num].sort((a, b) => a - b);
 
-      if (currentNotes.includes(num)) {
-        newNotes[key] = currentNotes.filter(n => n !== num);
-      } else {
-        newNotes[key] = [...currentNotes, num].sort();
-      }
-
-      setNotes(newNotes);
-    } else {
-      // Set number
-      if (newBoard[row]) {
-        newBoard[row][col] = num;
-      }
-
-      // Clear notes for this cell
-      const key = `${row}-${col}`;
-      if (notes[key]) {
-        const newNotes = { ...notes };
+      const newNotes = { ...gameState.notes };
+      if (updatedNotes.length === 0) {
         delete newNotes[key];
-        setNotes(newNotes);
+      } else {
+        newNotes[key] = updatedNotes;
       }
 
-      // Check if correct
-      if (solution && solution[row][col] !== num) {
-        setMistakes(prev => prev + 1);
-        logger.debug('Incorrect number placed', { row, col, num, correct: solution[row][col] });
+      setGameState(prev => ({
+        ...prev,
+        notes: newNotes,
+      }));
+
+      setValidationMessage('📝 Note added');
+    } else {
+      // Place number
+      newBoard[row][col] = num;
+      
+      // Check if wrong
+      if (num !== gameState.solution[row][col]) {
+        setGameState(prev => ({
+          ...prev,
+          mistakes: prev.mistakes + 1,
+        }));
+        setValidationMessage(`❌ Wrong! Mistakes: ${gameState.mistakes + 1}/${MAX_MISTAKES}`);
+
+        // Check if game over
+        if (gameState.mistakes + 1 >= MAX_MISTAKES) {
+          setValidationMessage('💀 Game Over! Too many mistakes.');
+          setGameState(prev => ({
+            ...prev,
+            isPaused: true,
+          }));
+        }
+      } else {
+        setValidationMessage('✅ Correct!');
       }
 
-      setBoard(newBoard);
-
-      // Check if puzzle is completed
-      checkCompletion(newBoard);
+      // Check if complete
+      if (checkCompletion(newBoard, gameState.solution)) {
+        const finalScore = calculateScore();
+        setGameState(prev => ({
+          ...prev,
+          board: newBoard,
+          isComplete: true,
+          score: finalScore,
+        }));
+        setShowCompletedModal(true);
+      } else {
+        setGameState(prev => ({
+          ...prev,
+          board: newBoard,
+          notes: {}, // Clear notes when placing a number
+        }));
+      }
     }
-  }
+  }, [gameState, checkCompletion]);
 
-  function handleClearCell(): void {
-    if (!selectedCell || isCompleted || isPaused) return;
+  // Handle clear cell
+  const handleClear = useCallback(() => {
+    if (!gameState.selectedCell || gameState.isPaused) return;
 
-    const { row, col } = selectedCell;
-    if (initialBoard && initialBoard[row][col] !== 0) return;
+    const { row, col } = gameState.selectedCell;
+    if (gameState.initialBoard[row][col] !== 0) return;
 
-    const newBoard = board ? board.map(r => [...r]) : [];
-    if (newBoard[row]) {
-      newBoard[row][col] = 0;
-    }
-    setBoard(newBoard);
+    const newBoard = gameState.board.map(r => [...r]);
+    newBoard[row][col] = 0;
 
-    // Clear notes for this cell
     const key = `${row}-${col}`;
-    if (notes[key]) {
-      const newNotes = { ...notes };
-      delete newNotes[key];
-      setNotes(newNotes);
-    }
-  }
+    const newNotes = { ...gameState.notes };
+    delete newNotes[key];
+
+    setGameState(prev => ({
+      ...prev,
+      board: newBoard,
+      notes: newNotes,
+    }));
+
+    setValidationMessage('🗑️ Cell cleared');
+  }, [gameState]);
 
   // Handle hint
-  function handleHint(): void {
-    if (!selectedCell || isCompleted || isPaused) return;
-
-    const { row, col } = selectedCell;
-    if (initialBoard && initialBoard[row][col] !== 0) return;
-
-    const newBoard = board ? board.map(r => [...r]) : [];
-    if (solution && newBoard[row]) {
-      newBoard[row][col] = solution[row][col];
-    }
-    setBoard(newBoard);
-    setHintsUsed(prev => prev + 1);
-
-    // Clear notes for this cell
-    const key = `${row}-${col}`;
-    if (notes[key]) {
-      const newNotes = { ...notes };
-      delete newNotes[key];
-      setNotes(newNotes);
+  const handleHint = useCallback(async () => {
+    if (gameState.hintsUsed >= MAX_HINTS) {
+      setValidationMessage(`💡 No hints left! (${MAX_HINTS}/${MAX_HINTS} used)`);
+      return;
     }
 
-    logger.info('Hint used', { row, col, hintsUsed: hintsUsed + 1 });
+    if (!gameState.selectedCell) {
+      setValidationMessage('Select a cell first!');
+      return;
+    }
 
-    checkCompletion(newBoard);
-  }
+    try {
+      const response = await fetch('/api/games/sudoku/hint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          puzzle: gameState.board,
+          initialBoard: gameState.initialBoard,
+        }),
+      });
 
-  // Check if puzzle is completed
-  function checkCompletion(currentBoard: BoardGrid): void {
-    // Check if all cells are filled
-    const isFilled = currentBoard.every(row => row.every(cell => cell !== 0));
+      const data = await response.json();
+      if (!data.hint) {
+        setValidationMessage('No hints available!');
+        return;
+      }
 
-    if (isFilled) {
-      // Check if solution is correct
-      const isCorrect = solution ? currentBoard.every((row, i) =>
-        row.every((cell, j) => cell === solution[i][j])
-      ) : false;
+      const { row, col, value, technique } = data.hint;
+      const newBoard = gameState.board.map(r => [...r]);
+      newBoard[row][col] = value;
 
-      if (isCorrect) {
-        setIsCompleted(true);
-        const finalTime = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+      setValidationMessage(`💡 Hint: ${technique} at (${row + 1}, ${col + 1})`);
 
-        // Calculate score based on time, mistakes, hints, and difficulty
-        const difficultyMultiplier: Record<SudokuDifficulty, number> = { easy: 1, medium: 1.5, hard: 2, expert: 2.5 };
-        const baseScore = 1000 * difficultyMultiplier[difficulty];
-        const timePenalty = Math.min(finalTime, 600); // Max 600 seconds penalty
-        const mistakesPenalty = mistakes * 50;
-        const hintsPenalty = hintsUsed * 100;
-        const finalScore = Math.max(Math.round(baseScore - timePenalty - mistakesPenalty - hintsPenalty), 100);
-
-        submitScore({
-          game: 'sudoku',
+      if (checkCompletion(newBoard, gameState.solution)) {
+        const finalScore = calculateScore();
+        setGameState(prev => ({
+          ...prev,
+          board: newBoard,
+          hintsUsed: prev.hintsUsed + 1,
+          isComplete: true,
           score: finalScore,
-          meta: {
-            difficulty,
-            time: finalTime,
-            mistakes,
-            hintsUsed
-          }
-        });
-
-        logger.info('Sudoku completed', { score: finalScore, time: finalTime, mistakes, hintsUsed, difficulty });
+        }));
+        setShowCompletedModal(true);
+      } else {
+        setGameState(prev => ({
+          ...prev,
+          board: newBoard,
+          hintsUsed: prev.hintsUsed + 1,
+          selectedCell: { row, col },
+        }));
       }
+    } catch (error) {
+      console.error('Failed to get hint:', error);
+      setValidationMessage('Failed to get hint');
     }
-  }
+  }, [gameState, checkCompletion]);
 
-  // Helper function to format time in mm:ss
-  function formatTime(seconds: number): string {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }
+  // Handle notes toggle
+  const handleNotesToggle = useCallback(() => {
+    setGameState(prev => ({
+      ...prev,
+      notesMode: !prev.notesMode,
+    }));
+    setValidationMessage(`${!gameState.notesMode ? '✏️' : '✋'} ${!gameState.notesMode ? 'Notes mode' : 'Number mode'}`);
+  }, [gameState.notesMode]);
 
-  function togglePause(): void {
-    if (isCompleted) return;
+  // Handle difficulty change
+  const handleDifficultyChange = useCallback(async (difficulty: SudokuDifficulty) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `/api/games/sudoku/puzzle?difficulty=${difficulty}`
+      );
+      const data = await response.json();
 
-    if (isPaused) {
-      // Resume: adjust start time to account for pause duration
-      if (startTime) {
-        const pauseDuration = Math.floor((Date.now() - startTime) / 1000) - elapsedTime;
-        setStartTime(Date.now() - (elapsedTime * 1000));
-      }
+      setGameState(prev => ({
+        ...INITIAL_STATE,
+        board: data.puzzle,
+        initialBoard: data.puzzle.map((row: number[]) => [...row]),
+        solution: data.solution,
+        difficulty,
+      }));
+      setValidationMessage(`🎮 ${difficulty.toUpperCase()} difficulty selected`);
+    } catch (error) {
+      console.error('Failed to load puzzle:', error);
+      setValidationMessage('Failed to load puzzle');
+    } finally {
+      setLoading(false);
     }
+  }, []);
 
-    setIsPaused(!isPaused);
-  }
+  // Handle new game
+  const handleNewGame = useCallback(() => {
+    handleDifficultyChange(gameState.difficulty);
+    setShowCompletedModal(false);
+    setValidationMessage('🆕 New game started!');
+  }, [gameState.difficulty, handleDifficultyChange]);
 
-  if (!board) {
+  // Handle pause/resume
+  const handlePause = useCallback(() => {
+    setGameState(prev => ({ ...prev, isPaused: true }));
+    setValidationMessage('⏸️ Game paused');
+  }, []);
+
+  const handleResume = useCallback(() => {
+    setGameState(prev => ({ ...prev, isPaused: false }));
+    setValidationMessage('▶️ Game resumed');
+  }, []);
+
+  // Calculate score with bonus/penalties
+  const calculateScore = (): number => {
+    const baseScore = 1000;
+    const timeBonus = Math.max(0, 500 - gameState.time / 2);
+    const mistakePenalty = gameState.mistakes * 50;
+    const hintPenalty = gameState.hintsUsed * 100;
+    const difficultyBonus = {
+      easy: 100,
+      medium: 250,
+      hard: 500,
+      expert: 750,
+    }[gameState.difficulty];
+    
+    return Math.max(0, Math.round(baseScore + timeBonus - mistakePenalty - hintPenalty + difficultyBonus));
+  };
+
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-light-text">Generating Sudoku puzzle...</p>
+          <div className="w-16 h-16 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl font-semibold">Loading Sudoku Puzzle...</p>
         </div>
       </div>
     );
   }
 
-  // Render the Sudoku game
   return (
-    <DashboardLayout>
-      <div className="min-h-screen p-8 bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-        <AnimatedBackground />
-        <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
-          {/* Header Section */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">🧩 Sudoku Master</h1>
-            <p className="text-white/70 text-lg">Master the classic number puzzle game</p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-5xl font-bold text-white mb-2">🧩 Sudoku Master v2.0</h1>
+          <p className="text-purple-200">Enhanced puzzle-solving experience</p>
+        </div>
 
-          {/* Main Game Container */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Game Board - Left side (2 columns) */}
-            <div className="lg:col-span-2">
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                <h2 className="text-white font-semibold mb-6">Game Board</h2>
-                <div className="flex justify-center">
-                  <SudokuBoard
-                    board={board}
-                    initialBoard={initialBoard}
-                    selectedCell={selectedCell}
-                    solution={solution}
-                    notes={notes}
-                    onCellClick={handleCellClick}
-                    isPaused={isPaused}
-                  />
-                </div>
-              </div>
+        {/* Validation Message */}
+        {validationMessage && (
+          <div className="mb-4 p-4 bg-white/20 backdrop-blur-md rounded-lg border border-white/30 text-white text-center animate-pulse">
+            {validationMessage}
+          </div>
+        )}
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Board and Stats */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Sudoku Board */}
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+              <SudokuBoard
+                board={gameState.board}
+                initialBoard={gameState.initialBoard}
+                selectedCell={gameState.selectedCell}
+                solution={gameState.solution}
+                notes={gameState.notes}
+                onCellClick={handleCellClick}
+                isPaused={gameState.isPaused}
+              />
             </div>
 
-            {/* Right Sidebar - Stats & Controls */}
-            <div className="space-y-6">
-              {/* Score Card */}
-              <div className="bg-linear-to-br from-green-500/20 to-emerald-600/20 backdrop-blur-lg rounded-xl p-4 border border-green-400/30">
-                <h3 className="text-white/70 text-sm font-medium mb-2">Score</h3>
-                <p className="text-3xl font-bold text-green-300">
-                  {Math.max(Math.round((1000 * ({ easy: 1, medium: 1.5, hard: 2, expert: 2.5 }[difficulty])) - Math.min(elapsedTime, 600) - (mistakes * 50) - (hintsUsed * 100)), 100)}
-                </p>
-              </div>
-
-              {/* Time Card */}
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                <h3 className="text-white/70 text-sm font-medium mb-2">Time</h3>
-                <p className="text-2xl font-bold text-white font-mono">{formatTime(elapsedTime)}</p>
-              </div>
-
-              {/* Mistakes Card */}
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                <h3 className="text-white/70 text-sm font-medium mb-2">Mistakes</h3>
-                <p className="text-2xl font-bold text-red-400">{mistakes} / 3</p>
-              </div>
-
-              {/* Hints Card */}
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                <h3 className="text-white/70 text-sm font-medium mb-2">Hints Used</h3>
-                <p className="text-2xl font-bold text-blue-300">{hintsUsed} / 3</p>
-              </div>
-
-              {/* Difficulty Card */}
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                <h3 className="text-white/70 text-sm font-medium mb-2">Difficulty</h3>
-                <p className="text-xl font-bold text-white capitalize">{difficulty}</p>
-              </div>
-
-              {/* Controls Card */}
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                <h2 className="text-white font-semibold mb-4 text-sm">Controls</h2>
-                <SudokuControls
-                  onNumberSelect={handleNumberInput}
-                  onClear={handleClearCell}
-                  onHint={handleHint}
-                  onNewGame={() => startNewGame(difficulty)}
-                  onDifficultyChange={(diff: SudokuDifficulty) => {
-                    if (window.confirm('Start a new game with different difficulty?')) {
-                      startNewGame(diff);
-                    }
-                  }}
-                  onPause={togglePause}
-                  onResume={togglePause}
-                  difficulty={difficulty}
-                  isPaused={isPaused}
-                  notesMode={notesMode}
-                  onNotesToggle={() => setNotesMode(!notesMode)}
-                  hintsUsed={hintsUsed}
-                  maxHints={3}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Instructions */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 mb-8">
-            <h2 className="text-white font-semibold mb-4">📖 How to Play</h2>
-            <Instructions gameType="sudoku" />
-          </div>
-
-          {/* Leaderboard Section */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 mb-8">
-            <h2 className="text-white font-semibold mb-6">🏆 Leaderboard</h2>
-            <Leaderboard gameType="sudoku" />
-          </div>
-
-          {/* Completion Modal */}
-          {isCompleted && (
-            <SudokuCompletedModal
-              isOpen={isCompleted}
-              score={Math.max(Math.round((1000 * ({ easy: 1, medium: 1.5, hard: 2, expert: 2.5 }[difficulty])) - Math.min(elapsedTime, 600) - (mistakes * 50) - (hintsUsed * 100)), 100)}
-              time={elapsedTime}
-              mistakes={mistakes}
-              hintsUsed={hintsUsed}
-              difficulty={difficulty}
-              onClose={() => setIsCompleted(false)}
-              onNewGame={() => startNewGame(difficulty)}
+            {/* Stats */}
+            <SudokuStats
+              difficulty={gameState.difficulty}
+              time={gameState.time}
+              mistakes={gameState.mistakes}
+              hintsUsed={gameState.hintsUsed}
+              maxHints={MAX_HINTS}
+              maxMistakes={MAX_MISTAKES}
             />
-          )}
+          </div>
+
+          {/* Right Column - Controls */}
+          <div className="lg:col-span-1">
+            <SudokuControls
+              difficulty={gameState.difficulty}
+              notesMode={gameState.notesMode}
+              isPaused={gameState.isPaused}
+              hintsUsed={gameState.hintsUsed}
+              maxHints={MAX_HINTS}
+              onNumberSelect={handleNumberSelect}
+              onClear={handleClear}
+              onHint={handleHint}
+              onNotesToggle={handleNotesToggle}
+              onDifficultyChange={handleDifficultyChange}
+              onNewGame={handleNewGame}
+              onPause={handlePause}
+              onResume={handleResume}
+            />
+          </div>
+        </div>
+
+        {/* Footer Info */}
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20 text-white text-center">
+            <div className="text-sm text-purple-200">Current Score</div>
+            <div className="text-3xl font-bold">{calculateScore()}</div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20 text-white text-center">
+            <div className="text-sm text-purple-200">Game Status</div>
+            <div className="text-xl font-bold">
+              {gameState.isComplete ? '✅ SOLVED!' : gameState.isPaused ? '⏸️ PAUSED' : '🎮 PLAYING'}
+            </div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20 text-white text-center">
+            <div className="text-sm text-purple-200">Progress</div>
+            <div className="text-xl font-bold">
+              {gameState.board.flat().filter(x => x !== 0).length}/81 cells
+            </div>
+          </div>
         </div>
       </div>
-    </DashboardLayout>
+
+      {/* Completed Modal */}
+      <SudokuCompletedModal
+        isOpen={showCompletedModal}
+        score={gameState.score}
+        time={gameState.time}
+        difficulty={gameState.difficulty}
+        mistakes={gameState.mistakes}
+        hintsUsed={gameState.hintsUsed}
+        onClose={() => setShowCompletedModal(false)}
+        onNewGame={handleNewGame}
+      />
+    </div>
   );
 }

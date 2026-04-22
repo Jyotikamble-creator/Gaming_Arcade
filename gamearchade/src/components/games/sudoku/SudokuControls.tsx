@@ -18,11 +18,12 @@ const SudokuControls: React.FC<SudokuControlsProps> = ({
   onResume
 }) => {
   const numbers: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  // Difficulty levels
+  // Difficulty levels - includes all 4 difficulties
   const difficultyLevels: Array<{ value: SudokuDifficulty, label: string, color: string }> = [
     { value: 'easy', label: 'Easy', color: 'green' },
     { value: 'medium', label: 'Medium', color: 'yellow' },
-    { value: 'hard', label: 'Hard', color: 'red' }
+    { value: 'hard', label: 'Hard', color: 'red' },
+    { value: 'expert', label: 'Expert', color: 'purple' }
   ];
 
   // Render the component
@@ -162,7 +163,7 @@ const SudokuControls: React.FC<SudokuControlsProps> = ({
 
         .difficulty-buttons {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
           gap: 0.6rem;
         }
 
@@ -250,6 +251,25 @@ const SudokuControls: React.FC<SudokuControlsProps> = ({
           color: white;
           border-color: #c53030;
           box-shadow: 0 8px 20px rgba(245, 101, 101, 0.3);
+        }
+
+        .difficulty-purple {
+          background: rgba(168, 85, 247, 0.2);
+          color: #d8b4fe;
+          border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .difficulty-purple:hover {
+          background: rgba(168, 85, 247, 0.35);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
+        }
+
+        .difficulty-purple.active {
+          background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+          color: white;
+          border-color: #7e22ce;
+          box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
         }
 
         .number-pad {
@@ -431,10 +451,38 @@ const SudokuControls: React.FC<SudokuControlsProps> = ({
           box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
         }
 
+        @media (max-width: 1024px) {
+          .sudoku-controls {
+            gap: 1.5rem;
+            padding: 1.5rem;
+          }
+
+          .difficulty-buttons {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .number-btn {
+            min-height: 55px;
+            font-size: 20px;
+          }
+
+          .action-buttons {
+            grid-template-columns: 1fr;
+          }
+
+          .game-controls {
+            grid-template-columns: 1fr;
+          }
+        }
+
         @media (max-width: 768px) {
           .sudoku-controls {
             padding: 1.25rem;
             gap: 1.25rem;
+          }
+
+          .difficulty-buttons {
+            grid-template-columns: repeat(2, 1fr);
           }
 
           .action-buttons {
@@ -446,8 +494,54 @@ const SudokuControls: React.FC<SudokuControlsProps> = ({
           }
 
           .number-btn {
-            min-height: 55px;
-            font-size: 20px;
+            min-height: 50px;
+            font-size: 18px;
+          }
+
+          .action-btn {
+            padding: 0.7rem 0.6rem;
+            font-size: 11px;
+          }
+
+          .game-btn {
+            padding: 0.75rem 0.8rem;
+            font-size: 12px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .sudoku-controls {
+            padding: 1rem;
+            gap: 1rem;
+          }
+
+          .difficulty-buttons {
+            grid-template-columns: 1fr;
+          }
+
+          .number-pad {
+            gap: 0.6rem;
+          }
+
+          .number-btn {
+            min-height: 45px;
+            font-size: 16px;
+          }
+
+          .action-btn {
+            padding: 0.6rem 0.5rem;
+            font-size: 10px;
+          }
+
+          .game-btn {
+            padding: 0.65rem 0.6rem;
+            font-size: 11px;
+          }
+
+          .action-btn svg,
+          .game-btn svg {
+            width: 16px;
+            height: 16px;
           }
         }
       `}</style>

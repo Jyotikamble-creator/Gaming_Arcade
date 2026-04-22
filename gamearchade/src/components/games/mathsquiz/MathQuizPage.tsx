@@ -19,7 +19,7 @@ interface User {
 }
 
 interface MathQuizPageProps {
-  user: User | null;
+  user?: User | null;
   onBackToDashboard?: () => void;
   className?: string;
 }

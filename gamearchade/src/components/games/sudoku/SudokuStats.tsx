@@ -19,9 +19,10 @@ const SudokuStats: React.FC<SudokuStatsProps> = ({
 
   // Difficulty configuration
   const difficultyConfig: Record<SudokuDifficulty, { color: string, label: string, emoji: string }> = {
-    easy: { color: 'green', label: 'Easy', emoji: 'ðŸ˜Š' },
-    medium: { color: 'yellow', label: 'Medium', emoji: 'ðŸ¤”' },
-    hard: { color: 'red', label: 'Hard', emoji: 'ðŸ˜¤' }
+    easy: { color: 'green', label: 'Easy', emoji: '😊' },
+    medium: { color: 'yellow', label: 'Medium', emoji: '🤔' },
+    hard: { color: 'red', label: 'Hard', emoji: '😤' },
+    expert: { color: 'purple', label: 'Expert', emoji: '🧠' }
   };
 
   const config = difficultyConfig[difficulty] || difficultyConfig.easy;
@@ -175,6 +176,11 @@ const SudokuStats: React.FC<SudokuStatsProps> = ({
 
         .difficulty-red .stat-icon {
           background: linear-gradient(135deg, rgba(245, 101, 101, 0.3) 0%, rgba(239, 68, 68, 0.15) 100%);
+        }
+
+        .difficulty-purple .stat-icon {
+          background: linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(147, 51, 234, 0.15) 100%);
+          color: #d8b4fe;
         }
 
         .timer-card .stat-icon {

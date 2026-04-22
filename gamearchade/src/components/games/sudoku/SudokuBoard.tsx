@@ -116,15 +116,15 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
       <style jsx>{`
         .sudoku-board-wrapper {
           position: relative;
-          display: inline-block;
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
         }
         
         .sudoku-pause-overlay {
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          inset: 0;
           background: rgba(0, 0, 0, 0.9);
           backdrop-filter: blur(8px);
           display: flex;
@@ -137,18 +137,18 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
         .sudoku-pause-message {
           text-align: center;
           padding: 2rem;
+          color: white;
         }
         
         .sudoku-board {
           display: inline-grid;
           grid-template-columns: repeat(9, 1fr);
           gap: 0;
-          background: #2d3748;
-          padding: 0;
-          border: 3px solid #1a202c;
-          border-radius: 12px;
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-          overflow: hidden;
+          background: #fff;
+          padding: 4px;
+          border: 2px solid #000;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .sudoku-row {
@@ -156,130 +156,118 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
         }
         
         .sudoku-cell {
-          width: 70px;
-          height: 70px;
-          background: #f8f9fa;
+          width: 56px;
+          height: 56px;
+          background: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: all 0.15s ease;
-          position: relative;
-          font-size: 28px;
-          font-weight: 600;
-          color: #1a202c;
-          border: 1px solid #cbd5e0;
+          font-size: 24px;
+          font-weight: bold;
+          color: #000;
+          border: 1px solid #999;
           user-select: none;
+          transition: background-color 0.1s ease;
         }
         
-        /* Main grid borders for 3x3 boxes */
-        .sudoku-cell:nth-child(3n) {
-          border-right: 3px solid #1a202c;
-        }
-        
-        .sudoku-cell:nth-child(27n+1),
-        .sudoku-cell:nth-child(27n+2),
-        .sudoku-cell:nth-child(27n+3),
-        .sudoku-cell:nth-child(27n+4),
-        .sudoku-cell:nth-child(27n+5),
-        .sudoku-cell:nth-child(27n+6),
-        .sudoku-cell:nth-child(27n+7),
-        .sudoku-cell:nth-child(27n+8),
-        .sudoku-cell:nth-child(27n+9) {
-          border-bottom: 1px solid #cbd5e0;
+        /* 3x3 Box borders */
+        .sudoku-cell:nth-child(3n):nth-child(-n+9),
+        .sudoku-cell:nth-child(3n):nth-child(n+19):nth-child(-n+27),
+        .sudoku-cell:nth-child(3n):nth-child(n+46):nth-child(-n+54),
+        .sudoku-cell:nth-child(3n):nth-child(n+73):nth-child(-n+81) {
+          border-right: 3px solid #000;
         }
         
         .sudoku-cell:nth-child(n+19):nth-child(-n+27),
         .sudoku-cell:nth-child(n+46):nth-child(-n+54),
         .sudoku-cell:nth-child(n+73):nth-child(-n+81) {
-          border-bottom: 3px solid #1a202c;
+          border-bottom: 3px solid #000;
         }
         
         .sudoku-cell:hover {
-          background: #edf2f7;
-          transform: translateY(-1px);
+          background: #f0f0f0;
         }
         
         .sudoku-cell-initial {
-          background: #e2e8f0;
-          color: #1a202c;
-          font-weight: 700;
+          background: #e8e8e8;
+          font-weight: bold;
           cursor: default;
-          box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
         }
         
         .sudoku-cell-initial:hover {
-          background: #e2e8f0;
-          transform: none;
+          background: #e8e8e8;
         }
         
         .sudoku-cell-selected {
-          background: #bee3f8 !important;
-          box-shadow: inset 0 0 0 2px #3182ce;
-          font-weight: 700;
+          background: #b3d9ff !important;
+          border: 2px solid #0066cc;
         }
         
         .sudoku-cell-highlighted {
-          background: #f0f7ff;
+          background: #e8f4f8;
         }
         
         .sudoku-cell-same-number {
-          background: #c6f6d5 !important;
-          font-weight: 600;
+          background: #c8e6c9 !important;
         }
         
         .sudoku-cell-wrong {
-          background: #fed7d7 !important;
-          color: #c53030;
-          font-weight: 700;
-          animation: pulse-error 0.3s ease;
-        }
-        
-        @keyframes pulse-error {
-          0%, 100% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.02);
-          }
+          background: #ffcccc !important;
+          color: #cc0000;
         }
         
         .sudoku-number {
-          font-size: 32px;
-          font-weight: 700;
-          line-height: 1;
+          font-size: 28px;
+          font-weight: bold;
         }
         
         .sudoku-notes {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          grid-template-rows: repeat(3, 1fr);
+          gap: 1px;
           width: 100%;
           height: 100%;
-          padding: 2px;
-          gap: 1px;
         }
         
         .sudoku-note {
           font-size: 10px;
           font-weight: 500;
-          color: #718096;
+          color: #666;
           display: flex;
           align-items: center;
           justify-content: center;
-          line-height: 1;
         }
         
-        /* Responsive design */
+        /* Responsive */
         @media (max-width: 768px) {
           .sudoku-cell {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
+            font-size: 18px;
+          }
+          
+          .sudoku-number {
             font-size: 20px;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .sudoku-board {
+            padding: 2px;
+          }
+          
+          .sudoku-cell {
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
             border-width: 0.5px;
           }
           
-          .sudoku-cell:nth-child(3n) {
+          .sudoku-cell:nth-child(3n):nth-child(-n+9),
+          .sudoku-cell:nth-child(3n):nth-child(n+19):nth-child(-n+27),
+          .sudoku-cell:nth-child(3n):nth-child(n+46):nth-child(-n+54),
+          .sudoku-cell:nth-child(3n):nth-child(n+73):nth-child(-n+81) {
             border-right-width: 2px;
           }
           
@@ -290,28 +278,11 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
           }
           
           .sudoku-number {
-            font-size: 22px;
-          }
-          
-          .sudoku-note {
-            font-size: 7px;
-          }
-        }
-        
-        @media (max-width: 480px) {
-          .sudoku-cell {
-            width: 38px;
-            height: 38px;
             font-size: 16px;
-            border-width: 0.5px;
-          }
-          
-          .sudoku-number {
-            font-size: 18px;
           }
           
           .sudoku-note {
-            font-size: 6px;
+            font-size: 8px;
           }
         }
       `}</style>

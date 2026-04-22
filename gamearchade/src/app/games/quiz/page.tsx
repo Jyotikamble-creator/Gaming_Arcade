@@ -36,6 +36,15 @@ const DIFFICULTY_CONFIG = {
     emoji: '🔥',
     description: 'Expert level - For quiz masters!',
     questionsCount: 5
+  },
+  expert: {
+    label: 'Expert',
+    color: 'from-purple-500 to-indigo-600',
+    borderColor: 'border-purple-500',
+    textColor: 'text-purple-400',
+    emoji: '💎',
+    description: 'Ultimate challenge - Only for legends!',
+    questionsCount: 5
   }
 } as const;
 
