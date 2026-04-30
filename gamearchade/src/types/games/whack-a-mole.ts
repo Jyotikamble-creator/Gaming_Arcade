@@ -514,5 +514,17 @@ export const DIFFICULTY_CONFIG = {
     basePoints: 100,
     gridSize: 16,
     duration: 60
+  },
+  expert: {
+    label: 'Expert',
+    basePoints: 150,
+    gridSize: 16,
+    duration: 45
+  },
+  insane: {
+    label: 'Insane',
+    basePoints: 200,
+    gridSize: 16,
+    duration: 30
   }
 } as const;

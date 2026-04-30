@@ -53,7 +53,7 @@ const DIFFICULTY_SETTINGS: Record<'easy' | 'medium' | 'hard', DifficultyConfig> 
 // SlidingPuzzle component
 export default function SlidingPuzzle() {
   const { user } = useAuth();
-  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | null>(null);
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | undefined>(undefined);
   const [tiles, setTiles] = useState<(number | null)[]>([]);
   const [emptyIndex, setEmptyIndex] = useState<number>(0);
   const [moves, setMoves] = useState<number>(0);

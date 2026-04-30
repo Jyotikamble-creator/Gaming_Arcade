@@ -73,7 +73,7 @@ export interface TypingTestHookReturn {
   startTime: number | null;
   done: boolean;
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  resetTest: () => void;
+  resetTest: (difficulty?: TypingTestDifficulty) => void;
   stats: TypingTestStats;
 }
 
