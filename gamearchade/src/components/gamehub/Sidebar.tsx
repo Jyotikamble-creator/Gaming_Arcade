@@ -38,19 +38,19 @@ const sidebarItems: SidebarItem[] = [
     id: 'leaderboard',
     label: 'Leaderboard',
     icon: Trophy,
-    path: '/pages/leaderboard'
+    path: '/leaderboard'
   },
   {
     id: 'profile',
     label: 'Profile',
     icon: User,
-    path: '/pages/profile'
+    path: '/profile'
   },
   {
     id: 'settings',
     label: 'Settings',
     icon: Settings,
-    path: '/pages/settings'
+    path: '/settings'
   },
 
 ];
@@ -72,7 +72,7 @@ export default function Sidebar({
   const handleLogout = async () => {
     await logout();
     onCloseMobile?.();
-    router.replace('/pages/auth');
+    router.replace('/auth');
     router.refresh();
   };
 
