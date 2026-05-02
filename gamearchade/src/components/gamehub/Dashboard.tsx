@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardHelpers } from '@/utility/dashboard/helpers';
 import Link from "next/link";
@@ -27,9 +27,10 @@ interface DashboardPageProps {
   className?: string;
 }
 
-const helperGames = DashboardHelpers?.Games?.getDefaultGames?.() || [];
-
-const defaultGames: GameConfig[] = helperGames.map(g => ({
+// Initialize games inside component with useMemo to prevent double renders
+function getDefaultGames(): GameConfig[] {
+  const helperGames = DashboardHelpers?.Games?.getDefaultGames?.() || [];
+  return helperGames.map(g => ({
   id: g.id || g.name?.toLowerCase().replace(/\s+/g, '-'),
   title: g.name || g.id,
   description: g.description || '',
@@ -43,17 +44,18 @@ const defaultGames: GameConfig[] = helperGames.map(g => ({
     : `/games/${(g.id || 'game').toString().toLowerCase().replace(/[^a-z0-9-]/g, '-')}`,
   isNew: !!g.isNew,
   isFeatured: !!g.isFeatured,
-  isComingSoon: !!g.isComingSoon
-}));
+    isComingSoon: !!g.isComingSoon
+  }));
+}
 
 function GameCard({ game }: { game: GameConfig }) {
   return (
     <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.8 }}
+      initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.8 }}
-      whileHover={{ y: -5, scale: 1.02 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.2 }}
+      whileHover={{ y: -2, scale: 1.01 }}
       className="min-w-0 rounded-lg border border-white/20 bg-white/10 p-4 shadow-lg backdrop-blur-lg transition-all duration-300 hover:border-white/40 sm:rounded-xl sm:p-5 lg:p-6"
     >
       <div className="flex h-full min-w-0 flex-col">
@@ -75,23 +77,25 @@ function GameCard({ game }: { game: GameConfig }) {
 }
 
 export default function DashboardPage({
-  games = defaultGames,
+  games: propGames,
   user,
   className = ""
 }: DashboardPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [filteredGames, setFilteredGames] = useState<GameConfig[]>(games);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
 
-  useEffect(() => {
+  // Memoize games to prevent recalculation
+  const games = useMemo(() => propGames || getDefaultGames(), [propGames]);
+  
+  // Memoize filtered games
+  const filteredGames = useMemo(() => {
     if (selectedCategory === "all") {
-      setFilteredGames(games);
-    } else {
-      setFilteredGames(games.filter(game => game.category === selectedCategory));
+      return games;
     }
+    return games.filter(game => game.category === selectedCategory);
   }, [selectedCategory, games]);
 
-  const categories = ["all", ...Array.from(new Set(games.map(game => game.category)))];
+  const categories = useMemo(() => ["all", ...Array.from(new Set(games.map(game => game.category)))], [games]);
 
   return (
     <div className={`min-h-screen overflow-x-hidden bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 ${className}`}>
@@ -126,10 +130,9 @@ export default function DashboardPage({
 
           {/* Games Grid */}
           <motion.div
-            layout
             className="grid w-full grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 sm:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] sm:gap-5 lg:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] lg:gap-6"
           >
-            <AnimatePresence mode="popLayout">
+            <AnimatePresence>
               {filteredGames.map((game) => (
                 <GameCard key={game.id} game={game} />
               ))}
