@@ -1,3 +1,5 @@
+import { useAuth } from '@/lib/auth/AuthProvider';
+import { useRouter } from 'next/navigation';
 // Simon Says Game Page
 "use client";
 
@@ -18,6 +20,21 @@ import { SimonSaysDifficulty, DIFFICULTY_CONFIG } from '@/types/games/simon-says
 
 // Simon Says Page Component
 export default function SimonSays() {
+    const { user, loading, isAuthenticated } = useAuth();
+    const router = useRouter();
+
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      );
+    }
+
+    if (!isAuthenticated) {
+      router.push('/pages/auth');
+      return null;
+    }
   const [colors, setColors] = useState<string[]>([]);
   const [seq, setSeq] = useState<string[]>([]);
   const [playerSeq, setPlayerSeq] = useState<string[]>([]);

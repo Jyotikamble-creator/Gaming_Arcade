@@ -1,3 +1,4 @@
+import { useRouter } from 'next/navigation';
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -64,6 +65,21 @@ const WhackMoleGameOverModal = dynamic(() => import('@/components/games/whackmol
 });
 
 export default function WhackMolePage() {
+    const router = useRouter();
+    const { user, loading, isAuthenticated } = useAuth();
+
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      );
+    }
+
+    if (!isAuthenticated) {
+      router.push('/pages/auth');
+      return null;
+    }
   const { user } = useAuth();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [selectedDifficulty, setSelectedDifficulty] = useState<WhackDifficulty>('normal');

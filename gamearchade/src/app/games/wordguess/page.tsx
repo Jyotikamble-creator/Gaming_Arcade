@@ -40,7 +40,20 @@ const WordGuessCompletedModal = dynamic(() => import('@/components/games/wordgue
 });
 
 export default function WordGuessPage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+    const router = useRouter();
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      );
+    }
+
+    if (!user) {
+      router.push("/pages/auth");
+      return null;
+    }
   const [gameKey, setGameKey] = useState<number>(0);
   const [showCompletedModal, setShowCompletedModal] = useState<boolean>(false);
   

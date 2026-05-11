@@ -1,3 +1,5 @@
+import { useAuth } from '@/lib/auth/AuthProvider';
+import { useRouter } from 'next/navigation';
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -52,6 +54,21 @@ const MAX_MISTAKES = 3;
  * - Pause/Resume functionality
  */
 export default function SudokuGame() {
+    const { user, loading, isAuthenticated } = useAuth();
+    const router = useRouter();
+
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      );
+    }
+
+    if (!isAuthenticated) {
+      router.push('/pages/auth');
+      return null;
+    }
   const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
   const [loading, setLoading] = useState(true);
   const [showCompletedModal, setShowCompletedModal] = useState(false);

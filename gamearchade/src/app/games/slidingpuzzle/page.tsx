@@ -52,7 +52,20 @@ const DIFFICULTY_SETTINGS: Record<'easy' | 'medium' | 'hard', DifficultyConfig> 
 
 // SlidingPuzzle component
 export default function SlidingPuzzle() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+    const router = useRouter();
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      );
+    }
+
+    if (!user) {
+      router.push("/pages/auth");
+      return null;
+    }
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | undefined>(undefined);
   const [tiles, setTiles] = useState<(number | null)[]>([]);
   const [emptyIndex, setEmptyIndex] = useState<number>(0);

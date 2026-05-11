@@ -130,11 +130,11 @@ export default function Game2048() {
     );
   }
 
-  // BYPASSING AUTH - ALLOW ALL USERS
-  // if (!isAuthenticated) {
-  //   router.push('/auth');
-  //   return null;
-  // }
+
+  if (!isAuthenticated) {
+    router.push('/pages/auth');
+    return null;
+  }
 
   return (
     <DashboardLayout>
