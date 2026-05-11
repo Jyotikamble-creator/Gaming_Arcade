@@ -14,19 +14,19 @@ export default function Hangman() {
     router.push('/dashboard');
   };
 
-  // TODO: Re-enable auth checks later
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen bg-linear-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center">
-  //       <div className="text-white text-xl">Loading...</div>
-  //     </div>
-  //   );
-  // }
 
-  // if (!isAuthenticated) {
-  //   router.push('/pages/auth');
-  //   return null;
-  // }
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    router.push('/pages/auth');
+    return null;
+  }
 
   return (
     <DashboardLayout>

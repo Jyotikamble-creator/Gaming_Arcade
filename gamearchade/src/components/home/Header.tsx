@@ -19,9 +19,7 @@ export default function Header() {
     <header className="container mx-auto px-4 pt-6">
       <nav className="flex justify-around items-center">
         <div className="flex items-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-xl">GA</span>
-          </div>
+          <img src="/images/logo.png" alt="GameHub Logo" className="w-16 h-16 rounded-full" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-light-text">GAME ARCHADE</h1>
