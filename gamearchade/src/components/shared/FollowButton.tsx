@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/auth/AuthProvider';
+import { useAuth } from '@/app/AuthProvider';
 
 interface FollowButtonProps {
   targetUserId: string;

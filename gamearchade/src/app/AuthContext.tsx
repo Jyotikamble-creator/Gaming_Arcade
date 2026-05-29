@@ -2,8 +2,8 @@
 
 // Single source of truth for auth: re-export everything from AuthProvider.
 // Import useAuth, AuthProvider, and User types from here or directly from AuthProvider.
-export { AuthContext, AuthProvider, useAuth } from '@/lib/auth/AuthProvider';
-export type { User, AuthContextType } from '@/lib/auth/AuthProvider';
+export { AuthContext, AuthProvider, useAuth } from '@/app/AuthProvider';
+export type { User, AuthContextType } from '@/app/AuthProvider';
 
 
 interface User {

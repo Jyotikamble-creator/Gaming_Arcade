@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useAuth } from '@/lib/auth/AuthProvider';
+import { useAuth } from '@/app/AuthProvider';
 import { useWordGuess } from '@/hooks/games/useWordGuess';
 import DashboardLayout from '@/components/shared/DashboardLayout';
 import Leaderboard from '@/components/leaderboard/Leaderboard';

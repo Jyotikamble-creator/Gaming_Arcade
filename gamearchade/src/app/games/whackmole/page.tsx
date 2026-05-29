@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useAuth } from '@/lib/auth/AuthProvider';
+import { useAuth } from '@/app/AuthProvider';
 import { useWhackMole } from '@/hooks/games/useWhackMole';
 import { WhackGameSettings, WhackDifficulty, DIFFICULTY_CONFIG } from '@/types/games/whack-a-mole';
 import DashboardLayout from '@/components/shared/DashboardLayout'

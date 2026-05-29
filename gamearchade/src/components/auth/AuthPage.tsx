@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Login from "./Login";
 import Signup from "./Signup";
 import ForgotPassword from "./ForgotPassword";
-import { useAuth } from "@/lib/auth/AuthProvider";
+import { useAuth } from "@/app/AuthProvider";
 
 type AuthMode = "login" | "signup" | "forgot-password";
 

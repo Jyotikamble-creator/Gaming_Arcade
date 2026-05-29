@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/lib/auth/AuthProvider';
+import { useAuth } from '@/app/AuthProvider';
 // Components
 import Instructions from '@/components/shared/Instructions';
 import Leaderboard from '@/components/leaderboard/Leaderboard';

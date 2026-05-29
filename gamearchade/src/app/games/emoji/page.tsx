@@ -2,7 +2,7 @@
 "use client";
 
 import EmojiGuessPage from "@/components/games/emojiguess/EmojiGuessPage";
-import { useAuth } from "@/lib/auth/AuthProvider";
+import { useAuth } from "@/app/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import DashboardLayout from '@/components/shared/DashboardLayout';

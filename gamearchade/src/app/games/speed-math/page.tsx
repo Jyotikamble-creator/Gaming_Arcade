@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 import SpeedMathComponent from '@/components/games/speedmath/SpeedMath'
-import { useAuth } from "@/lib/auth/AuthProvider";
+import { useAuth } from "@/app/AuthProvider";
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/shared/DashboardLayout'
 

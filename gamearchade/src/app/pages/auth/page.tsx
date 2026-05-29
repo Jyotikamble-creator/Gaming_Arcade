@@ -2,7 +2,7 @@
 
 import AuthPage from "@/components/auth/AuthPage";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth/AuthProvider";
+import { useAuth } from "@/app/AuthProvider";
 import { me as meApi } from "@/lib/auth/client";
 import { useEffect, useState } from "react";
 

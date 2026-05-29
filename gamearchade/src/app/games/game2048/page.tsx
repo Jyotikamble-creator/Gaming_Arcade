@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Game2048Page from "@/components/games/game2048/Game2048Page";
-import { useAuth } from "@/lib/auth/AuthProvider";
+import { useAuth } from "@/app/AuthProvider";
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/shared/DashboardLayout';
 import { Game2048Difficulty, DIFFICULTY_CONFIG } from '@/types/games/game2048';

@@ -2,7 +2,7 @@ import React from 'react';
 import Minesweeper from '@/components/games/minesweeper/Minesweeper';
 import DashboardLayout from '@/components/shared/DashboardLayout';
 import Leaderboard from '@/components/leaderboard/Leaderboard';
-import { useAuth } from '@/lib/auth/AuthProvider';
+import { useAuth } from '@/app/AuthProvider';
 import { useRouter } from 'next/navigation';
 
 export const metadata = {

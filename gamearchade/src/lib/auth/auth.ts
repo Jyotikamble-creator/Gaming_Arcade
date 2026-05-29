@@ -5,13 +5,20 @@ import { JWTPayload } from '@/types/auth/auth';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key';
 
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required in production');
+}
+
+// Type assertion: we've ensured JWT_SECRET exists above
+const SECURE_JWT_SECRET: string = JWT_SECRET;
+
 /**
  * Generate a JWT token for a user
  */
 export function generateToken(userId: string, email: string): string {
   return jwt.sign(
     { id: userId, email },
-    JWT_SECRET,
+    SECURE_JWT_SECRET,
     { expiresIn: '7d' }
   );
 }
@@ -21,7 +28,11 @@ export function generateToken(userId: string, email: string): string {
  */
 export function verifyToken(token: string): JWTPayload {
   try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload;
+    const decoded = jwt.verify(token, SECURE_JWT_SECRET) as Record<string, unknown>;
+    return {
+      id: decoded.id as string,
+      email: decoded.email as string,
+    };
   } catch (error) {
     throw new Error('Invalid token');
   }

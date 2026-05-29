@@ -1,8 +1,8 @@
 'use client';
 
 // Delegate to the central AuthProvider — single source of truth.
-export { useAuth } from '@/lib/auth/AuthProvider';
-export type { User, AuthContextType } from '@/lib/auth/AuthProvider';
+export { useAuth } from '@/app/AuthProvider';
+export type { User, AuthContextType } from '@/app/AuthProvider';
 
 
 interface User {

@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth/AuthProvider';
-import type { User } from '@/lib/auth/AuthProvider';
+import { useAuth } from '@/app/AuthProvider';
+import type { User } from '@/app/AuthProvider';
 
 interface FormData {
   displayName: string;

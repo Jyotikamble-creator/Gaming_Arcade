@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Bell, Volume2, Shield, Save, RefreshCw } from 'lucide-react';
-import { useAuth } from '@/lib/auth/AuthProvider';
+import { useAuth } from '@/app/AuthProvider';
 
 interface LocalPreferences {
   soundEnabled: boolean;

@@ -1,4 +1,4 @@
-import { useAuth } from '@/lib/auth/AuthProvider';
+import { useAuth } from '@/app/AuthProvider';
 import { useRouter } from 'next/navigation';
 // Simon Says Game Page
 "use client";
