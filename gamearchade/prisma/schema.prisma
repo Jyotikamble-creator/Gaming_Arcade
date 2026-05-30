@@ -1,76 +1,63 @@
-// Prisma schema for SQLite database (development) / PostgreSQL (production)
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// User model for authentication and profile management
 model User {
-  id                String   @id @default(cuid())
-  email             String   @unique
-  passwordHash      String
-  username          String?  @unique
-  displayName       String   @default("")
-  bio               String   @default("")
-  avatar            String   @default("")
-  favoriteGame      String   @default("")
-  profileCompleted  Boolean  @default(false)
-  role              String   @default("user") // 'user' or 'admin'
-  
-  // Stats
-  stats             UserStats?
-  
-  // Relationships
-  scores            Score[]
-  followers         Follow[]  @relation("Followers")
-  following         Follow[]  @relation("Following")
-  gameSessions      GameSession[]
-  wordGameSessions  WordGameSession[]
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  passwordHash       String
+  username           String?             @unique
+  displayName        String              @default("")
+  bio                String              @default("")
+  avatar             String              @default("")
+  favoriteGame       String              @default("")
+  profileCompleted   Boolean             @default(false)
+  role               String              @default("user")
+  meta               String              @default("{}")
+  createdAt          DateTime            @default(now())
+  lastLogin          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  following          Follow[]            @relation("Following")
+  followers          Follow[]            @relation("Followers")
+  gameData           GameData[]
+  gameSessions       GameSession[]
   memoryGameSessions MemoryGameSession[]
-  gameData          GameData[]
-  
-  // Metadata
-  meta              String   @default("{}")
-  createdAt         DateTime  @default(now())
-  lastLogin         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  scores             Score[]
+  stats              UserStats?
+  wordGameSessions   WordGameSession[]
 
   @@index([email])
   @@index([username])
   @@index([createdAt])
 }
 
-// User statistics
 model UserStats {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  followerCount     Int      @default(0)
-  followingCount    Int      @default(0)
-  totalScore        Int      @default(0)
-  gamesPlayed       Int      @default(0)
-  
-  updatedAt         DateTime @updatedAt
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  followerCount  Int      @default(0)
+  followingCount Int      @default(0)
+  totalScore     Int      @default(0)
+  gamesPlayed    Int      @default(0)
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
-// Score model for game scores and leaderboard
 model Score {
-  id                String   @id @default(cuid())
-  game              String   // Game type identifier
-  userId            String?
-  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  playerName        String   @default("guest")
-  score             Int
-  meta              String   @default("{}")
-  
-  createdAt         DateTime @default(now())
+  id         String   @id @default(cuid())
+  game       String
+  userId     String?
+  playerName String   @default("guest")
+  score      Int
+  meta       String   @default("{}")
+  createdAt  DateTime @default(now())
+  user       User?    @relation(fields: [userId], references: [id])
 
   @@index([game])
   @@index([userId])
@@ -79,44 +66,38 @@ model Score {
   @@index([createdAt])
 }
 
-// Follow relationship for social features
 model Follow {
-  id                String   @id @default(cuid())
-  followerId        String
-  follower          User     @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
-  
-  followingId       String
-  following         User     @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
-  
-  createdAt         DateTime @default(now())
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@unique([followerId, followingId])
   @@index([followerId])
   @@index([followingId])
 }
 
-// Word model for word games
 model Word {
-  id                String   @id @default(cuid())
-  word              String   @unique
-  category          String   @default("General")
-  difficulty        String   @default("beginner") // beginner, intermediate, advanced, expert, master
-  language          String   @default("english")
-  description       String
-  definition        String?
-  pronunciation     String?
-  etymology         String?
-  examples          String   @default("[]")
-  hints             String   @default("[]")
-  frequency         Int      @default(50) // 0-100 popularity score
-  status            String   @default("active") // active, inactive
-  
-  // Metadata
-  usageCount        Int      @default(0)
-  lastUsed          DateTime?
-  verifiedAt        DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id            String    @id @default(cuid())
+  word          String    @unique
+  category      String    @default("General")
+  difficulty    String    @default("beginner")
+  language      String    @default("english")
+  description   String
+  definition    String?
+  pronunciation String?
+  etymology     String?
+  examples      String    @default("[]")
+  hints         String    @default("[]")
+  frequency     Int       @default(50)
+  status        String    @default("active")
+  usageCount    Int       @default(0)
+  lastUsed      DateTime?
+  verifiedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([category])
   @@index([difficulty])
@@ -124,30 +105,24 @@ model Word {
   @@index([status])
 }
 
-// Game session model for tracking game progress
 model GameSession {
-  id                String   @id @default(cuid())
-  sessionId         String   @unique
-  game              String   // Game type identifier
-  userId            String?
-  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  difficulty        String?
-  gameMode          String?
-  category          String?
-  
-  state             String   @default("{}") // Current game state
-  meta              String   @default("{}") // Game-specific metadata
-  
-  startedAt         DateTime @default(now())
-  completedAt       DateTime?
-  duration          Int?     // Duration in milliseconds
-  
-  completed         Boolean  @default(false)
-  score             Int      @default(0)
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id          String    @id @default(cuid())
+  sessionId   String    @unique
+  game        String
+  userId      String?
+  difficulty  String?
+  gameMode    String?
+  category    String?
+  state       String    @default("{}")
+  meta        String    @default("{}")
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  duration    Int?
+  completed   Boolean   @default(false)
+  score       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User?     @relation(fields: [userId], references: [id])
 
   @@index([game])
   @@index([userId])
@@ -156,34 +131,27 @@ model GameSession {
   @@index([startedAt])
 }
 
-// Word game session for word scramble, word builder, word guess
 model WordGameSession {
-  id                String   @id @default(cuid())
-  sessionId         String   @unique
-  userId            String?
-  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  gameType          String   // word-scramble, word-builder, word-guess
-  difficulty        String   @default("medium")
-  category          String?
-  
-  words             String   @default("[]")
-  currentWordIndex  Int      @default(0)
-  
-  score             Int      @default(0)
-  moves             Int      @default(0)
-  hintsUsed         Int      @default(0)
-  correctGuesses    Int      @default(0)
-  
-  state             String   @default("{}") // Current game state
-  meta              String   @default("{}") // Additional metadata
-  
-  startedAt         DateTime @default(now())
-  completedAt       DateTime?
-  completed         Boolean  @default(false)
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String    @id @default(cuid())
+  sessionId        String    @unique
+  userId           String?
+  gameType         String
+  difficulty       String    @default("medium")
+  category         String?
+  words            String    @default("[]")
+  currentWordIndex Int       @default(0)
+  score            Int       @default(0)
+  moves            Int       @default(0)
+  hintsUsed        Int       @default(0)
+  correctGuesses   Int       @default(0)
+  state            String    @default("{}")
+  meta             String    @default("{}")
+  startedAt        DateTime  @default(now())
+  completedAt      DateTime?
+  completed        Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User?     @relation(fields: [userId], references: [id])
 
   @@index([gameType])
   @@index([userId])
@@ -191,50 +159,42 @@ model WordGameSession {
   @@index([completed])
 }
 
-// Memory game session
 model MemoryGameSession {
-  id                String   @id @default(cuid())
-  sessionId         String   @unique
-  userId            String?
-  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  difficulty        String   @default("easy") // easy, medium, hard
-  theme             String   @default("fruits")
-  
-  cards             String   // Card array stored as JSON
-  flips             String   @default("[]")
-  matches           Int      @default(0)
-  totalPairs        Int
-  moves             Int      @default(0)
-  score             Int      @default(0)
-  
-  state             String   @default("{}") // Current game state
-  meta              String   @default("{}") // Additional metadata
-  
-  startedAt         DateTime @default(now())
-  completedAt       DateTime?
-  completed         Boolean  @default(false)
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id          String    @id @default(cuid())
+  sessionId   String    @unique
+  userId      String?
+  difficulty  String    @default("easy")
+  theme       String    @default("fruits")
+  cards       String
+  flips       String    @default("[]")
+  matches     Int       @default(0)
+  totalPairs  Int
+  moves       Int       @default(0)
+  score       Int       @default(0)
+  state       String    @default("{}")
+  meta        String    @default("{}")
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  completed   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User?     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([sessionId])
   @@index([completed])
 }
 
-// Generic game-specific session data store
 model GameData {
-  id                String   @id @default(cuid())
-  game              String   // Game type
-  key               String   // Data key
-  value             String   // Data value
-  userId            String?
-  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  expiresAt         DateTime? // For temporary data
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id        String    @id @default(cuid())
+  game      String
+  key       String
+  value     String
+  userId    String?
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User?     @relation(fields: [userId], references: [id])
 
   @@unique([game, key, userId])
   @@index([game])
