@@ -1,10 +1,19 @@
 "use client";
 
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/AuthProvider';
 import WordScrambleGamePage from "@/components/games/wordscramble/WordScrambleGamePage";
 
 export default function WordScramblePage() {
   const { user, loading, isAuthenticated } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/pages/auth');
+    }
+  }, [isAuthenticated, loading, router]);
 
   if (loading) {
     return (
@@ -15,7 +24,6 @@ export default function WordScramblePage() {
   }
 
   if (!isAuthenticated) {
-    router.push('/pages/auth');
     return null;
   }
 

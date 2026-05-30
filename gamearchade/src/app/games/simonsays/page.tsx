@@ -1,9 +1,8 @@
-import { useAuth } from '@/app/AuthProvider';
-import { useRouter } from 'next/navigation';
-// Simon Says Game Page
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
+import { useAuth } from '@/app/AuthProvider';
+import { useRouter } from 'next/navigation';
 // API functions
 import { startSimon, submitScore } from '@/lib/api/client';
 // Logger

@@ -11,6 +11,11 @@ export default function MemoryCard() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/pages/auth");
+    }
+  }, [user, loading, router]);
 
   if (loading) {
     return (
@@ -21,7 +26,6 @@ export default function MemoryCard() {
   }
 
   if (!user) {
-    router.push("/pages/auth");
     return null;
   }
 

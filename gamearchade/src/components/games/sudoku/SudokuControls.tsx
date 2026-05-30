@@ -1,4 +1,6 @@
-﻿// Component for Sudoku game controls including number pad, difficulty selector, and action buttons
+﻿'use client';
+
+// Component for Sudoku game controls including number pad, difficulty selector, and action buttons
 import React from 'react';
 import type { SudokuControlsProps, SudokuDifficulty } from '@/types/games/sudoku';
 

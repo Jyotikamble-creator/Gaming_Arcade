@@ -1,4 +1,6 @@
-﻿// Component to render the Sudoku board with cells, highlights, notes, and pause overlay
+﻿'use client';
+
+// Component to render the Sudoku board with cells, highlights, notes, and pause overlay
 import React from 'react';
 import type { SudokuBoardProps } from '@/types/games/sudoku';
 

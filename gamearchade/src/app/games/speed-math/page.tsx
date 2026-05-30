@@ -9,6 +9,12 @@ export default function SpeedMathPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
+  React.useEffect(() => {
+    if (!loading && !user) {
+      router.push("/pages/auth");
+    }
+  }, [user, loading, router]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
@@ -18,7 +24,6 @@ export default function SpeedMathPage() {
   }
 
   if (!user) {
-    router.push("/pages/auth");
     return null;
   }
 

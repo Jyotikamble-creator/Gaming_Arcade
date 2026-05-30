@@ -10,6 +10,12 @@ export default function Hangman() {
   const { user, loading, isAuthenticated } = useAuth();
   const router = useRouter();
 
+  React.useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/pages/auth');
+    }
+  }, [isAuthenticated, loading, router]);
+
   const handleBackToDashboard = () => {
     router.push('/dashboard');
   };
@@ -24,7 +30,6 @@ export default function Hangman() {
   }
 
   if (!isAuthenticated) {
-    router.push('/pages/auth');
     return null;
   }
 

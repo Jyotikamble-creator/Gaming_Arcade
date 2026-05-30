@@ -1,4 +1,6 @@
-﻿// Component to display Sudoku game statistics including difficulty, time, mistakes, and hints used
+﻿'use client';
+
+// Component to display Sudoku game statistics including difficulty, time, mistakes, and hints used
 import React from 'react';
 import type { SudokuStatsProps, SudokuDifficulty } from '@/types/games/sudoku';
 

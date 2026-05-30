@@ -1,5 +1,7 @@
 "use client"
 import React, { useEffect, useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/app/AuthProvider'
 import QuestionCard from '@/components/games/quiz/QuestionCard'
 import QuizStats from '@/components/games/quiz/QuizStats'
 import Instructions from '@/components/shared/Instructions'
@@ -52,6 +54,12 @@ export default function QuizPage() {
   const { user, loading, isAuthenticated } = useAuth();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/pages/auth');
+    }
+  }, [isAuthenticated, loading, router]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
@@ -61,7 +69,6 @@ export default function QuizPage() {
   }
 
   if (!isAuthenticated) {
-    router.push('/pages/auth');
     return null;
   }
 

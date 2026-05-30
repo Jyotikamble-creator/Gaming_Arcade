@@ -1,8 +1,8 @@
-import { useAuth } from '@/app/AuthProvider';
-import { useRouter } from 'next/navigation';
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/app/AuthProvider';
+import { useRouter } from 'next/navigation';
 import SudokuBoard from '@/components/games/sudoku/SudokuBoard';
 import SudokuControls from '@/components/games/sudoku/SudokuControls';
 import SudokuStats from '@/components/games/sudoku/SudokuStats';
@@ -54,23 +54,29 @@ const MAX_MISTAKES = 3;
  * - Pause/Resume functionality
  */
 export default function SudokuGame() {
-    const { user, loading, isAuthenticated } = useAuth();
-    const router = useRouter();
+  const { user, loading, isAuthenticated } = useAuth();
+  const router = useRouter();
 
-    if (loading) {
-      return (
-        <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-          <div className="text-white text-xl">Loading...</div>
-        </div>
-      );
-    }
-
-    if (!isAuthenticated) {
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
       router.push('/pages/auth');
-      return null;
     }
+  }, [isAuthenticated, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
   const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
   const [validationMessage, setValidationMessage] = useState<string>('');
 
@@ -78,7 +84,7 @@ export default function SudokuGame() {
   useEffect(() => {
     const initializeGame = async () => {
       try {
-        setLoading(true);
+        setIsLoading(true);
         const response = await fetch(
           `/api/games/sudoku/puzzle?difficulty=${gameState.difficulty}`
         );
@@ -94,7 +100,7 @@ export default function SudokuGame() {
         console.error('Failed to load puzzle:', error);
         setValidationMessage('Failed to load puzzle. Please refresh.');
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -309,7 +315,7 @@ export default function SudokuGame() {
   // Handle difficulty change
   const handleDifficultyChange = useCallback(async (difficulty: SudokuDifficulty) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const response = await fetch(
         `/api/games/sudoku/puzzle?difficulty=${difficulty}`
       );
@@ -327,7 +333,7 @@ export default function SudokuGame() {
       console.error('Failed to load puzzle:', error);
       setValidationMessage('Failed to load puzzle');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 

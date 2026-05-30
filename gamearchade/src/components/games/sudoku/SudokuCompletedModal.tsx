@@ -1,4 +1,6 @@
-﻿// Component to display a modal when Sudoku puzzle is completed
+﻿'use client';
+
+// Component to display a modal when Sudoku puzzle is completed
 import React, { useEffect, useRef } from 'react';
 import type { SudokuCompletedModalProps, SudokuDifficulty } from '@/types/games/sudoku';
 

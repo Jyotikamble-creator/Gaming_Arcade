@@ -134,18 +134,18 @@ export default function ProfilePage() {
           <div className="flex items-center gap-6 mb-8">
             {/* Avatar */}
             <div className="w-24 h-24 rounded-full bg-linear-to-br from-purple-600 to-blue-600 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
-              {profile.avatar ? (
+              {profile?.avatar ? (
                 <img src={profile.avatar} alt="Avatar" className="w-full h-full rounded-full object-cover" />
               ) : (
-                profile.displayName?.charAt(0)?.toUpperCase() || 'U'
+                profile?.displayName?.charAt(0)?.toUpperCase() || 'U'
               )}
             </div>
 
             {/* User Info */}
             <div className="flex-1">
-              <h2 className="text-3xl font-bold text-white mb-2">{profile.displayName}</h2>
-              <p className="text-gray-400 text-lg mb-3">@{profile.username}</p>
-              <p className="text-gray-300 mb-4 max-w-md">{profile.bio}</p>
+              <h2 className="text-3xl font-bold text-white mb-2">{profile?.displayName || 'User'}</h2>
+              <p className="text-gray-400 text-lg mb-3">@{profile?.username || 'unknown'}</p>
+              <p className="text-gray-300 mb-4 max-w-md">{profile?.bio || ''}</p>
               
               <div className="flex gap-4">
                 <button
@@ -168,22 +168,22 @@ export default function ProfilePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-gray-700/50 rounded-lg p-4 text-center">
               <div className="text-gray-400 text-sm font-semibold mb-2">Total Score</div>
-              <div className="text-3xl font-bold text-yellow-400">{profile.totalScore.toLocaleString()}</div>
+              <div className="text-3xl font-bold text-yellow-400">{profile && profile.totalScore ? profile.totalScore.toLocaleString() : '0'}</div>
             </div>
 
             <div className="bg-gray-700/50 rounded-lg p-4 text-center">
               <div className="text-gray-400 text-sm font-semibold mb-2">Games Played</div>
-              <div className="text-3xl font-bold text-blue-400">{profile.gamesPlayed}</div>
+              <div className="text-3xl font-bold text-blue-400">{profile?.gamesPlayed || 0}</div>
             </div>
 
             <div className="bg-gray-700/50 rounded-lg p-4 text-center">
               <div className="text-gray-400 text-sm font-semibold mb-2">Followers</div>
-              <div className="text-3xl font-bold text-green-400">{profile.followers}</div>
+              <div className="text-3xl font-bold text-green-400">{profile?.followers || 0}</div>
             </div>
 
             <div className="bg-gray-700/50 rounded-lg p-4 text-center">
               <div className="text-gray-400 text-sm font-semibold mb-2">Following</div>
-              <div className="text-3xl font-bold text-pink-400">{profile.following}</div>
+              <div className="text-3xl font-bold text-pink-400">{profile?.following || 0}</div>
             </div>
           </div>
         </motion.div>
@@ -200,20 +200,20 @@ export default function ProfilePage() {
           <div className="space-y-4">
             <div className="flex justify-between items-center pb-4 border-b border-gray-700">
               <span className="text-gray-400">Email</span>
-              <span className="text-white font-medium">{profile.email}</span>
+              <span className="text-white font-medium">{profile?.email || 'N/A'}</span>
             </div>
 
             <div className="flex justify-between items-center pb-4 border-b border-gray-700">
               <span className="text-gray-400">Member Since</span>
               <span className="text-white font-medium">
-                {new Date(profile.joinDate).toLocaleDateString()}
+                {profile?.joinDate ? new Date(profile.joinDate).toLocaleDateString() : 'N/A'}
               </span>
             </div>
 
             <div className="flex justify-between items-center">
               <span className="text-gray-400">Last Login</span>
               <span className="text-white font-medium">
-                {new Date(profile.lastLogin).toLocaleDateString()}
+                {profile?.lastLogin ? new Date(profile.lastLogin).toLocaleDateString() : 'N/A'}
               </span>
             </div>
           </div>

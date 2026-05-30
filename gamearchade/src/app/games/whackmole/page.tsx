@@ -1,8 +1,8 @@
-import { useRouter } from 'next/navigation';
 "use client";
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/AuthProvider';
 import { useWhackMole } from '@/hooks/games/useWhackMole';
 import { WhackGameSettings, WhackDifficulty, DIFFICULTY_CONFIG } from '@/types/games/whack-a-mole';
@@ -80,7 +80,6 @@ export default function WhackMolePage() {
       router.push('/pages/auth');
       return null;
     }
-  const { user } = useAuth();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [selectedDifficulty, setSelectedDifficulty] = useState<WhackDifficulty>('normal');
   const [settings, setSettings] = useState<WhackGameSettings>({

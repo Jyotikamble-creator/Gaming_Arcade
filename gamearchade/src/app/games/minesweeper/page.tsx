@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Minesweeper from '@/components/games/minesweeper/Minesweeper';
 import DashboardLayout from '@/components/shared/DashboardLayout';
@@ -5,14 +7,15 @@ import Leaderboard from '@/components/leaderboard/Leaderboard';
 import { useAuth } from '@/app/AuthProvider';
 import { useRouter } from 'next/navigation';
 
-export const metadata = {
-  title: 'Minesweeper - GameArchade',
-  description: 'Play the classic Minesweeper game. Find all mines without detonating any!',
-};
-
 export default function MinesweeperRoutePage() {
   const { user, loading, isAuthenticated } = useAuth();
   const router = useRouter();
+
+  React.useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/pages/auth');
+    }
+  }, [isAuthenticated, loading, router]);
 
   if (loading) {
     return (
@@ -23,7 +26,6 @@ export default function MinesweeperRoutePage() {
   }
 
   if (!isAuthenticated) {
-    router.push('/pages/auth');
     return null;
   }
 
