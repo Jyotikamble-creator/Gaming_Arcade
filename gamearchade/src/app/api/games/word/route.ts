@@ -1,6 +1,6 @@
 // API Route: Get all words with optional filtering
 import { NextResponse } from 'next/server';
-// import { getAllWords, getWordStats } from '@/models/word';
+import { prisma } from '@/lib/api/prisma';
 import type { WordCategory, WordDifficulty, WordLanguage } from '@/types/games/word';
 
 export async function GET(request: Request) {
@@ -14,14 +14,56 @@ export async function GET(request: Request) {
     const includeAnalytics = searchParams.get('analytics') === 'true';
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
     
-    // TODO: Get words with optional filtering using Prisma
-    const words: any[] = [];
+    const where: any = {
+      language
+    };
+    if (category) {
+      where.category = category;
+    }
+    if (difficulty) {
+      where.difficulty = difficulty;
+    }
+
+    const dbWords = await prisma.word.findMany({
+      where,
+      take: limit
+    });
+
+    const words = dbWords.map(w => {
+      let parsedExamples = [];
+      let parsedHints = [];
+      try {
+        parsedExamples = JSON.parse(w.examples || '[]');
+      } catch (e) {}
+      try {
+        parsedHints = JSON.parse(w.hints || '[]');
+      } catch (e) {}
+
+      return {
+        ...w,
+        examples: parsedExamples,
+        hints: parsedHints
+      };
+    });
 
     // Get analytics if requested
     let analytics = null;
     if (includeAnalytics) {
-      // TODO: Implement word stats
-      analytics = { totalWords: 0, categories: [] };
+      const totalWords = await prisma.word.count({ where });
+      const groups = await prisma.word.groupBy({
+        by: ['category'],
+        where,
+        _count: {
+          id: true
+        }
+      });
+      analytics = {
+        totalWords,
+        categories: groups.map(g => ({
+          category: g.category,
+          count: g._count.id
+        }))
+      };
     }
 
     return NextResponse.json({

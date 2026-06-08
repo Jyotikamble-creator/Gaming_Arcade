@@ -24,7 +24,7 @@ export async function createScore(data: {
       userId: data.userId || undefined,
       playerName: data.playerName || 'guest',
       score: data.score,
-      meta: data.meta || {},
+      meta: JSON.stringify(data.meta || {}),
     },
     include: { user: true },
   });

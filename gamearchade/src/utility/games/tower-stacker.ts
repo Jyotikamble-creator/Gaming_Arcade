@@ -168,11 +168,12 @@ export function validateDrop(
   if (!previousBlock) {
     // First block - always valid
     return {
-      isValid: true,
-      overlap: currentBlock.width,
+      isValidDrop: true,
+      accuracy: 1.0,
       isPerfect: true,
       newWidth: currentBlock.width,
-      message: 'Perfect start!'
+      blocksLost: 0,
+      canContinue: true
     };
   }
 
@@ -185,15 +186,17 @@ export function validateDrop(
     previousBlock.position - previousBlock.width / 2
   ));
 
-  const isValid = overlap > 0;
+  const isValidDrop = overlap > 0;
   const isPerfect = overlap >= currentBlock.width * 0.9; // 90% overlap for perfect
+  const accuracy = overlap / currentBlock.width;
   
   return {
-    isValid,
-    overlap,
+    isValidDrop,
+    accuracy,
     isPerfect,
     newWidth: overlap,
-    message: isPerfect ? 'Perfect drop!' : isValid ? 'Good drop!' : 'Block fell!'
+    blocksLost: isValidDrop ? 0 : 1,
+    canContinue: isValidDrop
   };
 }
 

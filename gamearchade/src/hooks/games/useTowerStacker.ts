@@ -3,9 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   GameState, 
   Tower, 
-  Block, 
-  GameStats, 
-  TowerStackerHookReturn 
+  Block
 } from '@/types/games/tower-stacker';
 import { 
   GAME_CONFIG, 
@@ -16,7 +14,7 @@ import {
   getBlockColor 
 } from '@/utility/games/tower-stacker';
 
-export function useTowerStacker(): TowerStackerHookReturn {
+export function useTowerStacker() {
   const [gameState, setGameState] = useState<GameState>('idle');
   const [tower, setTower] = useState<Tower>([]);
   const [currentBlock, setCurrentBlock] = useState<Block | null>(null);
@@ -36,6 +34,7 @@ export function useTowerStacker(): TowerStackerHookReturn {
       x: GAME_CONFIG.CONTAINER_WIDTH / 2 - GAME_CONFIG.INITIAL_WIDTH / 2,
       width: GAME_CONFIG.INITIAL_WIDTH,
       y: 0,
+      color: getBlockColor(0),
     };
 
     setTower([initialBlock]);
@@ -43,6 +42,7 @@ export function useTowerStacker(): TowerStackerHookReturn {
       x: 0,
       width: GAME_CONFIG.INITIAL_WIDTH,
       y: GAME_CONFIG.BLOCK_HEIGHT,
+      color: getBlockColor(1),
     });
     setDirection(1);
     setSpeed(GAME_CONFIG.INITIAL_SPEED);
@@ -113,6 +113,7 @@ export function useTowerStacker(): TowerStackerHookReturn {
       x: Math.max(currentBlock.x, previousBlock.x),
       width: newWidth,
       y: tower.length * GAME_CONFIG.BLOCK_HEIGHT,
+      color: currentBlock.color,
     };
 
     // Update game state
@@ -145,6 +146,7 @@ export function useTowerStacker(): TowerStackerHookReturn {
       x: 0,
       width: newWidth,
       y: nextLevel * GAME_CONFIG.BLOCK_HEIGHT,
+      color: getBlockColor(nextLevel),
     });
   }, [currentBlock, gameState, tower, level, perfectDrops]);
 

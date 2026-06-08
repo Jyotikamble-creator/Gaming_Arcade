@@ -1,5 +1,6 @@
 // Word Scramble Game Core Logic
-import {
+import { prisma } from '@/lib/api/prisma';
+import type {
   WordScrambleGameSession,
   WordScrambleGameConfig,
   WordScrambleWord,
@@ -10,7 +11,9 @@ import {
   WordScramblePerformanceMetrics,
   WordGuessStatus,
   ScrambleAlgorithm,
-  ScrambleOptions,
+  ScrambleOptions
+} from '@/types/games/word-scramble';
+import {
   defaultWordBank,
   WORD_SCRAMBLE_CONSTANTS
 } from '@/types/games/word-scramble';
@@ -83,6 +86,60 @@ export const WORD_SETS: Record<GameDifficulty, WordSet> = {
     ],
   },
 };
+
+function mapToSession(dbSession: any): WordScrambleGameSession {
+  const state = JSON.parse(dbSession.state || '{}');
+  let timeLimit: number | undefined;
+  try {
+    const meta = JSON.parse(dbSession.meta || '{}');
+    if (typeof meta.timeLimit === 'number') {
+      timeLimit = meta.timeLimit;
+    }
+  } catch (e) {}
+
+  return {
+    sessionId: dbSession.sessionId,
+    userId: dbSession.userId || undefined,
+    difficulty: dbSession.difficulty as WordScrambleDifficulty,
+    gameMode: state.gameMode || 'classic',
+    category: dbSession.category as WordScrambleCategory,
+    currentWord: state.currentWord,
+    currentWordIndex: dbSession.currentWordIndex,
+    totalWords: state.totalWords || 10,
+    wordsCompleted: dbSession.correctGuesses,
+    currentScore: dbSession.score,
+    startTime: dbSession.startedAt,
+    endTime: dbSession.completedAt || undefined,
+    timeRemaining: state.timeRemaining || 0,
+    totalDuration: state.totalDuration || 0,
+    isPaused: state.isPaused || false,
+    totalGuesses: dbSession.moves,
+    correctGuesses: dbSession.correctGuesses,
+    incorrectGuesses: dbSession.moves - dbSession.correctGuesses,
+    accuracy: state.accuracy || 1.0,
+    averageReactionTime: state.averageReactionTime || 0,
+    fastestSolve: state.fastestSolve || 0,
+    slowestSolve: state.slowestSolve || 0,
+    currentStreak: state.currentStreak || 0,
+    maxStreak: state.maxStreak || 0,
+    perfectWords: state.perfectWords || 0,
+    oneGuessWords: state.oneGuessWords || 0,
+    activePowerUps: state.activePowerUps || [],
+    totalHintsUsed: dbSession.hintsUsed,
+    maxHints: state.maxHints || 0,
+    isCompleted: dbSession.completed,
+    completionPercentage: state.completionPercentage || 0,
+    finalRating: state.finalRating || '',
+    achievements: state.achievements || [],
+    categoryStats: state.categoryStats || {},
+    difficultyProgression: state.difficultyProgression || false,
+    bonusMultiplier: state.bonusMultiplier || 1.0,
+    consistencyScore: state.consistencyScore || 0,
+    attempts: state.attempts || [],
+    completedWords: state.completedWords || [],
+    skippedWords: state.skippedWords || []
+  };
+}
 
 /**
  * Get a random word from specified difficulty level
@@ -205,7 +262,6 @@ export function generateWordSequence(
     sourceWords = defaultWordBank[difficulty]?.[category] || [];
     
     if (sourceWords.length === 0) {
-      // Fallback to mixed category
       sourceWords = defaultWordBank[difficulty]?.mixed || [];
     }
   }
@@ -214,7 +270,6 @@ export function generateWordSequence(
     return [];
   }
   
-  // Shuffle and create word objects
   const shuffledWords = shuffleArray([...sourceWords]);
   
   return shuffledWords.map((word, index) => createWordScrambleWord(
@@ -241,7 +296,6 @@ export function createWordScrambleWord(
     minChanges: 2 
   });
   
-  // Calculate points based on length and difficulty
   const basePoints = normalizedWord.length * WORD_SCRAMBLE_CONSTANTS.BASE_WORD_SCORE;
   const difficultyMultiplier = WORD_SCRAMBLE_CONSTANTS.DIFFICULTY_MULTIPLIERS[difficulty];
   const points = Math.round(basePoints * difficultyMultiplier);
@@ -260,7 +314,281 @@ export function createWordScrambleWord(
 }
 
 /**
- * Create a new word scramble game session
+ * Create a new word scramble game session in database
+ */
+export async function createGameSession(
+  config: WordScrambleGameConfig,
+  userId?: string
+): Promise<WordScrambleGameSession> {
+  const wordSequence = generateWordSequence(config.difficulty, config.category);
+  const initSession = createWordScrambleSession(config, wordSequence, userId);
+  
+  const firstWord = wordSequence[0] || null;
+  initSession.currentWord = firstWord;
+
+  const sessionId = initSession.sessionId!;
+
+  const dbSession = await prisma.wordGameSession.create({
+    data: {
+      userId: userId || null,
+      sessionId,
+      gameType: 'word-scramble',
+      difficulty: config.difficulty,
+      category: config.category,
+      words: JSON.stringify([]),
+      currentWordIndex: 0,
+      score: 0,
+      moves: 0,
+      hintsUsed: 0,
+      correctGuesses: 0,
+      state: JSON.stringify(initSession),
+      startedAt: new Date(),
+      completed: false
+    }
+  });
+
+  return mapToSession(dbSession);
+}
+
+/**
+ * Get game session
+ */
+export async function getGameSession(sessionId: string): Promise<WordScrambleGameSession | null> {
+  const dbSession = await prisma.wordGameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!dbSession) return null;
+  return mapToSession(dbSession);
+}
+
+/**
+ * Submit guess
+ */
+export async function submitGuess(
+  sessionId: string,
+  guess: string,
+  reactionTime: number = 0
+): Promise<{ isCorrect: boolean; status: WordGuessStatus; session: WordScrambleGameSession | null }> {
+  const dbSession = await prisma.wordGameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!dbSession) return { isCorrect: false, status: 'incorrect', session: null };
+
+  const sessionState = mapToSession(dbSession);
+  if (sessionState.isCompleted) {
+    return { isCorrect: false, status: 'game_over', session: sessionState };
+  }
+
+  const currentWord = sessionState.currentWord;
+  if (!currentWord) return { isCorrect: false, status: 'incorrect', session: sessionState };
+
+  const validation = validateWordGuess(guess, currentWord.original);
+  
+  const attempts = sessionState.attempts || [];
+  attempts.push({
+    word: currentWord.original,
+    guess: guess,
+    isCorrect: validation.isCorrect,
+    timestamp: new Date(),
+    reactionTime,
+    wordId: currentWord.id,
+    hintsUsed: sessionState.totalHintsUsed,
+    attemptsCount: attempts.length + 1
+  });
+
+  const state = JSON.parse(dbSession.state || '{}');
+  state.attempts = attempts;
+
+  const totalGuesses = dbSession.moves + 1;
+
+  if (!validation.isCorrect) {
+    state.currentStreak = 0;
+    state.accuracy = dbSession.correctGuesses / totalGuesses;
+
+    const updatedSession = await prisma.wordGameSession.update({
+      where: { sessionId },
+      data: {
+        state: JSON.stringify(state),
+        moves: totalGuesses
+      }
+    });
+
+    return { isCorrect: false, status: validation.status, session: mapToSession(updatedSession) };
+  }
+
+  const scoreResult = calculateGuessScore(currentWord, sessionState.currentStreak, reactionTime, sessionState.totalHintsUsed, sessionState.activePowerUps);
+  const newScore = dbSession.score + scoreResult.totalScore;
+  const correctGuesses = dbSession.correctGuesses + 1;
+  const currentStreak = sessionState.currentStreak + 1;
+  const maxStreak = Math.max(sessionState.maxStreak, currentStreak);
+
+  state.currentStreak = currentStreak;
+  state.maxStreak = maxStreak;
+  state.accuracy = correctGuesses / totalGuesses;
+  
+  updatePerformanceMetrics(state, reactionTime, true);
+
+  const completedWords = [...sessionState.completedWords, currentWord.original];
+  state.completedWords = completedWords;
+
+  const nextWordIndex = dbSession.currentWordIndex + 1;
+  let completed = dbSession.completed;
+  let completedAt = dbSession.completedAt;
+  let nextWord = null;
+
+  if (nextWordIndex >= sessionState.totalWords) {
+    completed = true;
+    completedAt = new Date();
+    state.isCompleted = true;
+  } else {
+    const wordSequence = generateWordSequence(dbSession.difficulty as WordScrambleDifficulty, dbSession.category as WordScrambleCategory);
+    nextWord = wordSequence[nextWordIndex] || null;
+    state.currentWord = nextWord;
+  }
+
+  const completionPercentage = Math.round((correctGuesses / sessionState.totalWords) * 100);
+  state.completionPercentage = completionPercentage;
+
+  const newAchievements = checkForAchievements(state, currentWord, reactionTime, sessionState.totalHintsUsed);
+  state.achievements = [...(state.achievements || []), ...newAchievements];
+
+  const updatedSession = await prisma.wordGameSession.update({
+    where: { sessionId },
+    data: {
+      words: JSON.stringify(completedWords),
+      currentWordIndex: nextWordIndex,
+      score: newScore,
+      correctGuesses,
+      moves: totalGuesses,
+      completed,
+      completedAt,
+      state: JSON.stringify(state)
+    }
+  });
+
+  return { isCorrect: true, status: 'correct', session: mapToSession(updatedSession) };
+}
+
+/**
+ * Skip word
+ */
+export async function skipWord(sessionId: string): Promise<WordScrambleGameSession | null> {
+  const dbSession = await prisma.wordGameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!dbSession) return null;
+
+  const sessionState = mapToSession(dbSession);
+  if (sessionState.isCompleted) {
+    return sessionState;
+  }
+
+  const currentWord = sessionState.currentWord;
+  if (!currentWord) return sessionState;
+
+  const state = JSON.parse(dbSession.state || '{}');
+  const skippedWords = [...sessionState.skippedWords, currentWord.original];
+  state.skippedWords = skippedWords;
+  state.currentStreak = 0;
+
+  const nextWordIndex = dbSession.currentWordIndex + 1;
+  let completed = dbSession.completed;
+  let completedAt = dbSession.completedAt;
+
+  if (nextWordIndex >= sessionState.totalWords) {
+    completed = true;
+    completedAt = new Date();
+    state.isCompleted = true;
+  } else {
+    const wordSequence = generateWordSequence(dbSession.difficulty as WordScrambleDifficulty, dbSession.category as WordScrambleCategory);
+    const nextWord = wordSequence[nextWordIndex] || null;
+    state.currentWord = nextWord;
+  }
+
+  const updatedSession = await prisma.wordGameSession.update({
+    where: { sessionId },
+    data: {
+      currentWordIndex: nextWordIndex,
+      completed,
+      completedAt,
+      state: JSON.stringify(state)
+    }
+  });
+
+  return mapToSession(updatedSession);
+}
+
+/**
+ * Complete game session
+ */
+export async function completeGameSession(sessionId: string): Promise<WordScrambleGameSession | null> {
+  const dbSession = await prisma.wordGameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!dbSession) return null;
+
+  if (dbSession.completed) {
+    return mapToSession(dbSession);
+  }
+
+  const state = JSON.parse(dbSession.state || '{}');
+  state.isCompleted = true;
+  
+  const completedAt = new Date();
+  const duration = Math.floor((completedAt.getTime() - dbSession.startedAt.getTime()) / 1000);
+  
+  const finalSessionState = mapToSession({ ...dbSession, completed: true, completedAt, state: JSON.stringify(state) });
+  const finalMetrics = calculateFinalPerformanceMetrics(finalSessionState, duration);
+  state.statistics = finalMetrics;
+  state.finalRating = determineGameRating(finalMetrics);
+
+  const updatedSession = await prisma.wordGameSession.update({
+    where: { sessionId },
+    data: {
+      completed: true,
+      completedAt,
+      state: JSON.stringify(state)
+    }
+  });
+
+  return mapToSession(updatedSession);
+}
+
+/**
+ * Use hint
+ */
+export async function useHint(
+  sessionId: string,
+  hintType: string
+): Promise<{ hint: WordScrambleHint | null; session: WordScrambleGameSession | null }> {
+  const dbSession = await prisma.wordGameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!dbSession) return { hint: null, session: null };
+
+  const state = JSON.parse(dbSession.state || '{}');
+  const currentWord = state.currentWord;
+  if (!currentWord) return { hint: null, session: mapToSession(dbSession) };
+
+  const hint = generateWordHint(currentWord, hintType);
+  if (!hint) return { hint: null, session: mapToSession(dbSession) };
+
+  const hintsUsed = dbSession.hintsUsed + 1;
+  state.totalHintsUsed = hintsUsed;
+
+  const updatedSession = await prisma.wordGameSession.update({
+    where: { sessionId },
+    data: {
+      hintsUsed,
+      state: JSON.stringify(state)
+    }
+  });
+
+  return { hint, session: mapToSession(updatedSession) };
+}
+
+/**
+ * Create session state
  */
 export function createWordScrambleSession(
   config: WordScrambleGameConfig,
@@ -270,7 +598,6 @@ export function createWordScrambleSession(
   const sessionId = generateSessionId();
   const startTime = new Date();
   
-  // Calculate time limit based on game mode and difficulty
   let totalDuration = 0;
   if (config.customTimeLimit) {
     totalDuration = config.customTimeLimit;
@@ -281,19 +608,17 @@ export function createWordScrambleSession(
         totalDuration = getGameModeTimeLimit(config.gameMode, config.difficulty);
         break;
       case 'streak':
-        totalDuration = 300; // 5 minutes for streak mode
+        totalDuration = 300;
         break;
       case 'marathon':
-        totalDuration = 1200; // 20 minutes for marathon
+        totalDuration = 1200;
         break;
       default:
-        totalDuration = 0; // Unlimited for classic/zen
+        totalDuration = 0;
     }
   }
   
-  // Calculate total words based on game mode
   const totalWords = calculateTotalWords(config.gameMode, wordSequence.length);
-  const finalWordSequence = wordSequence.slice(0, totalWords);
 
   return {
     sessionId,
@@ -301,21 +626,15 @@ export function createWordScrambleSession(
     difficulty: config.difficulty,
     gameMode: config.gameMode,
     category: config.category,
-    
-    // Game State
-    currentWord: null, // Will be set by getFirstWord
+    currentWord: null,
     currentWordIndex: 0,
     totalWords,
     wordsCompleted: 0,
     currentScore: 0,
-    
-    // Timing
     startTime,
     timeRemaining: totalDuration,
     totalDuration,
     isPaused: false,
-    
-    // Performance Metrics
     totalGuesses: 0,
     correctGuesses: 0,
     incorrectGuesses: 0,
@@ -323,30 +642,21 @@ export function createWordScrambleSession(
     averageReactionTime: 0,
     fastestSolve: 0,
     slowestSolve: 0,
-    
-    // Streaks and Bonuses
     currentStreak: 0,
     maxStreak: 0,
     perfectWords: 0,
     oneGuessWords: 0,
-    
-    // Power-ups and Hints
     activePowerUps: config.enablePowerUps ? initializeGamePowerUps() : [],
     totalHintsUsed: 0,
     maxHints: config.enableHints ? WORD_SCRAMBLE_CONSTANTS.MAX_HINTS : 0,
-    
-    // Progress
     isCompleted: false,
     completionPercentage: 0,
     finalRating: '',
     achievements: [],
-    
-    // Advanced Features
-    categoryStats: new Map(),
+    categoryStats: {} as Record<WordScrambleCategory, number>,
     difficultyProgression: false,
     bonusMultiplier: 1.0,
     consistencyScore: 0,
-    
     attempts: [],
     completedWords: [],
     skippedWords: []
@@ -357,7 +667,6 @@ export function createWordScrambleSession(
  * Get the first word for a session
  */
 export function getFirstWord(session: Partial<WordScrambleGameSession>): WordScrambleWord | null {
-  // Generate the first word from the sequence
   if (!session.category || !session.difficulty) return null;
   
   const wordSequence = generateWordSequence(
@@ -379,7 +688,6 @@ export function getNextWord(session: Partial<WordScrambleGameSession>): WordScra
     return null;
   }
   
-  // Generate word sequence again (in a real implementation, this would be cached)
   const wordSequence = generateWordSequence(
     session.difficulty, 
     session.category
@@ -404,17 +712,14 @@ export function validateWordGuess(
   const normalizedGuess = guess.toUpperCase().trim();
   const normalizedCorrect = correctWord.toUpperCase();
   
-  // Check minimum length
   if (normalizedGuess.length < WORD_SCRAMBLE_CONSTANTS.MIN_WORD_LENGTH) {
     return { isCorrect: false, status: 'too_short' };
   }
   
-  // Check for invalid characters (only letters allowed)
   if (!/^[A-Z]+$/.test(normalizedGuess)) {
     return { isCorrect: false, status: 'invalid_chars' };
   }
   
-  // Check if correct
   if (normalizedGuess === normalizedCorrect) {
     return { isCorrect: true, status: 'correct' };
   }
@@ -432,16 +737,14 @@ export function calculateGuessScore(
   hintsUsed: number,
   activePowerUps: any[]
 ): { baseScore: number; bonuses: number; totalScore: number; bonusMultiplier: number; streakBonus: number } {
-  let baseScore = word.points;
+  const baseScore = word.points;
   
-  // Speed bonus
   let bonusMultiplier = 1.0;
   if (reactionTime > 0 && reactionTime < WORD_SCRAMBLE_CONSTANTS.SPEED_BONUS_THRESHOLD) {
     const speedBonus = 1 + (WORD_SCRAMBLE_CONSTANTS.SPEED_BONUS_THRESHOLD - reactionTime) / WORD_SCRAMBLE_CONSTANTS.SPEED_BONUS_THRESHOLD;
     bonusMultiplier += speedBonus * 0.5;
   }
   
-  // Streak bonus
   let streakBonus = 0;
   if (currentStreak >= 3) {
     const streakMultiplier = Math.min(3.0, 1 + (currentStreak * 0.1));
@@ -449,12 +752,10 @@ export function calculateGuessScore(
     bonusMultiplier += (streakMultiplier - 1);
   }
   
-  // Hint penalty
   if (hintsUsed > 0) {
     bonusMultiplier = Math.max(0.5, bonusMultiplier - (hintsUsed * 0.15));
   }
   
-  // Power-up bonuses
   for (const powerUp of activePowerUps) {
     if (powerUp.isActive && powerUp.type === 'double-points') {
       bonusMultiplier += powerUp.effect;
@@ -552,7 +853,6 @@ export function updatePerformanceMetrics(
   if (!session) return;
   
   if (isCorrect && reactionTime > 0) {
-    // Update fastest/slowest solve times
     if (session.fastestSolve === undefined || session.fastestSolve === 0 || reactionTime < session.fastestSolve) {
       session.fastestSolve = reactionTime;
     }
@@ -560,7 +860,6 @@ export function updatePerformanceMetrics(
       session.slowestSolve = reactionTime;
     }
     
-    // Update average reaction time
     const totalCorrect = session.correctGuesses || 0;
     const currentAvg = session.averageReactionTime || 0;
     session.averageReactionTime = (currentAvg * totalCorrect + reactionTime) / (totalCorrect + 1);
@@ -579,31 +878,26 @@ export function checkForAchievements(
   const newAchievements: string[] = [];
   const currentAchievements = session.achievements || [];
   
-  // Speed Master - Solve in under 3 seconds
   if (reactionTime < 3000 && !currentAchievements.includes('speed_master')) {
     newAchievements.push('speed_master');
   }
   
-  // Streak King - 10 word streak
   if ((session.currentStreak || 0) >= 10 && !currentAchievements.includes('streak_king')) {
     newAchievements.push('streak_king');
   }
   
-  // Hint-free solver - Solve 5 words without hints
   if (hintsUsed === 0) {
-    const hintFreeWords = session.attempts?.filter(a => a.isCorrect && a.hintsUsed === 0).length || 0;
+    const hintFreeWords = session.attempts?.filter((a: any) => a.isCorrect && a.hintsUsed === 0).length || 0;
     if (hintFreeWords >= 5 && !currentAchievements.includes('hint_free')) {
       newAchievements.push('hint_free');
     }
   }
   
-  // Perfect accuracy - 100% accuracy with 10+ guesses
   if ((session.totalGuesses || 0) >= 10 && (session.accuracy || 0) >= 1.0 && 
       !currentAchievements.includes('perfect_round')) {
     newAchievements.push('perfect_round');
   }
   
-  // Difficulty master - Complete expert/insane level
   if (['expert', 'insane'].includes(session.difficulty || '') && 
       !currentAchievements.includes('difficulty_master')) {
     newAchievements.push('difficulty_master');
@@ -619,10 +913,9 @@ export function calculateFinalPerformanceMetrics(
   session: Partial<WordScrambleGameSession>,
   totalPlayTime: number
 ): WordScramblePerformanceMetrics {
-  const attempts = session.attempts || [];
+  const attempts: any[] = session.attempts || [];
   const correctAttempts = attempts.filter(a => a.isCorrect);
   
-  // Speed Metrics
   const reactionTimes = correctAttempts.map(a => a.reactionTime).filter(t => t > 0);
   const averageReactionTime = reactionTimes.length > 0 ? 
     reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length : 0;
@@ -637,11 +930,9 @@ export function calculateFinalPerformanceMetrics(
     time: Math.max(...reactionTimes)
   } : { word: '', time: 0 };
   
-  // Accuracy Metrics
   const accuracy = attempts.length > 0 ? correctAttempts.length / attempts.length : 1;
   const firstTrySuccess = session.oneGuessWords || 0;
   
-  // Calculate ratings (0-1 scale)
   const speedRating = calculateSpeedRating(averageReactionTime);
   const accuracyRating = accuracy;
   const streakRating = calculateStreakRating(session.maxStreak || 0);
@@ -651,36 +942,25 @@ export function calculateFinalPerformanceMetrics(
                        (streakRating * 0.25) + (difficultyRating * 0.15);
   
   return {
-    // Speed Metrics
     averageReactionTime,
     fastestGuess,
     slowestGuess,
-    
-    // Accuracy Metrics
     totalAttempts: attempts.length,
     correctAttempts: correctAttempts.length,
     incorrectAttempts: attempts.length - correctAttempts.length,
     accuracy,
     firstTrySuccess,
-    
-    // Streak Metrics
     longestStreak: session.maxStreak || 0,
     currentStreak: session.currentStreak || 0,
-    streakBreaks: 0, // Could be calculated from attempts
+    streakBreaks: 0,
     perfectRounds: session.perfectWords || 0,
-    
-    // Word Difficulty Metrics
     easiestWordSolved: '',
     hardestWordSolved: '',
     averageWordDifficulty: 0,
     difficultyProgression: 0,
-    
-    // Consistency Metrics
     reactionTimeVariance: calculateReactionTimeVariance(reactionTimes),
     consistencyRating: calculateConsistencyRating(reactionTimes),
     improvementRate: 0,
-    
-    // Overall Rating
     speedRating,
     accuracyRating,
     streakRating,
@@ -740,7 +1020,7 @@ export function generateGameSummary(
   return parts.join(', ') + '. Great job!';
 }
 
-// Helper Functions
+// Helpers
 
 function generateSessionId(): string {
   return `ws_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -779,7 +1059,6 @@ function scrambleWord(word: string, options: ScrambleOptions): string {
       
     case 'complex':
     default:
-      // Ensure minimum changes
       let scrambled = word;
       let attempts = 0;
       const maxAttempts = 10;
@@ -796,7 +1075,6 @@ function scrambleWord(word: string, options: ScrambleOptions): string {
 function generateWordHints(word: string, category: WordScrambleCategory): string[] {
   const hints = [];
   
-  // Category-specific hints
   switch (category) {
     case 'programming':
       hints.push('Related to software development');
@@ -817,7 +1095,6 @@ function generateWordHints(word: string, category: WordScrambleCategory): string
       hints.push('A common word');
   }
   
-  // Length hint
   if (word.length > 5) {
     hints.push('A longer word');
   } else {
@@ -857,10 +1134,10 @@ function getCategoryDisplayName(category: WordScrambleCategory): string {
 
 function getGameModeTimeLimit(gameMode: WordScrambleGameMode, difficulty: WordScrambleDifficulty): number {
   const baseLimits = {
-    timed: 300,    // 5 minutes
-    blitz: 120,    // 2 minutes
-    streak: 300,   // 5 minutes
-    marathon: 1200 // 20 minutes
+    timed: 300,
+    blitz: 120,
+    streak: 300,
+    marathon: 1200
   };
   
   const difficultyMultipliers = {
@@ -890,7 +1167,7 @@ function calculateTotalWords(gameMode: WordScrambleGameMode, availableWords: num
   return limits[gameMode] || 10;
 }
 
-function initializeGamePowerUps() {
+function initializeGamePowerUps(): any[] {
   return [
     {
       id: 'reveal_1',
@@ -970,6 +1247,5 @@ function calculateConsistencyRating(times: number[]): number {
   const mean = times.reduce((sum, time) => sum + time, 0) / times.length;
   const coefficientOfVariation = Math.sqrt(variance) / mean;
   
-  // Lower coefficient of variation = higher consistency
   return Math.max(0, 1 - coefficientOfVariation);
 }

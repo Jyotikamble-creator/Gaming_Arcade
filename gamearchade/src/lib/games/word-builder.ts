@@ -1,5 +1,6 @@
 // Word Builder Game Core Logic
-import {
+import { prisma } from '@/lib/api/prisma';
+import type {
   WordBuilderChallenge,
   WordBuilderGameSession,
   WordBuilderGameConfig,
@@ -8,9 +9,61 @@ import {
   WordBuilderPowerUp,
   WordBuilderHint,
   WordBuilderPerformanceMetrics,
+  WordBuilderAttempt
+} from '@/types/games/word-builder';
+import {
   defaultWordBuilderChallenges,
   WORD_BUILDER_CONSTANTS
 } from '@/types/games/word-builder';
+
+function mapToSession(dbSession: any): WordBuilderGameSession {
+  const state = JSON.parse(dbSession.state || '{}');
+  let timeLimit: number | undefined;
+  try {
+    const meta = JSON.parse(dbSession.meta || '{}');
+    if (typeof meta.timeLimit === 'number') {
+      timeLimit = meta.timeLimit;
+    }
+  } catch (e) {}
+
+  return {
+    sessionId: dbSession.sessionId,
+    userId: dbSession.userId || undefined,
+    challengeId: state.challengeId,
+    difficulty: dbSession.difficulty as WordBuilderDifficulty,
+    gameMode: state.gameMode || 'timed',
+    letters: state.letters || [],
+    foundWords: JSON.parse(dbSession.words || '[]'),
+    currentScore: dbSession.score,
+    wordsFound: dbSession.correctGuesses,
+    targetWordsCount: state.targetWordsCount || 0,
+    startTime: dbSession.startedAt,
+    endTime: dbSession.completedAt || undefined,
+    timeRemaining: state.timeRemaining || 0,
+    totalDuration: state.totalDuration || 0,
+    isPaused: state.isPaused || false,
+    averageWordTime: state.averageWordTime || 0,
+    longestWord: state.longestWord || '',
+    shortestWord: state.shortestWord || '',
+    wordsPerMinute: state.wordsPerMinute || 0,
+    accuracy: state.accuracy || 1.0,
+    perfectWords: state.perfectWords || 0,
+    activePowerUps: state.activePowerUps || [],
+    hintsUsed: dbSession.hintsUsed,
+    maxHints: state.maxHints || 0,
+    comboStreak: state.comboStreak || 0,
+    maxComboStreak: state.maxComboStreak || 0,
+    isCompleted: dbSession.completed,
+    completionPercentage: state.completionPercentage || 0,
+    finalRating: state.finalRating || '',
+    achievements: state.achievements || [],
+    attempts: state.attempts || [],
+    letterUsageStats: state.letterUsageStats || {},
+    wordLengthDistribution: state.wordLengthDistribution || {},
+    categoryBonus: state.categoryBonus || 0,
+    consistencyRating: state.consistencyRating || 0
+  };
+}
 
 /**
  * Select a random challenge based on difficulty
@@ -20,7 +73,6 @@ export function selectRandomChallenge(
   customLetters?: string[],
   customTargetWords?: string[]
 ): WordBuilderChallenge | null {
-  // If custom parameters provided, create custom challenge
   if (customLetters && customTargetWords) {
     return {
       id: 999,
@@ -33,7 +85,6 @@ export function selectRandomChallenge(
     };
   }
 
-  // Select from default challenges
   const availableChallenges = defaultWordBuilderChallenges.filter(
     challenge => challenge.difficulty === difficulty
   );
@@ -46,7 +97,228 @@ export function selectRandomChallenge(
 }
 
 /**
- * Create a new game session
+ * Create a new game session in database
+ */
+export async function createGameSession(
+  challenge: WordBuilderChallenge,
+  config: WordBuilderGameConfig,
+  userId?: string
+): Promise<WordBuilderGameSession> {
+  const initSession = createWordBuilderSession(challenge, config, userId);
+  const sessionId = initSession.sessionId!;
+
+  const dbSession = await prisma.wordGameSession.create({
+    data: {
+      userId: userId || null,
+      sessionId,
+      gameType: 'word-builder',
+      difficulty: config.difficulty,
+      category: challenge.category || 'General',
+      words: JSON.stringify([]),
+      score: 0,
+      moves: 0,
+      hintsUsed: 0,
+      correctGuesses: 0,
+      state: JSON.stringify(initSession),
+      startedAt: new Date(),
+      completed: false
+    }
+  });
+
+  return mapToSession(dbSession);
+}
+
+/**
+ * Get game session
+ */
+export async function getGameSession(sessionId: string): Promise<WordBuilderGameSession | null> {
+  const dbSession = await prisma.wordGameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!dbSession) return null;
+  return mapToSession(dbSession);
+}
+
+/**
+ * Submit word
+ */
+export async function submitWord(
+  sessionId: string,
+  word: string,
+  reactionTime: number = 0
+): Promise<{ isValid: boolean; status: WordValidationStatus; session: WordBuilderGameSession | null }> {
+  const dbSession = await prisma.wordGameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!dbSession) return { isValid: false, status: 'invalid', session: null };
+
+  const sessionState = mapToSession(dbSession);
+  if (sessionState.isCompleted) {
+    return { isValid: false, status: 'game_over', session: sessionState };
+  }
+
+  const validation = validateWordInGame(word, sessionState.letters, sessionState.foundWords, sessionState.challengeId);
+  const attempts: WordBuilderAttempt[] = sessionState.attempts || [];
+  
+  attempts.push({
+    word,
+    isValid: validation.isValid,
+    score: 0,
+    timestamp: new Date(),
+    reactionTime
+  });
+
+  const state = JSON.parse(dbSession.state || '{}');
+  state.attempts = attempts;
+
+  if (!validation.isValid) {
+    state.comboStreak = 0;
+    
+    const totalAttempts = attempts.length;
+    const validAttempts = attempts.filter(a => a.isValid).length;
+    state.accuracy = totalAttempts > 0 ? validAttempts / totalAttempts : 1.0;
+
+    const updatedSession = await prisma.wordGameSession.update({
+      where: { sessionId },
+      data: {
+        state: JSON.stringify(state),
+        moves: totalAttempts
+      }
+    });
+    return { isValid: false, status: validation.status, session: mapToSession(updatedSession) };
+  }
+
+  const foundWords = [...sessionState.foundWords, word.toUpperCase()];
+  const scoreResult = calculateWordScore(word, sessionState.comboStreak, sessionState.activePowerUps, reactionTime);
+  
+  const currentScore = sessionState.currentScore + scoreResult.totalScore;
+  const wordsFound = sessionState.wordsFound + 1;
+  const comboStreak = sessionState.comboStreak + 1;
+  const maxComboStreak = Math.max(sessionState.maxComboStreak, comboStreak);
+
+  attempts[attempts.length - 1].score = scoreResult.totalScore;
+
+  const longestWord = !sessionState.longestWord || word.length > sessionState.longestWord.length ? word : sessionState.longestWord;
+  const shortestWord = !sessionState.shortestWord || word.length < sessionState.shortestWord.length ? word : sessionState.shortestWord;
+
+  state.foundWords = foundWords;
+  state.currentScore = currentScore;
+  state.wordsFound = wordsFound;
+  state.comboStreak = comboStreak;
+  state.maxComboStreak = maxComboStreak;
+  state.longestWord = longestWord;
+  state.shortestWord = shortestWord;
+  
+  const totalAttempts = attempts.length;
+  const validAttempts = attempts.filter(a => a.isValid).length;
+  state.accuracy = totalAttempts > 0 ? validAttempts / totalAttempts : 1.0;
+
+  const targetWordsCount = sessionState.targetWordsCount;
+  const completionPercentage = Math.round((wordsFound / targetWordsCount) * 100);
+  state.completionPercentage = completionPercentage;
+
+  let completed = dbSession.completed;
+  let completedAt = dbSession.completedAt;
+
+  if (wordsFound >= targetWordsCount) {
+    completed = true;
+    completedAt = new Date();
+  }
+
+  const newAchievements = checkForAchievements(state, word, reactionTime);
+  state.achievements = [...(state.achievements || []), ...newAchievements];
+
+  const updatedSession = await prisma.wordGameSession.update({
+    where: { sessionId },
+    data: {
+      words: JSON.stringify(foundWords),
+      score: currentScore,
+      correctGuesses: wordsFound,
+      moves: totalAttempts,
+      completed,
+      completedAt,
+      state: JSON.stringify(state)
+    }
+  });
+
+  return { isValid: true, status: 'valid', session: mapToSession(updatedSession) };
+}
+
+/**
+ * Use hint
+ */
+export async function useHint(
+  sessionId: string,
+  hintType: string
+): Promise<{ hint: WordBuilderHint | null; session: WordBuilderGameSession | null }> {
+  const dbSession = await prisma.wordGameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!dbSession) return { hint: null, session: null };
+
+  const state = JSON.parse(dbSession.state || '{}');
+  const challenge = defaultWordBuilderChallenges.find(c => c.id === state.challengeId);
+  if (!challenge) return { hint: null, session: mapToSession(dbSession) };
+
+  const unfoundWords = challenge.targetWords.filter((w: string) => !(state.foundWords || []).includes(w));
+  if (unfoundWords.length === 0) return { hint: null, session: mapToSession(dbSession) };
+
+  const targetWord = unfoundWords[0];
+  const hint = generateWordHint(targetWord, hintType, state.letters || []);
+  if (!hint) return { hint: null, session: mapToSession(dbSession) };
+
+  const hintsUsed = dbSession.hintsUsed + 1;
+  state.hintsUsed = hintsUsed;
+
+  const updatedSession = await prisma.wordGameSession.update({
+    where: { sessionId },
+    data: {
+      hintsUsed,
+      state: JSON.stringify(state)
+    }
+  });
+
+  return { hint, session: mapToSession(updatedSession) };
+}
+
+/**
+ * Complete game session
+ */
+export async function completeGameSession(sessionId: string): Promise<WordBuilderGameSession | null> {
+  const dbSession = await prisma.wordGameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!dbSession) return null;
+
+  if (dbSession.completed) {
+    return mapToSession(dbSession);
+  }
+
+  const state = JSON.parse(dbSession.state || '{}');
+  state.isCompleted = true;
+  
+  const completedAt = new Date();
+  const duration = Math.floor((completedAt.getTime() - dbSession.startedAt.getTime()) / 1000);
+  
+  const finalSessionState = mapToSession({ ...dbSession, completed: true, completedAt, state: JSON.stringify(state) });
+  const finalMetrics = calculateFinalPerformanceMetrics(finalSessionState, duration);
+  state.statistics = finalMetrics;
+  state.finalRating = determineGameRating(finalMetrics);
+
+  const updatedSession = await prisma.wordGameSession.update({
+    where: { sessionId },
+    data: {
+      completed: true,
+      completedAt,
+      state: JSON.stringify(state)
+    }
+  });
+
+  return mapToSession(updatedSession);
+}
+
+/**
+ * Create a new game session state helper
  */
 export function createWordBuilderSession(
   challenge: WordBuilderChallenge,
@@ -56,7 +328,6 @@ export function createWordBuilderSession(
   const sessionId = generateSessionId();
   const startTime = new Date();
   
-  // Calculate time limit based on game mode and difficulty
   let totalDuration = 0;
   if (config.customTimeLimit) {
     totalDuration = config.customTimeLimit;
@@ -69,11 +340,10 @@ export function createWordBuilderSession(
         totalDuration = challenge.timeLimit || 300;
         break;
       default:
-        totalDuration = 0; // Unlimited
+        totalDuration = 0;
     }
   }
 
-  // Initialize power-ups
   const activePowerUps: WordBuilderPowerUp[] = config.enablePowerUps ? 
     initializeGamePowerUps() : [];
 
@@ -83,47 +353,30 @@ export function createWordBuilderSession(
     challengeId: challenge.id,
     difficulty: config.difficulty,
     gameMode: config.gameMode,
-    
-    // Game State
     letters: [...challenge.letters],
     foundWords: [],
     currentScore: 0,
     wordsFound: 0,
     targetWordsCount: challenge.targetWords.length,
-    
-    // Timing
     startTime,
     timeRemaining: totalDuration,
     totalDuration,
     isPaused: false,
-    
-    // Performance Metrics
     averageWordTime: 0,
     longestWord: '',
     shortestWord: '',
     wordsPerMinute: 0,
     accuracy: 1.0,
     perfectWords: 0,
-    
-    // Power-ups and Bonuses
     activePowerUps,
     hintsUsed: 0,
     maxHints: config.enableHints ? WORD_BUILDER_CONSTANTS.MAX_HINTS : 0,
     comboStreak: 0,
     maxComboStreak: 0,
-    
-    // Progress
     isCompleted: false,
     completionPercentage: 0,
     finalRating: '',
     achievements: [],
-    
-    // Advanced Features
-    letterUsageStats: new Map(),
-    wordLengthDistribution: new Map(),
-    categoryBonus: 0,
-    consistencyRating: 0,
-    
     attempts: []
   };
 }
@@ -139,17 +392,14 @@ export function validateWordInGame(
 ): { isValid: boolean; status: WordValidationStatus } {
   const normalizedWord = word.toUpperCase().trim();
   
-  // Check minimum length
   if (normalizedWord.length < WORD_BUILDER_CONSTANTS.MIN_WORD_LENGTH) {
     return { isValid: false, status: 'too_short' };
   }
   
-  // Check if already found
   if (foundWords.includes(normalizedWord)) {
     return { isValid: false, status: 'already_used' };
   }
   
-  // Check if word uses only available letters
   const letterCount = new Map<string, number>();
   for (const letter of availableLetters) {
     letterCount.set(letter, (letterCount.get(letter) || 0) + 1);
@@ -163,7 +413,6 @@ export function validateWordInGame(
     letterCount.set(letter, available - 1);
   }
   
-  // Check if word is in target words list
   const challenge = defaultWordBuilderChallenges.find(c => c.id === challengeId);
   if (!challenge || !challenge.targetWords.includes(normalizedWord)) {
     return { isValid: false, status: 'invalid' };
@@ -184,37 +433,30 @@ export function calculateWordScore(
   const normalizedWord = word.toUpperCase();
   let baseScore = 0;
   
-  // Calculate base score using letter values
   for (const letter of normalizedWord) {
-    const letterValue = WORD_BUILDER_CONSTANTS.SCORING.LETTER_VALUES[letter] || 1;
+    const letterValue = WORD_BUILDER_CONSTANTS.SCORING.LETTER_VALUES[letter as keyof typeof WORD_BUILDER_CONSTANTS.SCORING.LETTER_VALUES] || 1;
     baseScore += letterValue;
   }
   
-  // Length bonus
   const lengthBonus = Math.max(0, normalizedWord.length - 3) * WORD_BUILDER_CONSTANTS.LENGTH_MULTIPLIER;
   baseScore += lengthBonus;
   
-  // Calculate multipliers
   let bonusMultiplier = 1;
   let bonuses = 0;
   
-  // Combo streak bonus
   if (comboStreak >= 3) {
     bonusMultiplier += Math.min(2, comboStreak * 0.1);
   }
   
-  // Speed bonus for quick reactions
-  if (reactionTime > 0 && reactionTime < 5000) { // Under 5 seconds
+  if (reactionTime > 0 && reactionTime < 5000) {
     const speedBonus = Math.max(0, 1 - (reactionTime / 5000));
     bonusMultiplier += speedBonus * 0.5;
   }
   
-  // Long word bonus
   if (normalizedWord.length >= 7) {
     bonusMultiplier += 0.5;
   }
   
-  // Power-up bonuses
   for (const powerUp of activePowerUps) {
     if (powerUp.isActive) {
       switch (powerUp.type) {
@@ -246,7 +488,6 @@ export function updateGameProgress(session: Partial<WordBuilderGameSession>): vo
     );
   }
   
-  // Check for auto-completion
   if (session.wordsFound && session.targetWordsCount && 
       session.wordsFound >= session.targetWordsCount) {
     session.isCompleted = true;
@@ -265,27 +506,22 @@ export function checkForAchievements(
   const newAchievements: string[] = [];
   const currentAchievements = session.achievements || [];
   
-  // Speed Demon - Find word in under 5 seconds
   if (reactionTime < 5000 && !currentAchievements.includes('speed_demon')) {
     newAchievements.push('speed_demon');
   }
   
-  // Word Master - Find 10 words in one game
   if ((session.wordsFound || 0) >= 10 && !currentAchievements.includes('word_master')) {
     newAchievements.push('word_master');
   }
   
-  // Long Word - Find 8+ letter word
   if (word.length >= 8 && !currentAchievements.includes('long_word')) {
     newAchievements.push('long_word');
   }
   
-  // Streak King - 5 word combo streak
   if ((session.comboStreak || 0) >= 5 && !currentAchievements.includes('streak_king')) {
     newAchievements.push('streak_king');
   }
   
-  // Perfect Game - 100% accuracy with 5+ words
   if ((session.accuracy || 0) >= 1.0 && (session.wordsFound || 0) >= 5 && 
       !currentAchievements.includes('perfect_game')) {
     newAchievements.push('perfect_game');
@@ -358,10 +594,9 @@ export function calculateFinalPerformanceMetrics(
   session: Partial<WordBuilderGameSession>,
   totalPlayTime: number
 ): WordBuilderPerformanceMetrics {
-  const attempts = session.attempts || [];
+  const attempts = (session.attempts || []) as WordBuilderAttempt[];
   const validAttempts = attempts.filter(a => a.isValid);
   
-  // Speed Metrics
   const reactionTimes = validAttempts.map(a => a.reactionTime).filter(t => t > 0);
   const averageWordTime = reactionTimes.length > 0 ? 
     reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length / 1000 : 0;
@@ -376,15 +611,12 @@ export function calculateFinalPerformanceMetrics(
     time: Math.max(...reactionTimes) / 1000
   } : { word: '', time: 0 };
   
-  // Accuracy Metrics
   const accuracy = attempts.length > 0 ? validAttempts.length / attempts.length : 1;
   
-  // Word Quality Metrics
   const wordLengths = validAttempts.map(a => a.word.length);
   const averageWordLength = wordLengths.length > 0 ? 
     wordLengths.reduce((sum, len) => sum + len, 0) / wordLengths.length : 0;
   
-  // Calculate ratings (0-1 scale)
   const speedRating = calculateSpeedRating(averageWordTime);
   const accuracyRating = accuracy;
   const discoveryRating = session.targetWordsCount ? 
@@ -395,35 +627,24 @@ export function calculateFinalPerformanceMetrics(
                        (discoveryRating * 0.35) + (consistencyRating * 0.15);
   
   return {
-    // Speed Metrics
     averageWordTime,
     fastestWord,
     slowestWord,
-    
-    // Accuracy Metrics
     totalAttempts: attempts.length,
     validAttempts: validAttempts.length,
     invalidAttempts: attempts.length - validAttempts.length,
     accuracy,
-    
-    // Word Quality Metrics
     longestWord: session.longestWord || '',
     shortestValidWord: session.shortestWord || '',
     averageWordLength,
     wordLengthVariety: calculateWordLengthVariety(wordLengths),
-    
-    // Discovery Metrics
     wordsFound: session.wordsFound || 0,
     targetWordsFound: session.wordsFound || 0,
     completionRate: discoveryRating,
-    hiddenWordsFound: 0, // Could be expanded for bonus words
-    
-    // Consistency Metrics
+    hiddenWordsFound: 0,
     streakLength: session.comboStreak || 0,
     maxStreak: session.maxComboStreak || 0,
     consistencyScore: consistencyRating,
-    
-    // Overall Rating
     speedRating,
     accuracyRating,
     discoveryRating,
@@ -483,7 +704,7 @@ export function generateGameSummary(
   return parts.join(', ') + '. Well done!';
 }
 
-// Helper Functions
+// Helpers
 
 function generateSessionId(): string {
   return `wb_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -491,11 +712,11 @@ function generateSessionId(): string {
 
 function getDifficultyTimeLimit(difficulty: WordBuilderDifficulty): number {
   const timeLimits = {
-    easy: 180,      // 3 minutes
-    medium: 240,    // 4 minutes
-    hard: 300,      // 5 minutes
-    expert: 360,    // 6 minutes
-    master: 420     // 7 minutes
+    easy: 180,
+    medium: 240,
+    hard: 300,
+    expert: 360,
+    master: 420
   };
   
   return timeLimits[difficulty] || 240;
@@ -536,7 +757,6 @@ function initializeGamePowerUps(): WordBuilderPowerUp[] {
 }
 
 function getWordDefinition(word: string): string | null {
-  // Simple definitions for common words - could be expanded with external API
   const definitions: Record<string, string> = {
     'CAT': 'A small domesticated carnivorous mammal',
     'DOG': 'A domesticated carnivorous mammal, typically loyal pet',
@@ -551,7 +771,6 @@ function getWordDefinition(word: string): string | null {
 }
 
 function getCategoryHint(word: string): string {
-  // Simple category hints - could be expanded
   if (['CAT', 'DOG', 'FISH'].includes(word)) return 'Animal';
   if (['TRAIN', 'CAR', 'BIKE'].includes(word)) return 'Transportation';
   if (['GARDEN', 'TREE', 'FLOWER'].includes(word)) return 'Nature';
@@ -575,7 +794,6 @@ function calculateConsistencyRating(reactionTimes: number[]): number {
   const variance = reactionTimes.reduce((sum, time) => sum + Math.pow(time - mean, 2), 0) / reactionTimes.length;
   const stdDev = Math.sqrt(variance);
   
-  // Lower standard deviation = higher consistency
   const consistencyScore = Math.max(0, 1 - (stdDev / mean));
   return Math.min(1, consistencyScore);
 }
@@ -583,6 +801,6 @@ function calculateConsistencyRating(reactionTimes: number[]): number {
 function calculateWordLengthVariety(lengths: number[]): number {
   if (lengths.length === 0) return 0;
   const uniqueLengths = new Set(lengths).size;
-  const maxPossibleVariety = Math.min(10, lengths.length); // Cap at reasonable max
+  const maxPossibleVariety = Math.min(10, lengths.length);
   return uniqueLengths / maxPossibleVariety;
 }

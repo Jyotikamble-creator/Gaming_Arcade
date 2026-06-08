@@ -4,7 +4,7 @@ export type WordBuilderDifficulty = 'easy' | 'medium' | 'hard';
 
 export type WordBuilderGameMode = 'classic' | 'timed' | 'endless' | 'puzzle' | 'challenge';
 
-export type WordValidationStatus = 'valid' | 'invalid' | 'already_used' | 'too_short' | 'invalid_letters';
+export type WordValidationStatus = 'valid' | 'invalid' | 'already_used' | 'too_short' | 'invalid_letters' | 'game_over';
 
 export type WordBuilderMessageType = 'success' | 'error' | 'hint' | '';
 
@@ -134,8 +134,8 @@ export interface WordBuilderAttempt {
   score: number;
   reactionTime: number;
   timestamp: Date;
-  bonusMultiplier: number;
-  letterCount: number;
+  bonusMultiplier?: number;
+  letterCount?: number;
 }
 
 export interface WordBuilderPowerUp {
@@ -197,6 +197,7 @@ export interface WordBuilderGameSession {
   wordLengthDistribution: Record<number, number>;
   categoryBonus: number;
   consistencyRating: number;
+  attempts?: WordBuilderAttempt[];
 }
 
 export interface WordValidationRequest {

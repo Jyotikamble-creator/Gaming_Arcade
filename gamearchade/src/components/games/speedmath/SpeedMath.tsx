@@ -47,6 +47,8 @@ const SpeedMathPage: React.FC<SpeedMathPageProps> = ({
   const [startTime, setStartTime] = useState<number | null>(null);
   const [gameTime, setGameTime] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>("");
+  const [streak, setStreak] = useState<number>(0);
+  const [bestStreak, setBestStreak] = useState<number>(0);
 
   // Load problem sequence for a round (5 problems)
   const loadProblemSequence = async (selectedDiff: SpeedMathDifficulty) => {
@@ -66,6 +68,8 @@ const SpeedMathPage: React.FC<SpeedMathPageProps> = ({
       setCurrentProblemIndex(0);
       setRoundScores([]);
       setTotalScore(0);
+      setStreak(0);
+      setBestStreak(0);
 
       // Load first problem
       if (problems.length > 0) {
@@ -128,6 +132,13 @@ const SpeedMathPage: React.FC<SpeedMathPageProps> = ({
       setRoundScores(newScores);
       setTotalScore((prev) => prev + problemScore);
 
+      // Update streak and best streak
+      setStreak((prevStreak) => {
+        const nextStreak = prevStreak + 1;
+        setBestStreak((prevBest) => Math.max(prevBest, nextStreak));
+        return nextStreak;
+      });
+
       console.log(
         "[SPEED_MATH] Correct! Problem Score:",
         problemScore,
@@ -137,6 +148,7 @@ const SpeedMathPage: React.FC<SpeedMathPageProps> = ({
     } else {
       setAttempts((prev) => prev + 1);
       setFeedback("✗ Incorrect, try again!");
+      setStreak(0);
       console.log("[SPEED_MATH] Incorrect. Attempts:", attempts + 1);
     }
   };
@@ -169,6 +181,8 @@ const SpeedMathPage: React.FC<SpeedMathPageProps> = ({
     setTotalScore(0);
     setShowCompletedModal(false);
     setFeedback("");
+    setStreak(0);
+    setBestStreak(0);
   };
 
   // Submit score to leaderboard
@@ -355,10 +369,10 @@ const SpeedMathPage: React.FC<SpeedMathPageProps> = ({
 
         {/* Game Stats */}
         <SpeedMathStats
-          attempts={attempts}
-          answered={answered}
-          isCorrect={isCorrect}
-          score={roundScores[currentProblemIndex] || 0}
+          score={totalScore}
+          problemsSolved={isCorrect ? currentProblemIndex + 1 : currentProblemIndex}
+          streak={streak}
+          bestStreak={bestStreak}
         />
 
         {/* Instructions */}
@@ -483,7 +497,15 @@ const SpeedMathPage: React.FC<SpeedMathPageProps> = ({
       {showCompletedModal && (
         <SpeedMathCompletedModal
           score={totalScore}
-          onClose={() => {
+          problemsSolved={problemSequence.length}
+          totalProblems={problemSequence.length}
+          bestStreak={bestStreak}
+          difficulty={difficulty}
+          onRestart={() => {
+            setShowCompletedModal(false);
+            startGame(difficulty);
+          }}
+          onBackToMenu={() => {
             setShowCompletedModal(false);
             resetGame();
           }}

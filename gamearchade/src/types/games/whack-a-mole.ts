@@ -8,9 +8,11 @@ export interface WhackMolePosition {
 export interface WhackMoleConfig {
   gridSize: number;
   duration: number;
-  maxMoles: number;
-  spawnRate: number;
-  moleSpeed: number;
+  maxMoles?: number;
+  spawnRate?: number;
+  moleSpeed?: number;
+  moleInterval?: number;
+  pointsPerHit?: number;
 }
 
 export interface WhackMole {
@@ -442,12 +444,7 @@ export interface WhackMoleStats {
   accuracy: number;
 }
 
-export interface WhackMoleConfig {
-  gridSize: number;
-  duration: number;
-  moleInterval: number;
-  pointsPerHit: number;
-}
+
 
 // Hook return type
 export interface WhackMoleHookReturn {

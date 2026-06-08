@@ -1,4 +1,4 @@
-﻿// WordScrambleCompletedModal component to display game completion results
+// WordScrambleCompletedModal component to display game completion results
 import React from 'react';
 import { WordScrambleCompletedModalProps } from '@/types/games/word-scramble';
 
@@ -79,7 +79,7 @@ const WordScrambleCompletedModal: React.FC<WordScrambleCompletedModalProps> = ({
           <div>
             <h3 className="text-white text-lg font-semibold mb-3">Original Scramble:</h3>
             <div className="flex justify-center gap-2 mb-4">
-              {scrambled.split('').map((letter, index) => (
+              {scrambled.split('').map((letter: string, index: number) => (
                 <div
                   key={index}
                   className="w-10 h-10 flex items-center justify-center text-lg font-bold rounded-lg bg-purple-600 text-white border border-purple-400"
@@ -93,7 +93,7 @@ const WordScrambleCompletedModal: React.FC<WordScrambleCompletedModalProps> = ({
           <div>
             <h3 className="text-white text-lg font-semibold mb-3">Correct Answer:</h3>
             <div className="flex justify-center gap-2 mb-4">
-              {word.split('').map((letter, index) => (
+              {word.split('').map((letter: string, index: number) => (
                 <div
                   key={index}
                   className={`w-10 h-10 flex items-center justify-center text-lg font-bold rounded-lg border-2 ${

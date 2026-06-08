@@ -3,8 +3,6 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-// TODO: Replace with Prisma ORM
-// import EmojiGameSessionModel from '@/models/games/emoji';
 import { prisma } from '@/lib/api/prisma';
 import type {
   EmojiGameSession,
@@ -16,6 +14,25 @@ import type {
   CategoryStats
 } from '@/types/games/emoji';
 
+function mapToSession(dbSession: any): EmojiGameSession {
+  const state = JSON.parse(dbSession.state || '{}');
+  return {
+    _id: dbSession.id,
+    userId: dbSession.userId || undefined,
+    sessionId: dbSession.sessionId,
+    currentPuzzle: state.currentPuzzle,
+    startTime: dbSession.startedAt,
+    endTime: dbSession.completedAt || undefined,
+    attempts: state.attempts || [],
+    score: dbSession.score,
+    hintsUsed: state.hintsUsed || 0,
+    completed: dbSession.completed,
+    difficulty: (dbSession.difficulty || 'Easy') as DifficultyLevel,
+    createdAt: dbSession.createdAt,
+    updatedAt: dbSession.updatedAt
+  };
+}
+
 /**
  * Create a new game session
  */
@@ -24,27 +41,36 @@ export async function createGameSession(
   userId?: string,
   difficulty?: DifficultyLevel
 ): Promise<EmojiGameSession> {
-  const session = await EmojiGameSessionModel.create({
-    userId,
-    sessionId: uuidv4(),
-    currentPuzzle: puzzle,
-    startTime: new Date(),
-    attempts: [],
-    score: 0,
-    hintsUsed: 0,
-    completed: false,
-    difficulty: difficulty || puzzle.difficulty
+  const session = await prisma.gameSession.create({
+    data: {
+      userId: userId || null,
+      sessionId: uuidv4(),
+      game: 'emoji',
+      difficulty: difficulty || puzzle.difficulty,
+      category: puzzle.category,
+      state: JSON.stringify({
+        currentPuzzle: puzzle,
+        attempts: [],
+        hintsUsed: 0
+      }),
+      startedAt: new Date(),
+      completed: false,
+      score: 0
+    }
   });
 
-  return session.toObject();
+  return mapToSession(session);
 }
 
 /**
  * Get a game session by session ID
  */
 export async function getGameSession(sessionId: string): Promise<EmojiGameSession | null> {
-  const session = await EmojiGameSessionModel.findOne({ sessionId }).lean();
-  return session;
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!session) return null;
+  return mapToSession(session);
 }
 
 /**
@@ -93,7 +119,7 @@ export function validateAnswer(
       correct: false,
       correctAnswer,
       similarity,
-      feedback: 'You\'re on the right track! Try again.',
+      feedback: "You're on the right track! Try again.",
       score: 0,
       attempts: 1
     };
@@ -164,33 +190,47 @@ export async function updateSessionWithAttempt(
   timeTaken: number,
   score: number
 ): Promise<EmojiGameSession | null> {
-  const session = await EmojiGameSessionModel.findOneAndUpdate(
-    { sessionId },
-    {
-      $push: {
-        attempts: {
-          guess,
-          correct,
-          timestamp: new Date(),
-          timeTaken
-        }
-      },
-      $inc: { score },
-      ...(correct && { completed: true, endTime: new Date() })
-    },
-    { new: true }
-  ).lean();
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!session) return null;
 
-  return session;
+  const state = JSON.parse(session.state || '{}');
+  const attempts = state.attempts || [];
+  attempts.push({
+    guess,
+    correct,
+    timestamp: new Date(),
+    timeTaken
+  });
+  state.attempts = attempts;
+
+  const completed = correct ? true : session.completed;
+  const completedAt = correct ? new Date() : session.completedAt;
+  const newScore = session.score + score;
+
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      state: JSON.stringify(state),
+      completed,
+      completedAt,
+      score: newScore
+    }
+  });
+
+  return mapToSession(updatedSession);
 }
 
 /**
  * Get user's game statistics
  */
 export async function getUserGameStats(userId: string): Promise<EmojiGameStats> {
-  const sessions = await EmojiGameSessionModel.find({ userId, completed: true }).lean();
+  const dbSessions = await prisma.gameSession.findMany({
+    where: { userId, game: 'emoji', completed: true }
+  });
 
-  if (sessions.length === 0) {
+  if (dbSessions.length === 0) {
     return {
       totalPuzzlesSolved: 0,
       averageAttempts: 0,
@@ -203,6 +243,7 @@ export async function getUserGameStats(userId: string): Promise<EmojiGameStats> 
     };
   }
 
+  const sessions = dbSessions.map(mapToSession);
   const totalPuzzlesSolved = sessions.length;
   const totalAttempts = sessions.reduce((sum, s) => sum + s.attempts.length, 0);
   const averageAttempts = totalAttempts / totalPuzzlesSolved;
@@ -219,26 +260,33 @@ export async function getUserGameStats(userId: string): Promise<EmojiGameStats> 
     (sum, s) => sum + s.attempts.filter(a => a.correct).length,
     0
   );
-  const accuracyRate = (correctAttempts / totalAttempts) * 100;
+  const accuracyRate = totalAttempts > 0 ? (correctAttempts / totalAttempts) * 100 : 0;
 
   // Find favorite category
   const categoryCount: Record<string, number> = {};
   sessions.forEach(s => {
-    categoryCount[s.currentPuzzle.category] = (categoryCount[s.currentPuzzle.category] || 0) + 1;
+    if (s.currentPuzzle && s.currentPuzzle.category) {
+      categoryCount[s.currentPuzzle.category] = (categoryCount[s.currentPuzzle.category] || 0) + 1;
+    }
   });
-  const favoriteCategory = Object.keys(categoryCount).reduce((a, b) =>
-    categoryCount[a] > categoryCount[b] ? a : b
-  ) as PuzzleCategory;
+  let favoriteCategory: PuzzleCategory = 'Nature';
+  if (Object.keys(categoryCount).length > 0) {
+    favoriteCategory = Object.keys(categoryCount).reduce((a, b) =>
+      categoryCount[a] > categoryCount[b] ? a : b
+    ) as PuzzleCategory;
+  }
 
   // Find mastered difficulties
   const difficultySuccess: Record<DifficultyLevel, number> = { Easy: 0, Medium: 0, Hard: 0 };
   const difficultyTotal: Record<DifficultyLevel, number> = { Easy: 0, Medium: 0, Hard: 0 };
   sessions.forEach(s => {
-    difficultyTotal[s.difficulty]++;
-    if (s.score >= 80) difficultySuccess[s.difficulty]++;
+    if (s.difficulty && difficultyTotal[s.difficulty] !== undefined) {
+      difficultyTotal[s.difficulty]++;
+      if (s.score >= 80) difficultySuccess[s.difficulty]++;
+    }
   });
   const difficultiesMastered = (Object.keys(difficultySuccess) as DifficultyLevel[]).filter(
-    diff => difficultySuccess[diff] / difficultyTotal[diff] >= 0.7
+    diff => difficultyTotal[diff] > 0 && (difficultySuccess[diff] / difficultyTotal[diff] >= 0.7)
   );
 
   return {
@@ -248,7 +296,7 @@ export async function getUserGameStats(userId: string): Promise<EmojiGameStats> 
     accuracyRate,
     favoriteCategory,
     difficultiesMastered,
-    bestStreak: 0, // TODO: Implement streak calculation
+    bestStreak: 0,
     currentStreak: 0
   };
 }
@@ -257,8 +305,6 @@ export async function getUserGameStats(userId: string): Promise<EmojiGameStats> 
  * Get category statistics
  */
 export async function getCategoryStats(): Promise<CategoryStats[]> {
-  // This would typically aggregate from actual puzzle data
-  // For now, returning empty array as placeholder
   return [];
 }
 
@@ -269,10 +315,13 @@ export async function deleteOldIncompleteSessions(daysOld: number = 7): Promise<
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-  const result = await EmojiGameSessionModel.deleteMany({
-    completed: false,
-    createdAt: { $lt: cutoffDate }
+  const result = await prisma.gameSession.deleteMany({
+    where: {
+      game: 'emoji',
+      completed: false,
+      createdAt: { lt: cutoffDate }
+    }
   });
 
-  return result.deletedCount;
+  return result.count;
 }

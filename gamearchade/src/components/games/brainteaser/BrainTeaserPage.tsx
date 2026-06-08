@@ -488,7 +488,12 @@ const BrainTeaserPage: React.FC<BrainTeaserPageProps> = ({
       {showCompletedModal && (
         <BrainTeaserCompletedModal
           score={totalScore}
-          onClose={() => {
+          timeElapsed={gameTime}
+          onPlayAgain={() => {
+            setShowCompletedModal(false);
+            loadQuestionSequence(difficulty);
+          }}
+          onBackToDashboard={() => {
             setShowCompletedModal(false);
             resetGame();
           }}

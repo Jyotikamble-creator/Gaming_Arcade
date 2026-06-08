@@ -2,8 +2,6 @@
  * Database operations for Reaction Time Game
  */
 
-// TODO: Replace with Prisma ORM
-// import ReactionSessionModel from '@/models/games/reaction-time';
 import { prisma } from '@/lib/api/prisma';
 import type {
   ReactionSession,
@@ -14,31 +12,143 @@ import type {
   ReactionPerformance
 } from '@/types/games/reaction-time';
 
+function mapToSession(dbSession: any): ReactionSession {
+  const state = JSON.parse(dbSession.state || '{}');
+  return {
+    sessionId: dbSession.sessionId,
+    userId: dbSession.userId || undefined,
+    attempts: state.attempts || [],
+    currentAttempt: state.currentAttempt ?? 0,
+    totalAttempts: state.totalAttempts ?? 5,
+    startTime: dbSession.startedAt,
+    endTime: dbSession.completedAt || undefined,
+    averageTime: state.averageTime,
+    bestTime: state.bestTime,
+    worstTime: state.worstTime,
+    consistency: state.consistency,
+    score: dbSession.score,
+    performance: state.performance as ReactionPerformance,
+    difficulty: (dbSession.difficulty || 'medium') as ReactionDifficulty,
+    completed: dbSession.completed,
+    falseStarts: state.falseStarts ?? 0
+  };
+}
+
+function getPerformanceCategory(averageTime: number): ReactionPerformance {
+  if (averageTime <= 180) return 'elite';
+  if (averageTime <= 220) return 'excellent';
+  if (averageTime <= 260) return 'good';
+  if (averageTime <= 320) return 'average';
+  if (averageTime <= 450) return 'belowAverage';
+  return 'slow';
+}
+
+function calculateReactionStatsAndScore(state: any, difficulty: ReactionDifficulty): {
+  averageTime?: number;
+  bestTime?: number;
+  worstTime?: number;
+  consistency?: number;
+  score?: number;
+  performance?: ReactionPerformance;
+  falseStarts: number;
+} {
+  const attempts: ReactionAttempt[] = state.attempts || [];
+  const falseStarts = attempts.filter(a => a.tooEarly).length;
+  const validAttempts = attempts.filter(a => a.valid && !a.tooEarly);
+
+  if (validAttempts.length === 0) {
+    return {
+      averageTime: undefined,
+      bestTime: undefined,
+      worstTime: undefined,
+      consistency: undefined,
+      score: 0,
+      performance: undefined,
+      falseStarts
+    };
+  }
+
+  const times = validAttempts.map(a => a.reactionTime);
+  const bestTime = Math.min(...times);
+  const worstTime = Math.max(...times);
+  const averageTime = Math.round(times.reduce((sum, t) => sum + t, 0) / times.length);
+
+  // Consistency (standard deviation)
+  const mean = averageTime;
+  const squareDiffs = times.map(t => Math.pow(t - mean, 2));
+  const avgSquareDiff = squareDiffs.reduce((sum, d) => sum + d, 0) / times.length;
+  const consistency = Math.round(Math.sqrt(avgSquareDiff));
+
+  // Base score calculation (lower average time = higher score)
+  let baseScore = Math.max(0, 1000 - (averageTime - 100) * 1.5);
+  
+  // Consistency bonus (lower deviation = higher bonus, up to 150 points)
+  const consistencyBonus = Math.max(0, 150 - consistency * 2);
+
+  // Best time bonus
+  let bestTimeBonus = 0;
+  if (bestTime < 180) bestTimeBonus = 100;
+  else if (bestTime < 220) bestTimeBonus = 50;
+
+  // Penalties
+  const penaltyDeduction = falseStarts * 50;
+
+  // Multiplier
+  let multiplier = 1.0;
+  if (difficulty === 'easy') multiplier = 0.8;
+  else if (difficulty === 'hard') multiplier = 1.3;
+  else if (difficulty === 'extreme') multiplier = 1.6;
+
+  const score = Math.round(Math.max(0, (baseScore + consistencyBonus + bestTimeBonus - penaltyDeduction) * multiplier));
+  const performance = getPerformanceCategory(averageTime);
+
+  return {
+    averageTime,
+    bestTime,
+    worstTime,
+    consistency,
+    score,
+    performance,
+    falseStarts
+  };
+}
+
 /**
  * Create a new reaction time session
  */
 export async function createReactionSession(
   sessionData: Omit<ReactionSession, 'attempts' | 'currentAttempt' | 'completed' | 'falseStarts'>
 ): Promise<ReactionSession> {
-  const session = new ReactionSessionModel({
-    ...sessionData,
-    attempts: [],
-    currentAttempt: 0,
-    completed: false,
-    falseStarts: 0
+  const session = await prisma.gameSession.create({
+    data: {
+      userId: sessionData.userId || null,
+      sessionId: sessionData.sessionId,
+      game: 'reaction-time',
+      difficulty: sessionData.difficulty || 'medium',
+      state: JSON.stringify({
+        attempts: [],
+        currentAttempt: 0,
+        totalAttempts: sessionData.totalAttempts || 5,
+        falseStarts: 0
+      }),
+      startedAt: sessionData.startTime || new Date(),
+      completed: false,
+      score: 0
+    }
   });
 
-  await session.save();
-
-  return session.toObject();
+  return mapToSession(session);
 }
 
 /**
  * Get reaction session by ID
  */
 export async function getReactionSession(sessionId: string): Promise<ReactionSession | null> {
-  const session = await ReactionSessionModel.findOne({ sessionId }).lean();
-  return session;
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!session) return null;
+  return mapToSession(session);
 }
 
 /**
@@ -48,35 +158,48 @@ export async function recordAttempt(
   sessionId: string,
   attempt: Omit<ReactionAttempt, 'attemptNumber' | 'timestamp'>
 ): Promise<ReactionSession | null> {
-  const session = await ReactionSessionModel.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) return null;
   if (session.completed) {
     throw new Error('Session already completed');
   }
 
-  // Check if session has reached max attempts
-  if (session.currentAttempt >= session.totalAttempts) {
+  const state = JSON.parse(session.state || '{}');
+  const attempts: ReactionAttempt[] = state.attempts || [];
+  const currentAttempt = state.currentAttempt || 0;
+  const totalAttempts = state.totalAttempts || 5;
+
+  if (currentAttempt >= totalAttempts) {
     throw new Error('Maximum attempts reached');
   }
 
-  // Add attempt
-  session.attempts.push({
-    attemptNumber: session.currentAttempt + 1,
+  const nextAttemptNumber = currentAttempt + 1;
+  attempts.push({
+    attemptNumber: nextAttemptNumber,
     reactionTime: attempt.reactionTime,
     timestamp: new Date(),
     valid: attempt.valid,
     tooEarly: attempt.tooEarly
   });
 
-  session.currentAttempt += 1;
+  state.attempts = attempts;
+  state.currentAttempt = nextAttemptNumber;
 
-  // Recalculate stats
-  session.calculateStats();
+  const stats = calculateReactionStatsAndScore(state, (session.difficulty || 'medium') as ReactionDifficulty);
+  Object.assign(state, stats);
 
-  await session.save();
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      state: JSON.stringify(state),
+      score: stats.score || 0
+    }
+  });
 
-  return session.toObject();
+  return mapToSession(updatedSession);
 }
 
 /**
@@ -85,33 +208,44 @@ export async function recordAttempt(
 export async function completeReactionSession(
   sessionId: string
 ): Promise<ReactionSession | null> {
-  const session = await ReactionSessionModel.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) return null;
-  if (session.completed) return session.toObject();
+  if (session.completed) return mapToSession(session);
 
-  session.completed = true;
-  session.endTime = new Date();
+  const state = JSON.parse(session.state || '{}');
+  const completedAt = new Date();
+  const duration = Math.floor((completedAt.getTime() - session.startedAt.getTime()) / 1000);
 
-  // Calculate final stats and score
-  session.calculateStats();
-  session.calculateScore();
+  const stats = calculateReactionStatsAndScore(state, (session.difficulty || 'medium') as ReactionDifficulty);
+  Object.assign(state, stats);
 
-  await session.save();
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      completed: true,
+      completedAt,
+      duration,
+      score: stats.score || 0,
+      state: JSON.stringify(state)
+    }
+  });
 
-  return session.toObject();
+  return mapToSession(updatedSession);
 }
 
 /**
  * Get user's reaction time statistics
  */
 export async function getUserReactionStats(userId: string): Promise<ReactionStats> {
-  const sessions = await ReactionSessionModel
-    .find({ userId, completed: true })
-    .sort({ startTime: -1 })
-    .lean();
+  const dbSessions = await prisma.gameSession.findMany({
+    where: { userId, game: 'reaction-time', completed: true },
+    orderBy: { startedAt: 'desc' }
+  });
 
-  if (sessions.length === 0) {
+  if (dbSessions.length === 0) {
     return {
       userId,
       totalSessions: 0,
@@ -135,13 +269,13 @@ export async function getUserReactionStats(userId: string): Promise<ReactionStat
     };
   }
 
+  const sessions = dbSessions.map(mapToSession);
   const totalSessions = sessions.length;
   const totalAttempts = sessions.reduce((sum, s) => sum + s.attempts.length, 0);
 
-  // Find overall best time
-  const overallBestTime = Math.min(...sessions.map(s => s.bestTime || Infinity));
+  const validBestTimes = sessions.map(s => s.bestTime || Infinity).filter(t => t !== Infinity);
+  const overallBestTime = validBestTimes.length > 0 ? Math.min(...validBestTimes) : 0;
   
-  // Calculate overall average time
   const allValidTimes: number[] = [];
   sessions.forEach(s => {
     s.attempts.forEach(a => {
@@ -154,11 +288,9 @@ export async function getUserReactionStats(userId: string): Promise<ReactionStat
     ? Math.round(allValidTimes.reduce((sum, t) => sum + t, 0) / allValidTimes.length)
     : 0;
 
-  // Best and average scores
   const bestScore = Math.max(...sessions.map(s => s.score || 0));
   const averageScore = Math.round(sessions.reduce((sum, s) => sum + (s.score || 0), 0) / totalSessions);
 
-  // Performance distribution
   const performanceDistribution: Record<ReactionPerformance, number> = {
     elite: 0,
     excellent: 0,
@@ -168,41 +300,38 @@ export async function getUserReactionStats(userId: string): Promise<ReactionStat
     slow: 0
   };
   sessions.forEach(s => {
-    if (s.performance) {
-      performanceDistribution[s.performance as ReactionPerformance]++;
+    if (s.performance && performanceDistribution[s.performance] !== undefined) {
+      performanceDistribution[s.performance]++;
     }
   });
 
-  // Calculate improvement rate (compare first 5 sessions to last 5 sessions)
   let improvementRate = 0;
   if (sessions.length >= 10) {
-    const firstFive = sessions.slice(-5).map(s => s.averageTime || 0);
-    const lastFive = sessions.slice(0, 5).map(s => s.averageTime || 0);
+    const firstFive = sessions.slice(-5).map(s => s.averageTime || 0).filter(t => t > 0);
+    const lastFive = sessions.slice(0, 5).map(s => s.averageTime || 0).filter(t => t > 0);
     
-    const firstAvg = firstFive.reduce((sum, t) => sum + t, 0) / 5;
-    const lastAvg = lastFive.reduce((sum, t) => sum + t, 0) / 5;
-    
-    improvementRate = Math.round(((firstAvg - lastAvg) / firstAvg) * 100);
+    if (firstFive.length > 0 && lastFive.length > 0) {
+      const firstAvg = firstFive.reduce((sum, t) => sum + t, 0) / firstFive.length;
+      const lastAvg = lastFive.reduce((sum, t) => sum + t, 0) / lastFive.length;
+      improvementRate = Math.round(((firstAvg - lastAvg) / firstAvg) * 100);
+    }
   }
 
-  // Recent sessions
   const recentSessions: ReactionSessionSummary[] = sessions.slice(0, 10).map(s => ({
     sessionId: s.sessionId,
     score: s.score || 0,
     averageTime: s.averageTime || 0,
     bestTime: s.bestTime || 0,
-    performance: s.performance as ReactionPerformance || 'average',
-    difficulty: s.difficulty as ReactionDifficulty,
+    performance: s.performance || 'average',
+    difficulty: s.difficulty,
     completedAt: s.endTime || s.startTime
   }));
 
-  // Average consistency
   const consistencies = sessions.map(s => s.consistency || 0).filter(c => c > 0);
   const averageConsistency = consistencies.length > 0
     ? Math.round(consistencies.reduce((sum, c) => sum + c, 0) / consistencies.length)
     : 0;
 
-  // Total false starts
   const totalFalseStarts = sessions.reduce((sum, s) => sum + (s.falseStarts || 0), 0);
 
   return {
@@ -228,35 +357,48 @@ export async function getRecentReactionSessions(
   userId: string,
   limit: number = 10
 ): Promise<ReactionSessionSummary[]> {
-  const sessions = await ReactionSessionModel
-    .find({ userId, completed: true })
-    .sort({ endTime: -1 })
-    .limit(limit)
-    .lean();
+  const dbSessions = await prisma.gameSession.findMany({
+    where: { userId, game: 'reaction-time', completed: true },
+    orderBy: { completedAt: 'desc' },
+    take: limit
+  });
 
-  return sessions.map(s => ({
-    sessionId: s.sessionId,
-    score: s.score || 0,
-    averageTime: s.averageTime || 0,
-    bestTime: s.bestTime || 0,
-    performance: s.performance as ReactionPerformance || 'average',
-    difficulty: s.difficulty as ReactionDifficulty,
-    completedAt: s.endTime || s.startTime
-  }));
+  return dbSessions.map(s => {
+    const state = JSON.parse(s.state || '{}');
+    return {
+      sessionId: s.sessionId,
+      score: s.score || 0,
+      averageTime: state.averageTime || 0,
+      bestTime: state.bestTime || 0,
+      performance: (state.performance || 'average') as ReactionPerformance,
+      difficulty: (s.difficulty || 'medium') as ReactionDifficulty,
+      completedAt: s.completedAt || s.startedAt
+    };
+  });
 }
 
 /**
  * Get global best times for comparison
  */
 export async function getGlobalBestTimes(limit: number = 100): Promise<number[]> {
-  const sessions = await ReactionSessionModel
-    .find({ completed: true, bestTime: { $exists: true } })
-    .sort({ bestTime: 1 })
-    .limit(limit)
-    .select('bestTime')
-    .lean();
+  const dbSessions = await prisma.gameSession.findMany({
+    where: { game: 'reaction-time', completed: true },
+    take: limit
+  });
 
-  return sessions.map(s => s.bestTime!);
+  const bestTimes = dbSessions
+    .map(s => {
+      try {
+        const state = JSON.parse(s.state || '{}');
+        return state.bestTime || Infinity;
+      } catch (e) {
+        return Infinity;
+      }
+    })
+    .filter(t => t !== Infinity)
+    .sort((a, b) => a - b);
+
+  return bestTimes;
 }
 
 /**
@@ -265,10 +407,13 @@ export async function getGlobalBestTimes(limit: number = 100): Promise<number[]>
 export async function cleanupExpiredSessions(): Promise<number> {
   const expiryTime = new Date(Date.now() - 24 * 60 * 60 * 1000);
   
-  const result = await ReactionSessionModel.deleteMany({
-    completed: false,
-    startTime: { $lt: expiryTime }
+  const result = await prisma.gameSession.deleteMany({
+    where: {
+      game: 'reaction-time',
+      completed: false,
+      startedAt: { lt: expiryTime }
+    }
   });
 
-  return result.deletedCount || 0;
+  return result.count;
 }

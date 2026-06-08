@@ -1,6 +1,5 @@
-// Helper functions for Score and Leaderboard operations
-import { connectDB } from '@/models/db';
-import ScoreModel from '@/models/common/score';
+// Helper functions for Score and Leaderboard operations using Prisma Client
+import { prisma } from '@/lib/api/prisma';
 import { 
   IScore, 
   LeaderboardEntry,
@@ -24,21 +23,24 @@ export async function createScore(
   meta: Record<string, any> = {},
   userId?: string
 ): Promise<IScore> {
-  await connectDB();
+  const newScore = await prisma.score.create({
+    data: {
+      game,
+      score,
+      playerName,
+      meta: JSON.stringify(meta),
+      userId: userId || null,
+    }
+  });
   
-  const scoreData: any = {
-    game,
-    score,
-    playerName,
-    meta,
-  };
-  
-  if (userId) {
-    scoreData.user = userId;
-  }
-  
-  const newScore = await ScoreModel.create(scoreData);
-  return newScore;
+  return {
+    _id: newScore.id,
+    game: newScore.game,
+    playerName: newScore.playerName,
+    score: newScore.score,
+    meta: JSON.parse(newScore.meta),
+    createdAt: newScore.createdAt,
+  } as unknown as IScore;
 }
 
 /**
@@ -48,20 +50,33 @@ export async function getLeaderboard(
   game: string = 'word-guess',
   limit: number = 10
 ): Promise<LeaderboardEntry[]> {
-  await connectDB();
+  const scores = await prisma.score.findMany({
+    where: { game },
+    orderBy: [
+      { score: 'desc' },
+      { createdAt: 'asc' }
+    ],
+    take: limit,
+    include: {
+      user: {
+        select: {
+          username: true,
+          displayName: true
+        }
+      }
+    }
+  });
   
-  const scores = await ScoreModel.find({ game })
-    .sort({ score: -1, createdAt: 1 })
-    .limit(limit)
-    .populate('user', 'username displayName')
-    .lean();
-  
-  // Add ranks
   return scores.map((score, index) => ({
-    ...score,
-    _id: score._id.toString(),
+    _id: score.id,
+    game: score.game,
+    playerName: score.playerName,
+    score: score.score,
+    meta: JSON.parse(score.meta),
+    createdAt: score.createdAt,
     rank: index + 1,
-  } as LeaderboardEntry));
+    user: score.user || undefined,
+  } as unknown as LeaderboardEntry));
 }
 
 /**
@@ -72,19 +87,25 @@ export async function getUserScores(
   game?: string,
   limit: number = 100
 ): Promise<IScore[]> {
-  await connectDB();
-  
-  const query: any = { user: userId };
+  const where: any = { userId };
   if (game) {
-    query.game = game;
+    where.game = game;
   }
   
-  const scores = await ScoreModel.find(query)
-    .sort({ createdAt: -1 })
-    .limit(limit)
-    .lean();
+  const scores = await prisma.score.findMany({
+    where,
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
   
-  return scores;
+  return scores.map(score => ({
+    _id: score.id,
+    game: score.game,
+    playerName: score.playerName,
+    score: score.score,
+    meta: JSON.parse(score.meta),
+    createdAt: score.createdAt,
+  } as unknown as IScore));
 }
 
 /**
@@ -94,17 +115,26 @@ export async function getScoresFiltered(
   filters: ScoreFilterOptions = {},
   pagination: PaginationOptions = {}
 ): Promise<{ scores: IScore[]; total: number }> {
-  await connectDB();
-  
-  const query: any = {};
+  const where: any = {};
   
   // Apply filters
-  if (filters.game) query.game = filters.game;
-  if (filters.playerName) query.playerName = { $regex: filters.playerName, $options: 'i' };
-  if (filters.minScore !== undefined) query.score = { ...query.score, $gte: filters.minScore };
-  if (filters.maxScore !== undefined) query.score = { ...query.score, $lte: filters.maxScore };
-  if (filters.startDate) query.createdAt = { ...query.createdAt, $gte: filters.startDate };
-  if (filters.endDate) query.createdAt = { ...query.createdAt, $lte: filters.endDate };
+  if (filters.game) where.game = filters.game;
+  if (filters.playerName) {
+    where.playerName = {
+      contains: filters.playerName,
+      mode: 'insensitive'
+    };
+  }
+  if (filters.minScore !== undefined || filters.maxScore !== undefined) {
+    where.score = {};
+    if (filters.minScore !== undefined) where.score.gte = filters.minScore;
+    if (filters.maxScore !== undefined) where.score.lte = filters.maxScore;
+  }
+  if (filters.startDate || filters.endDate) {
+    where.createdAt = {};
+    if (filters.startDate) where.createdAt.gte = filters.startDate;
+    if (filters.endDate) where.createdAt.lte = filters.endDate;
+  }
   
   // Pagination
   const page = pagination.page || 1;
@@ -113,24 +143,37 @@ export async function getScoresFiltered(
   
   // Sort
   const sortField = pagination.sortBy || 'score';
-  const sortOrder = pagination.sortOrder === 'asc' ? 1 : -1;
-  const sort: Record<string, 1 | -1> = { [sortField]: sortOrder as 1 | -1 };
+  const sortOrder = pagination.sortOrder === 'asc' ? 'asc' : 'desc';
   
   const [scores, total] = await Promise.all([
-    ScoreModel.find(query).sort(sort).skip(skip).limit(limit).lean().exec(),
-    ScoreModel.countDocuments(query).exec(),
+    prisma.score.findMany({
+      where,
+      orderBy: { [sortField]: sortOrder },
+      skip,
+      take: limit,
+    }),
+    prisma.score.count({ where }),
   ]);
   
-  return { scores, total };
+  const parsedScores = scores.map(score => ({
+    _id: score.id,
+    game: score.game,
+    playerName: score.playerName,
+    score: score.score,
+    meta: JSON.parse(score.meta),
+    createdAt: score.createdAt,
+  } as unknown as IScore));
+  
+  return { scores: parsedScores, total };
 }
 
 /**
  * Get game statistics
  */
 export async function getGameStats(game: string): Promise<GameStats> {
-  await connectDB();
-  
-  const scores = await ScoreModel.find({ game }).lean();
+  const scores = await prisma.score.findMany({
+    where: { game }
+  });
   
   if (scores.length === 0) {
     return {
@@ -147,10 +190,11 @@ export async function getGameStats(game: string): Promise<GameStats> {
   const totalScore = scores.reduce((sum, s) => sum + s.score, 0);
   const highestScore = Math.max(...scores.map(s => s.score));
   
-  const latestScores = await ScoreModel.find({ game })
-    .sort({ createdAt: -1 })
-    .limit(5)
-    .lean();
+  const latestScores = await prisma.score.findMany({
+    where: { game },
+    orderBy: { createdAt: 'desc' },
+    take: 5
+  });
   
   return {
     game,
@@ -159,9 +203,13 @@ export async function getGameStats(game: string): Promise<GameStats> {
     highestScore,
     averageScore: Math.round(totalScore / scores.length),
     latestScores: latestScores.map(s => ({
-      ...s,
-      _id: s._id.toString(),
-    } as LeaderboardEntry)),
+      _id: s.id,
+      game: s.game,
+      playerName: s.playerName,
+      score: s.score,
+      meta: JSON.parse(s.meta),
+      createdAt: s.createdAt,
+    } as unknown as LeaderboardEntry)),
   };
 }
 
@@ -169,9 +217,9 @@ export async function getGameStats(game: string): Promise<GameStats> {
  * Get player statistics across all games
  */
 export async function getPlayerStats(playerName: string): Promise<PlayerStats> {
-  await connectDB();
-  
-  const scores = await ScoreModel.find({ playerName }).lean();
+  const scores = await prisma.score.findMany({
+    where: { playerName }
+  });
   
   if (scores.length === 0) {
     return {
@@ -226,47 +274,43 @@ export async function getTopPlayers(limit: number = 10): Promise<Array<{
   totalScore: number;
   gamesPlayed: number;
 }>> {
-  await connectDB();
+  const aggregations = await prisma.score.groupBy({
+    by: ['playerName'],
+    _sum: {
+      score: true
+    },
+    _count: {
+      id: true
+    },
+    orderBy: {
+      _sum: {
+        score: 'desc'
+      }
+    },
+    take: limit
+  });
   
-  const result = await ScoreModel.aggregate([
-    {
-      $group: {
-        _id: '$playerName',
-        totalScore: { $sum: '$score' },
-        gamesPlayed: { $sum: 1 },
-      },
-    },
-    {
-      $sort: { totalScore: -1 },
-    },
-    {
-      $limit: limit,
-    },
-    {
-      $project: {
-        _id: 0,
-        playerName: '$_id',
-        totalScore: 1,
-        gamesPlayed: 1,
-      },
-    },
-  ]);
-  
-  return result;
+  return aggregations.map(agg => ({
+    playerName: agg.playerName,
+    totalScore: agg._sum.score || 0,
+    gamesPlayed: agg._count.id
+  }));
 }
 
 /**
  * Delete old scores (cleanup utility)
  */
 export async function deleteOldScores(daysOld: number = 90): Promise<number> {
-  await connectDB();
-  
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - daysOld);
   
-  const result = await ScoreModel.deleteMany({
-    createdAt: { $lt: cutoffDate },
+  const result = await prisma.score.deleteMany({
+    where: {
+      createdAt: {
+        lt: cutoffDate
+      }
+    }
   });
   
-  return result.deletedCount;
+  return result.count;
 }

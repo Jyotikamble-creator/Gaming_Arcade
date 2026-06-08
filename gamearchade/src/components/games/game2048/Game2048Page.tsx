@@ -189,7 +189,7 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
       }, 300);
 
       // Check win condition (target tile for the difficulty)
-      if (newBoard.some(row => row.some(cell => cell === diffConfig.winTarget))) {
+      if (newBoard.some(row => row.some(cell => cell === diffConfig.targetTile))) {
         setGameWon(true);
       }
 
@@ -336,7 +336,7 @@ const Game2048Page: React.FC<Game2048PageProps> = ({
           <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-2">
             🎮 2048
           </h1>
-          <p className="text-white/70 text-lg">Combine tiles to reach {diffConfig.winTarget}!</p>
+          <p className="text-white/70 text-lg">Combine tiles to reach {diffConfig.targetTile}!</p>
         </div>
 
         {/* Score and Difficulty Section */}

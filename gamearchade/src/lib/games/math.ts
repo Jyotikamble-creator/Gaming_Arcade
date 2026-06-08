@@ -3,8 +3,6 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-// TODO: Replace with Prisma ORM
-// import MathQuizSessionModel from '@/models/games/math';
 import { prisma } from '@/lib/api/prisma';
 import type {
   MathQuizSession,
@@ -13,8 +11,101 @@ import type {
   QuizConfig,
   MathQuizStats,
   OperationStats,
-  MathOperation
+  MathOperation,
+  UserAnswer
 } from '@/types/games/math';
+
+function mapToSession(dbSession: any): MathQuizSession {
+  const state = JSON.parse(dbSession.state || '{}');
+  let timeLimit: number | undefined;
+  try {
+    const meta = JSON.parse(dbSession.meta || '{}');
+    if (typeof meta.timeLimit === 'number') {
+      timeLimit = meta.timeLimit;
+    }
+  } catch (e) {}
+
+  const questions = state.questions || [];
+  const answers = state.answers || [];
+
+  return {
+    _id: dbSession.id,
+    userId: dbSession.userId || undefined,
+    sessionId: dbSession.sessionId,
+    questions,
+    answers,
+    startTime: dbSession.startedAt,
+    endTime: dbSession.completedAt || undefined,
+    score: dbSession.score,
+    totalQuestions: questions.length,
+    correctAnswers: answers.filter((a: any) => a.isCorrect).length,
+    difficulty: (dbSession.difficulty || 'Easy') as MathDifficultyLevel,
+    timeLimit,
+    completed: dbSession.completed,
+    createdAt: dbSession.createdAt,
+    updatedAt: dbSession.updatedAt
+  };
+}
+
+function addAnswerToSession(
+  state: any,
+  questionId: number,
+  answer: string,
+  timeTaken: number
+): boolean {
+  const questions: MathQuestion[] = state.questions || [];
+  const answers: UserAnswer[] = state.answers || [];
+
+  const question = questions.find(q => q.id === questionId);
+  if (!question) return false;
+
+  const correctAnswer = question.ans;
+  const isCorrect = answer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+
+  // Remove existing answer for this question if any
+  const existingIndex = answers.findIndex(a => a.questionId === questionId);
+  if (existingIndex !== -1) {
+    answers.splice(existingIndex, 1);
+  }
+
+  answers.push({
+    questionId,
+    userAnswer: answer,
+    correctAnswer,
+    isCorrect,
+    timeTaken,
+    timestamp: new Date()
+  });
+
+  state.answers = answers;
+  return isCorrect;
+}
+
+function calculateScore(state: any, difficulty: MathDifficultyLevel): number {
+  const answers: UserAnswer[] = state.answers || [];
+  const correctCount = answers.filter(a => a.isCorrect).length;
+  
+  // BaseScore
+  const baseScore = correctCount * 100;
+  
+  // Time bonus
+  let timeBonus = 0;
+  const correctAnswers = answers.filter(a => a.isCorrect);
+  if (correctAnswers.length > 0) {
+    const avgTime = correctAnswers.reduce((sum, a) => sum + a.timeTaken, 0) / correctAnswers.length;
+    const avgTimeSeconds = avgTime / 1000;
+    if (avgTimeSeconds < 5) {
+      timeBonus = Math.round(correctAnswers.length * (5 - avgTimeSeconds) * 20);
+    }
+  }
+
+  let multiplier = 1;
+  if (difficulty === 'Medium') multiplier = 1.5;
+  else if (difficulty === 'Hard') multiplier = 2;
+  else if (difficulty === 'Expert') multiplier = 2.5;
+
+  return Math.round((baseScore + timeBonus) * multiplier);
+}
 
 /**
  * Create a new math quiz session
@@ -24,29 +115,35 @@ export async function createQuizSession(
   config: QuizConfig,
   userId?: string
 ): Promise<MathQuizSession> {
-  const session = await MathQuizSessionModel.create({
-    userId,
-    sessionId: uuidv4(),
-    questions,
-    answers: [],
-    startTime: new Date(),
-    score: 0,
-    totalQuestions: questions.length,
-    correctAnswers: 0,
-    difficulty: config.difficulty,
-    timeLimit: config.timeLimit,
-    completed: false
+  const session = await prisma.gameSession.create({
+    data: {
+      userId: userId || null,
+      sessionId: uuidv4(),
+      game: 'math',
+      difficulty: config.difficulty,
+      state: JSON.stringify({
+        questions,
+        answers: []
+      }),
+      meta: JSON.stringify({ timeLimit: config.timeLimit }),
+      startedAt: new Date(),
+      completed: false,
+      score: 0
+    }
   });
 
-  return session.toObject();
+  return mapToSession(session);
 }
 
 /**
  * Get a quiz session by session ID
  */
 export async function getQuizSession(sessionId: string): Promise<MathQuizSession | null> {
-  const session = await MathQuizSessionModel.findOne({ sessionId }).lean();
-  return session;
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
+  if (!session) return null;
+  return mapToSession(session);
 }
 
 /**
@@ -58,20 +155,29 @@ export async function submitAnswer(
   answer: string,
   timeTaken: number = 0
 ): Promise<{ correct: boolean; session: MathQuizSession | null }> {
-  const session = await MathQuizSessionModel.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) {
     return { correct: false, session: null };
   }
 
   if (session.completed) {
-    return { correct: false, session: session.toObject() };
+    return { correct: false, session: mapToSession(session) };
   }
 
-  const correct = session.addAnswer(questionId, answer, timeTaken);
-  await session.save();
+  const state = JSON.parse(session.state || '{}');
+  const correct = addAnswerToSession(state, questionId, answer, timeTaken);
 
-  return { correct, session: session.toObject() };
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      state: JSON.stringify(state)
+    }
+  });
+
+  return { correct, session: mapToSession(updatedSession) };
 }
 
 /**
@@ -81,48 +187,64 @@ export async function submitMultipleAnswers(
   sessionId: string,
   answers: { questionId: number; answer: string; timeTaken?: number }[]
 ): Promise<MathQuizSession | null> {
-  const session = await MathQuizSessionModel.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session || session.completed) {
-    return session ? session.toObject() : null;
+    return session ? mapToSession(session) : null;
   }
 
+  const state = JSON.parse(session.state || '{}');
   answers.forEach(({ questionId, answer, timeTaken = 0 }) => {
-    session.addAnswer(questionId, answer, timeTaken);
+    addAnswerToSession(state, questionId, answer, timeTaken);
   });
 
-  await session.save();
-  return session.toObject();
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      state: JSON.stringify(state)
+    }
+  });
+
+  return mapToSession(updatedSession);
 }
 
 /**
  * Complete a quiz session
  */
 export async function completeQuizSession(sessionId: string): Promise<MathQuizSession | null> {
-  const session = await MathQuizSessionModel.findOneAndUpdate(
-    { sessionId },
-    {
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
+
+  if (!session) return null;
+
+  const state = JSON.parse(session.state || '{}');
+  const score = calculateScore(state, (session.difficulty || 'Easy') as MathDifficultyLevel);
+  const completedAt = new Date();
+
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
       completed: true,
-      endTime: new Date()
-    },
-    { new: true }
-  );
+      completedAt,
+      score
+    }
+  });
 
-  if (session) {
-    session.score = session.calculateScore();
-    await session.save();
-  }
-
-  return session ? session.toObject() : null;
+  return mapToSession(updatedSession);
 }
 
 /**
  * Get user's quiz statistics
  */
 export async function getUserQuizStats(userId: string): Promise<MathQuizStats> {
-  const sessions = await MathQuizSessionModel.find({ userId, completed: true }).lean();
+  const dbSessions = await prisma.gameSession.findMany({
+    where: { userId, game: 'math', completed: true }
+  });
 
-  if (sessions.length === 0) {
+  if (dbSessions.length === 0) {
     return {
       totalQuizzesTaken: 0,
       totalQuestionsAnswered: 0,
@@ -139,23 +261,22 @@ export async function getUserQuizStats(userId: string): Promise<MathQuizStats> {
     };
   }
 
+  const sessions = dbSessions.map(mapToSession);
   const totalQuizzesTaken = sessions.length;
   const totalQuestionsAnswered = sessions.reduce((sum, s) => sum + s.totalQuestions, 0);
   const correctAnswers = sessions.reduce((sum, s) => sum + s.correctAnswers, 0);
-  const accuracy = (correctAnswers / totalQuestionsAnswered) * 100;
+  const accuracy = totalQuestionsAnswered > 0 ? (correctAnswers / totalQuestionsAnswered) * 100 : 0;
   const averageScore = sessions.reduce((sum, s) => sum + s.score, 0) / totalQuizzesTaken;
   const bestScore = Math.max(...sessions.map(s => s.score));
 
-  // Calculate average time per question
   const totalTime = sessions.reduce((sum, s) => {
     if (s.endTime) {
       return sum + (s.endTime.getTime() - s.startTime.getTime());
     }
     return sum;
   }, 0);
-  const averageTimePerQuestion = totalTime / totalQuestionsAnswered;
+  const averageTimePerQuestion = totalQuestionsAnswered > 0 ? totalTime / totalQuestionsAnswered : 0;
 
-  // Calculate strengths by operation
   const operationStats: Record<MathOperation, { correct: number; total: number }> = {
     '+': { correct: 0, total: 0 },
     '-': { correct: 0, total: 0 },
@@ -166,7 +287,7 @@ export async function getUserQuizStats(userId: string): Promise<MathQuizStats> {
   sessions.forEach(session => {
     session.answers.forEach(answer => {
       const question = session.questions.find(q => q.id === answer.questionId);
-      if (question?.operation) {
+      if (question?.operation && operationStats[question.operation]) {
         operationStats[question.operation].total += 1;
         if (answer.isCorrect) {
           operationStats[question.operation].correct += 1;
@@ -186,7 +307,6 @@ export async function getUserQuizStats(userId: string): Promise<MathQuizStats> {
     strengthsByOperation[a] > strengthsByOperation[b] ? a : b
   );
 
-  // Calculate mastered difficulties
   const difficultyStats: Record<MathDifficultyLevel, { total: number; avgScore: number }> = {
     Easy: { total: 0, avgScore: 0 },
     Medium: { total: 0, avgScore: 0 },
@@ -195,8 +315,10 @@ export async function getUserQuizStats(userId: string): Promise<MathQuizStats> {
   };
 
   sessions.forEach(session => {
-    difficultyStats[session.difficulty].total += 1;
-    difficultyStats[session.difficulty].avgScore += session.score;
+    if (difficultyStats[session.difficulty]) {
+      difficultyStats[session.difficulty].total += 1;
+      difficultyStats[session.difficulty].avgScore += session.score;
+    }
   });
 
   const difficultiesMastered = (Object.keys(difficultyStats) as MathDifficultyLevel[]).filter(
@@ -217,7 +339,7 @@ export async function getUserQuizStats(userId: string): Promise<MathQuizStats> {
     favoriteOperation,
     strengthsByOperation,
     difficultiesMastered,
-    currentStreak: 0, // TODO: Implement streak calculation
+    currentStreak: 0,
     bestStreak: 0
   };
 }
@@ -226,7 +348,11 @@ export async function getUserQuizStats(userId: string): Promise<MathQuizStats> {
  * Get operation statistics
  */
 export async function getOperationStats(userId: string): Promise<OperationStats[]> {
-  const sessions = await MathQuizSessionModel.find({ userId, completed: true }).lean();
+  const dbSessions = await prisma.gameSession.findMany({
+    where: { userId, game: 'math', completed: true }
+  });
+
+  const sessions = dbSessions.map(mapToSession);
 
   const stats: Record<MathOperation, { total: number; correct: number; totalTime: number }> = {
     '+': { total: 0, correct: 0, totalTime: 0 },
@@ -238,7 +364,7 @@ export async function getOperationStats(userId: string): Promise<OperationStats[
   sessions.forEach(session => {
     session.answers.forEach(answer => {
       const question = session.questions.find(q => q.id === answer.questionId);
-      if (question?.operation) {
+      if (question?.operation && stats[question.operation]) {
         stats[question.operation].total += 1;
         stats[question.operation].totalTime += answer.timeTaken;
         if (answer.isCorrect) {
@@ -268,13 +394,13 @@ export async function getRecentSessions(
   userId: string,
   limit: number = 10
 ): Promise<MathQuizSession[]> {
-  const sessions = await MathQuizSessionModel
-    .find({ userId, completed: true })
-    .sort({ createdAt: -1 })
-    .limit(limit)
-    .lean();
+  const dbSessions = await prisma.gameSession.findMany({
+    where: { userId, game: 'math', completed: true },
+    orderBy: { createdAt: 'desc' },
+    take: limit
+  });
 
-  return sessions;
+  return dbSessions.map(mapToSession);
 }
 
 /**
@@ -284,10 +410,13 @@ export async function deleteOldIncompleteSessions(daysOld: number = 7): Promise<
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-  const result = await MathQuizSessionModel.deleteMany({
-    completed: false,
-    createdAt: { $lt: cutoffDate }
+  const result = await prisma.gameSession.deleteMany({
+    where: {
+      game: 'math',
+      completed: false,
+      createdAt: { lt: cutoffDate }
+    }
   });
 
-  return result.deletedCount;
+  return result.count;
 }

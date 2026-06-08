@@ -1,6 +1,4 @@
 // Tower Stacker Game Core Logic
-// TODO: Replace with Prisma ORM
-// import { TowerStackerSession } from "@/models/games/tower-stacker";
 import { prisma } from '@/lib/api/prisma';
 import { 
   generateTowerStackerColors,
@@ -8,6 +6,19 @@ import {
   validateDrop,
   formatTowerStackerScore
 } from "@/utility/games/tower-stacker";
+import type {
+  TowerStackerGameConfiguration,
+  TowerStackerBlock,
+  TowerStackerMove,
+  TowerStackerGameSession,
+  TowerStackerSessionRequest,
+  TowerStackerValidation,
+  TowerStackerScoreResult,
+  TowerStackerRating,
+  TowerStackerAchievement,
+  TowerStackerPerformanceMetrics,
+  TowerStackerScoreCalculation
+} from '@/types/games/tower-stacker';
 
 // Default game configuration
 const DEFAULT_CONFIG: TowerStackerGameConfiguration = {
@@ -29,6 +40,46 @@ const DEFAULT_CONFIG: TowerStackerGameConfiguration = {
   }
 };
 
+function mapToSession(dbSession: any): TowerStackerGameSession {
+  const state = JSON.parse(dbSession.state || '{}');
+  return {
+    sessionId: dbSession.sessionId,
+    userId: dbSession.userId || '',
+    currentLevel: state.currentLevel ?? 1,
+    maxLevel: state.maxLevel ?? 1,
+    perfectDrops: state.perfectDrops ?? 0,
+    totalDrops: state.totalDrops ?? 0,
+    score: dbSession.score,
+    gameState: (state.gameState || (dbSession.completed ? 'completed' : 'playing')) as 'playing' | 'completed' | 'failed',
+    tower: state.tower || [],
+    moves: state.moves || [],
+    startTime: dbSession.startedAt,
+    endTime: dbSession.completedAt || undefined,
+    totalTime: dbSession.duration || state.totalTime || 0,
+    averageAccuracy: state.averageAccuracy || 0,
+    bestStreak: state.bestStreak || 0,
+    currentStreak: state.currentStreak || 0
+  };
+}
+
+function addMoveToSession(sessionState: any, move: TowerStackerMove) {
+  const moves: TowerStackerMove[] = sessionState.moves || [];
+  moves.push(move);
+  sessionState.moves = moves;
+
+  sessionState.totalDrops = (sessionState.totalDrops || 0) + 1;
+  if (move.perfectDrop) {
+    sessionState.perfectDrops = (sessionState.perfectDrops || 0) + 1;
+    sessionState.currentStreak = (sessionState.currentStreak || 0) + 1;
+    sessionState.bestStreak = Math.max(sessionState.bestStreak || 0, sessionState.currentStreak);
+  } else {
+    sessionState.currentStreak = 0;
+  }
+
+  const totalAccuracy = moves.reduce((sum, m) => sum + m.accuracy, 0);
+  sessionState.averageAccuracy = totalAccuracy / moves.length;
+}
+
 /**
  * Create a new Tower Stacker game session
  */
@@ -42,18 +93,14 @@ export async function createTowerStackerSession(
   // Generate initial block
   const initialBlock = generateInitialBlock(1, config);
   
-  const session: TowerStackerGameSession = {
-    sessionId: `ts_${userId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    userId,
+  const state = {
     currentLevel: 1,
     maxLevel: 1,
     perfectDrops: 0,
     totalDrops: 0,
-    score: 0,
     gameState: 'playing',
     tower: [initialBlock],
     moves: [],
-    startTime: new Date(),
     totalTime: 0,
     averageAccuracy: 0,
     bestStreak: 0,
@@ -61,10 +108,20 @@ export async function createTowerStackerSession(
   };
   
   // Save to database
-  const sessionDoc = new TowerStackerSession(session);
-  await sessionDoc.save();
+  const session = await prisma.gameSession.create({
+    data: {
+      userId: userId || null,
+      sessionId: `ts_${userId || 'guest'}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      game: 'tower-stacker',
+      difficulty,
+      state: JSON.stringify(state),
+      startedAt: new Date(),
+      completed: false,
+      score: 0
+    }
+  });
   
-  return sessionDoc.toObject();
+  return mapToSession(session);
 }
 
 /**
@@ -139,25 +196,29 @@ export async function processBlockDrop(
   gameOver?: boolean;
   session: TowerStackerGameSession;
 }> {
-  const session = await TowerStackerSession.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) {
     throw new Error("Session not found");
   }
   
-  if (session.gameState !== 'playing') {
+  const state = JSON.parse(session.state || '{}');
+  if (state.gameState !== 'playing') {
     throw new Error("Game is not active");
   }
   
-  const currentBlock = session.tower[session.tower.length - 1];
-  const previousBlock = session.tower.length > 1 ? session.tower[session.tower.length - 2] : null;
+  const tower = state.tower || [];
+  const currentBlock = tower[tower.length - 1];
+  const previousBlock = tower.length > 1 ? tower[tower.length - 2] : null;
   
   // Validate the drop
   const validation = validateDrop(currentBlock, previousBlock, dropPosition);
   
   // Create move record
   const move: TowerStackerMove = {
-    level: session.currentLevel,
+    level: state.currentLevel || 1,
     dropPosition,
     targetPosition: previousBlock?.position || 0,
     accuracy: validation.accuracy,
@@ -168,41 +229,81 @@ export async function processBlockDrop(
   };
   
   // Update session
-  await session.addMove(move);
+  addMoveToSession(state, move);
   
   let result: any = {
     success: true,
-    validation,
-    session: session.toObject()
+    validation
   };
   
+  let completed = session.completed;
+  let completedAt = session.completedAt;
+  let score = session.score;
+
   // Check if game should continue
   if (validation.canContinue) {
-    // Update current block width
+    // Update current block width & position
     currentBlock.width = validation.newWidth;
     currentBlock.position = dropPosition;
     
     // Check if reached max level (20)
-    if (session.currentLevel >= 20) {
-      await session.completeGame();
+    if (state.currentLevel >= 20) {
+      state.gameState = 'completed';
+      completed = true;
+      completedAt = new Date();
+      
+      const duration = Math.floor((completedAt.getTime() - session.startedAt.getTime()) / 1000);
+      const scoreResult = await calculateTowerStackerScore({
+        level: state.currentLevel,
+        perfectDrops: state.perfectDrops,
+        totalDrops: state.totalDrops,
+        averageAccuracy: state.averageAccuracy,
+        completionTime: duration,
+        userId: session.userId || undefined
+      });
+      score = scoreResult.score;
       result.gameComplete = true;
     } else {
       // Generate next block
-      session.currentLevel += 1;
-      session.maxLevel = Math.max(session.maxLevel, session.currentLevel);
+      state.currentLevel = (state.currentLevel || 1) + 1;
+      state.maxLevel = Math.max(state.maxLevel || 1, state.currentLevel);
       
-      const nextBlock = generateNextBlock(session.currentLevel, currentBlock, DEFAULT_CONFIG);
-      session.tower.push(nextBlock);
+      const nextBlock = generateNextBlock(state.currentLevel, currentBlock, DEFAULT_CONFIG);
+      tower.push(nextBlock);
       
       result.newBlock = nextBlock;
     }
-    
-    await session.save();
   } else {
-    // Game over - block too small to continue
-    await session.failGame();
+    // Game over - block too small to continue or missed previous block
+    state.gameState = 'failed';
+    completed = true;
+    completedAt = new Date();
+    
+    const duration = Math.floor((completedAt.getTime() - session.startedAt.getTime()) / 1000);
+    const scoreResult = await calculateTowerStackerScore({
+      level: state.currentLevel,
+      perfectDrops: state.perfectDrops,
+      totalDrops: state.totalDrops,
+      averageAccuracy: state.averageAccuracy,
+      completionTime: duration,
+      userId: session.userId || undefined
+    });
+    score = scoreResult.score;
     result.gameOver = true;
   }
+  
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      state: JSON.stringify(state),
+      completed,
+      completedAt,
+      score,
+      duration: completedAt ? Math.floor((completedAt.getTime() - session.startedAt.getTime()) / 1000) : undefined
+    }
+  });
+
+  result.session = mapToSession(updatedSession);
   
   return result;
 }
@@ -221,7 +322,7 @@ export async function calculateTowerStackerScore(params: {
   const { level, perfectDrops, totalDrops, averageAccuracy, completionTime, userId } = params;
   
   // Base score calculation
-  let baseScore = level * 10;
+  const baseScore = level * 10;
   
   // Perfect drops bonus (20 points each)
   const perfectDropsBonus = perfectDrops * 20;
@@ -241,18 +342,17 @@ export async function calculateTowerStackerScore(params: {
     completionBonus = 50;
   }
   
-  // Speed bonus (if completion time provided)
+  // Speed bonus
   let speedBonus = 0;
   if (completionTime && level >= 20) {
-    // Bonus for completing quickly (under 2 minutes = 120 seconds)
-    const targetTime = 120; // 2 minutes
+    const targetTime = 120;
     if (completionTime < targetTime) {
-      speedBonus = Math.floor((targetTime - completionTime) / 2); // 0.5 points per second saved
+      speedBonus = Math.floor((targetTime - completionTime) / 2);
     }
   }
   
   // Streak bonus
-  const streakBonus = Math.floor(perfectDrops * 1.5); // Bonus for consecutive perfect drops
+  const streakBonus = Math.floor(perfectDrops * 1.5);
   
   // Total score calculation
   const totalScore = baseScore + perfectDropsBonus + accuracyBonus + completionBonus + speedBonus + streakBonus;
@@ -295,32 +395,26 @@ export function getTowerStackerRating(
   perfectDrops: number = 0, 
   averageAccuracy: number = 0
 ): TowerStackerRating {
-  // Perfect game
   if (level >= 20 && perfectDrops >= 18 && averageAccuracy >= 0.95) {
     return 'Perfect Architect';
   }
   
-  // Complete game
   if (level >= 20) {
     return 'Tower Master';
   }
   
-  // High performance
   if (level >= 15 && averageAccuracy >= 0.8) {
     return 'Sky Scraper Builder';
   }
   
-  // Good performance
   if (level >= 15 || (level >= 10 && averageAccuracy >= 0.85)) {
     return 'Excellent';
   }
   
-  // Decent performance
   if (level >= 10 || (level >= 5 && averageAccuracy >= 0.8)) {
     return 'Great';
   }
   
-  // Basic performance
   if (level >= 5 || averageAccuracy >= 0.7) {
     return 'Good';
   }
@@ -379,10 +473,9 @@ export async function checkTowerStackerAchievements(
   },
   userId?: string
 ): Promise<TowerStackerAchievement[]> {
-  const { level, perfectDrops, totalDrops, averageAccuracy } = params;
+  const { level, perfectDrops, averageAccuracy } = params;
   const achievements: TowerStackerAchievement[] = [];
   
-  // Define achievements
   const achievementDefinitions = [
     {
       id: 'first_tower',
@@ -442,7 +535,6 @@ export async function checkTowerStackerAchievements(
     }
   ];
   
-  // Check each achievement
   for (const def of achievementDefinitions) {
     if (def.check()) {
       achievements.push({
@@ -463,33 +555,27 @@ export async function checkTowerStackerAchievements(
  * Calculate performance metrics
  */
 export function calculatePerformanceMetrics(session: TowerStackerGameSession): TowerStackerPerformanceMetrics {
-  const { moves, perfectDrops, totalDrops, averageAccuracy, bestStreak, maxLevel } = session;
+  const { moves, perfectDrops, totalDrops, averageAccuracy, maxLevel } = session;
   
-  // Reaction time (average time to drop)
   const reactionTime = moves.length > 0 
     ? moves.reduce((sum, move) => sum + move.timeTaken, 0) / moves.length 
     : 0;
   
-  // Precision (accuracy)
   const precision = averageAccuracy;
   
-  // Consistency (standard deviation of accuracy)
   let consistency = 1.0;
   if (moves.length > 1) {
     const accuracyValues = moves.map(m => m.accuracy);
     const mean = accuracyValues.reduce((a, b) => a + b, 0) / accuracyValues.length;
     const variance = accuracyValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / accuracyValues.length;
     const stdDev = Math.sqrt(variance);
-    consistency = Math.max(0, 1 - stdDev); // Lower deviation = higher consistency
+    consistency = Math.max(0, 1 - stdDev);
   }
   
-  // Progression (level reached / max possible)
   const progression = maxLevel / 20;
   
-  // Efficiency (perfect drops / total drops)
   const efficiency = totalDrops > 0 ? perfectDrops / totalDrops : 0;
   
-  // Overall rating (weighted average)
   const overallRating = (
     precision * 0.3 +
     consistency * 0.2 +

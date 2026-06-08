@@ -29,9 +29,10 @@ export function generateSudokuPuzzle(request: SudokuPuzzleRequest = {}): ISudoku
   const { difficulty = 'medium', seed } = request;
   const params = getDifficultyParams(difficulty);
   
+  const originalRandom = Math.random;
   // Set random seed if provided for reproducible puzzles
   if (seed !== undefined) {
-    Math.seedrandom = createSeededRandom(seed);
+    Math.random = createSeededRandom(seed);
   }
 
   // Generate complete board
@@ -41,6 +42,11 @@ export function generateSudokuPuzzle(request: SudokuPuzzleRequest = {}): ISudoku
   const puzzle = createPuzzle(solution, params);
   
   const puzzleId = generateUniqueId();
+
+  // Restore Math.random
+  if (seed !== undefined) {
+    Math.random = originalRandom;
+  }
 
   return {
     puzzle,

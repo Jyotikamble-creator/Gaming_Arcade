@@ -4,7 +4,9 @@ import {
   WordBuilderGameMode,
   WordBuilderChallenge,
   WordBuilderLetter,
-  WordBuilderCurrentWordLetter
+  WordBuilderCurrentWordLetter,
+  WordBuilderLetterTile,
+  WORD_BUILDER_CONSTANTS
 } from '@/types/games/word-builder';
 
 // Specific word challenges for the classic game
@@ -148,7 +150,12 @@ export function getRemainingLetters(
  * Calculate letter values based on Scrabble-like scoring
  */
 export function calculateLetterValue(letter: string): number {
-  return WORD_BUILDER_CONSTANTS.SCORING.LETTER_VALUES[letter.toUpperCase()] || 1;
+  const upper = letter.toUpperCase();
+  const values = WORD_BUILDER_CONSTANTS.SCORING.LETTER_VALUES;
+  if (upper in values) {
+    return values[upper as keyof typeof values];
+  }
+  return 1;
 }
 
 /**

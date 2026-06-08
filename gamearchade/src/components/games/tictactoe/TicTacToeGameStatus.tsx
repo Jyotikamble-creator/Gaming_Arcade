@@ -3,7 +3,7 @@ import React from 'react';
 import { TicTacToeGameStatusProps } from '@/types/games/tic-tac-toe';
 import { getPlayerColor, getWinnerMessage } from '@/utility/games/tic-tac-toe';
 
-export default function TicTacToeGameStatus({ winner }: TicTacToeGameStatusProps): JSX.Element | null {
+export default function TicTacToeGameStatus({ winner }: TicTacToeGameStatusProps): React.ReactNode {
   if (!winner) return null;
   
   // Render the game status

@@ -200,7 +200,7 @@ const NumberMazePage: React.FC<NumberMazePageProps> = ({
     const newJ = currentJ + dj;
 
     // Check bounds
-    if (newI < 0 || newI >= GRID_SIZE || newJ < 0 || newJ >= GRID_SIZE) {
+    if (newI < 0 || newI >= gridSize || newJ < 0 || newJ >= gridSize) {
       return;
     }
 
@@ -233,7 +233,7 @@ const NumberMazePage: React.FC<NumberMazePageProps> = ({
           time: timeElapsed + 1,
           target: targetNumber,
           finalSum: newSum,
-          gridSize: GRID_SIZE
+          gridSize: gridSize
         }
       });
       console.log('[NUMBER_MAZE] Number Maze completed', {

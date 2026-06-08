@@ -3,7 +3,9 @@ import {
   WhackGameSession, 
   WhackAPIResponse, 
   WhackStartRequest,
-  WhackGameConfiguration 
+  WhackGameConfiguration,
+  WhackDifficulty,
+  WhackGameMode
 } from "@/types/games/whack-a-mole";
 import { createWhackGameSession, getWhackGameConfiguration } from "@/lib/games/whack-a-mole";
 
@@ -12,8 +14,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId") || "guest";
-    const gameMode = (searchParams.get("gameMode") as any) || "classic";
-    const difficulty = (searchParams.get("difficulty") as any) || "normal";
+    const gameMode = (searchParams.get("gameMode") || "classic") as WhackGameMode;
+    const difficulty = (searchParams.get("difficulty") || "normal") as WhackDifficulty;
 
     // Get game configuration
     const config = getWhackGameConfiguration();

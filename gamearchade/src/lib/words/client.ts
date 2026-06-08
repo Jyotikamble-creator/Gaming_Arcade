@@ -55,7 +55,7 @@ export class WordApiClient {
 
       // Create cache key for performance
       const cacheKey = this.getCacheKey('fetchWords', { game, ...params });
-      const cached = this.getFromCache(cacheKey);
+      const cached = this.getFromCache<IWord[]>(cacheKey);
       if (cached) {
         logger.debug("Words fetched from cache", { game, count: cached.length }, LogTags.WORD_GUESS);
         return cached;
@@ -242,8 +242,8 @@ export class WordApiClient {
           "Word search completed",
           { 
             query: params.query,
-            results: response.data.totalResults,
-            searchTime: response.data.searchTime
+            results: response.data.total,
+            searchTime: (response.data as any).searchTime
           }
         );
         return response.data;
@@ -406,8 +406,8 @@ export class WordApiClient {
           "Word analytics fetched",
           { 
             wordId,
-            word: response.data.word,
-            successRate: response.data.usage.successRate
+            word: (response.data as any).word,
+            successRate: (response.data as any).usage?.successRate
           }
         );
         return response.data;
@@ -461,7 +461,7 @@ export class WordApiClient {
    */
   async importWords(importData: WordImportData): Promise<{ success: boolean; imported: number; errors: string[] }> {
     try {
-      logger.info("Importing words", { count: importData.words.length, format: importData.format });
+      logger.info("Importing words", { count: (importData as any).words?.length || (Array.isArray(importData.data) ? importData.data.length : 0), format: importData.format });
 
       const response = await apiClient.post<{ success: boolean; imported: number; errors: string[] }>(
         `${this.wordsUrl}/import`,

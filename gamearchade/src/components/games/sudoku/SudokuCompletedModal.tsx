@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 // Component to display a modal when Sudoku puzzle is completed
 import React, { useEffect, useRef } from 'react';
@@ -15,7 +15,7 @@ const SudokuCompletedModal: React.FC<SudokuCompletedModalProps> = ({
   onClose,
   onNewGame
 }) => {
-  const modalRef = useRef(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Focus the modal when it's opened
   useEffect(() => {

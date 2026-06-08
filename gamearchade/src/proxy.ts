@@ -3,10 +3,10 @@ import type { NextRequest } from 'next/server';
 import { handleCorsPreFlight, applyCorsHeaders } from '@/lib/security/cors';
 
 /**
- * Security Middleware for Next.js App Router
+ * Security Proxy for Next.js App Router
  * Handles CORS, security headers, and rate limiting
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Handle CORS preflight requests
   const corsPreflightResponse = handleCorsPreFlight(request);
   if (corsPreflightResponse) {
@@ -26,10 +26,10 @@ export function middleware(request: NextRequest) {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   
-  // Strict CSP (adjust as needed for your app)
+  // Strict CSP (allow ws: and wss: in dev for Fast Refresh)
   response.headers.set(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' ws: wss:;"
   );
 
   // HSTS header (only in production)
@@ -44,14 +44,13 @@ export function middleware(request: NextRequest) {
 }
 
 /**
- * Configure which routes the middleware should run on
+ * Configure which routes the proxy should run on
  */
 export const config = {
   matcher: [
     // API routes
     '/api/:path*',
     // Public pages
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next|favicon.ico).*)',
   ],
 };
-

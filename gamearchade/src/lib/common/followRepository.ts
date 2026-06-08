@@ -1,7 +1,5 @@
-// Follow repository — advanced follow-relationship utilities
-import Follow from '@/models/common/Follow';
-import User from '@/models/auth/auth';
-import { connectDB } from '@/models/db';
+// Follow repository — advanced follow-relationship utilities using Prisma Client
+import { prisma } from '@/lib/api/prisma';
 
 /**
  * Check if userA follows userB.
@@ -10,8 +8,14 @@ export async function isFollowing(
   followerId: string,
   followingId: string
 ): Promise<boolean> {
-  await connectDB();
-  const follow = await Follow.findOne({ follower: followerId, following: followingId });
+  const follow = await prisma.follow.findUnique({
+    where: {
+      followerId_followingId: {
+        followerId,
+        followingId
+      }
+    }
+  });
   return !!follow;
 }
 
@@ -23,12 +27,14 @@ export async function bulkIsFollowing(
   viewerId: string,
   userIds: string[]
 ): Promise<Set<string>> {
-  await connectDB();
-  const follows = await Follow.find({
-    follower: viewerId,
-    following: { $in: userIds },
-  }).select('following');
-  return new Set(follows.map((f) => f.following.toString()));
+  const follows = await prisma.follow.findMany({
+    where: {
+      followerId: viewerId,
+      followingId: { in: userIds },
+    },
+    select: { followingId: true }
+  });
+  return new Set(follows.map((f) => f.followingId));
 }
 
 /**
@@ -38,14 +44,19 @@ export async function getMutualFollowers(
   userIdA: string,
   userIdB: string
 ): Promise<string[]> {
-  await connectDB();
   const [followersA, followersB] = await Promise.all([
-    Follow.find({ following: userIdA }).select('follower'),
-    Follow.find({ following: userIdB }).select('follower'),
+    prisma.follow.findMany({
+      where: { followingId: userIdA },
+      select: { followerId: true }
+    }),
+    prisma.follow.findMany({
+      where: { followingId: userIdB },
+      select: { followerId: true }
+    }),
   ]);
-  const setA = new Set(followersA.map((f) => f.follower.toString()));
+  const setA = new Set(followersA.map((f) => f.followerId));
   return followersB
-    .map((f) => f.follower.toString())
+    .map((f) => f.followerId)
     .filter((id) => setA.has(id));
 }
 
@@ -53,27 +64,38 @@ export async function getMutualFollowers(
  * Suggest users to follow — second-degree connections not already followed.
  */
 export async function getFollowSuggestions(userId: string, limit = 5) {
-  await connectDB();
-
   // IDs I already follow
-  const myFollowing = await Follow.find({ follower: userId }).select('following');
-  const followingIds = myFollowing.map((f) => f.following);
+  const myFollowing = await prisma.follow.findMany({
+    where: { followerId: userId },
+    select: { followingId: true }
+  });
+  const followingIds = myFollowing.map((f) => f.followingId);
 
-  // Second-degree: users followed by people I follow, excluding myself
-  const secondDegree = await Follow.find({
-    follower: { $in: followingIds },
-    following: { $nin: [...followingIds, userId] },
-  })
-    .select('following')
-    .limit(limit * 3);
+  // Second-degree: users followed by people I follow, excluding myself and those I already follow
+  const secondDegree = await prisma.follow.findMany({
+    where: {
+      followerId: { in: followingIds },
+      followingId: { notIn: [...followingIds, userId] },
+    },
+    select: { followingId: true },
+    take: limit * 3
+  });
 
   const candidateIds = [
-    ...new Set(secondDegree.map((f) => f.following.toString())),
+    ...new Set(secondDegree.map((f) => f.followingId)),
   ].slice(0, limit);
 
-  return User.find({ _id: { $in: candidateIds } })
-    .select('_id email displayName username avatar stats')
-    .lean();
+  return prisma.user.findMany({
+    where: { id: { in: candidateIds } },
+    select: {
+      id: true,
+      email: true,
+      displayName: true,
+      username: true,
+      avatar: true,
+      stats: true,
+    }
+  });
 }
 
 /**
@@ -81,14 +103,31 @@ export async function getFollowSuggestions(userId: string, limit = 5) {
  * (follows made by people the user follows).
  */
 export async function getFollowActivity(userId: string, limit = 20) {
-  await connectDB();
+  const myFollowing = await prisma.follow.findMany({
+    where: { followerId: userId },
+    select: { followingId: true }
+  });
+  const followingIds = myFollowing.map((f) => f.followingId);
 
-  const myFollowing = await Follow.find({ follower: userId }).select('following');
-  const followingIds = myFollowing.map((f) => f.following);
-
-  return Follow.find({ follower: { $in: followingIds } })
-    .populate('follower', 'displayName username avatar')
-    .populate('following', 'displayName username avatar')
-    .sort({ createdAt: -1 })
-    .limit(limit);
+  return prisma.follow.findMany({
+    where: { followerId: { in: followingIds } },
+    include: {
+      follower: {
+        select: {
+          displayName: true,
+          username: true,
+          avatar: true,
+        }
+      },
+      following: {
+        select: {
+          displayName: true,
+          username: true,
+          avatar: true,
+        }
+      }
+    },
+    orderBy: { createdAt: 'desc' },
+    take: limit
+  });
 }

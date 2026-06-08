@@ -389,7 +389,7 @@ const WordScrambleGamePage: React.FC<WordScramblePageProps> = ({
 
           {/* Answer Display */}
           {showAnswer && (
-            <WordScrambleAnswer word={wordData.word} />
+            <WordScrambleAnswer word={wordData.word} show={showAnswer} />
           )}
 
           {/* Input */}
@@ -455,10 +455,21 @@ const WordScrambleGamePage: React.FC<WordScramblePageProps> = ({
       {/* Completed Modal */}
       {showCompletedModal && (
         <WordScrambleCompletedModal 
+          isOpen={showCompletedModal}
+          isCorrect={correct}
           score={totalScore}
+          word={wordData?.word || ''}
+          scrambled={wordData?.scrambled || ''}
+          attempts={attempts}
+          guess={guess}
+          gameTime={gameTime}
           onClose={() => {
             setShowCompletedModal(false);
             resetGame();
+          }}
+          onNewGame={() => {
+            setShowCompletedModal(false);
+            loadWordSequence(difficulty);
           }}
         />
       )}

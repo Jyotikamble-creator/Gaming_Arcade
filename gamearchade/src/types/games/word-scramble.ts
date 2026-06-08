@@ -4,7 +4,7 @@ export type WordScrambleDifficulty = 'easy' | 'medium' | 'hard' | 'expert' | 'in
 
 export type WordScrambleGameMode = 'classic' | 'timed' | 'streak' | 'marathon' | 'blitz' | 'zen';
 
-export type WordGuessStatus = 'correct' | 'incorrect' | 'too_short' | 'invalid_chars' | 'already_guessed';
+export type WordGuessStatus = 'correct' | 'incorrect' | 'too_short' | 'invalid_chars' | 'already_guessed' | 'game_over';
 
 export type WordScrambleCategory = 'programming' | 'science' | 'animals' | 'countries' | 'technology' | 'general' | 'mixed';
 
@@ -64,6 +64,19 @@ export interface WordScrambleAnswerProps {
   attempts?: number;
 }
 
+export interface WordScrambleCompletedModalProps {
+  isOpen: boolean;
+  isCorrect: boolean;
+  score: number;
+  word: string;
+  scrambled: string;
+  attempts: number;
+  guess: string;
+  gameTime?: number;
+  onClose: () => void;
+  onNewGame: () => void;
+}
+
 // Hook Return Type
 export interface UseWordScrambleReturn {
   gameState: WordScrambleGameState;
@@ -103,9 +116,10 @@ export interface WordScrambleAttempt {
   isCorrect: boolean;
   reactionTime: number;
   hintsUsed: number;
-  score: number;
+  score?: number;
   timestamp: Date;
-  attemptsCount: number;
+  attemptsCount?: number;
+  wordId?: number;
 }
 
 export interface WordScramblePowerUp {

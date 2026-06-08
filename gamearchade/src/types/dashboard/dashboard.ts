@@ -342,48 +342,4 @@ export interface DashboardPageSearchParams {
   page?: string;
   view?: DashboardLayout;
 }
-
-/**
- * Export all types
- */
-export type {
-  // Core interfaces
-  GameConfig,
-  DashboardConfig,
-  DashboardPageProps,
-  DashboardComponentProps,
-  GameCardProps,
-  
-  // Filter and sorting
-  DashboardFilters,
-  DashboardSorting,
-  DashboardSortField,
-  
-  // State management
-  DashboardState,
-  DashboardError,
-  DashboardErrorType,
-  
-  // User data
-  DashboardUserStats,
-  DashboardAnalytics,
-  
-  // Hooks
-  UseDashboardReturn,
-  
-  // Configuration
-  GameNavigationConfig,
-  DashboardTheme,
-  DashboardBreakpoints,
-  DashboardAccessibility,
-  
-  // Next.js specific
-  DashboardPageParams,
-  DashboardPageSearchParams,
-  
-  // Enums
-  GameColor,
-  GameCategory,
-  GameDifficulty,
-  DashboardLayout
-};
+

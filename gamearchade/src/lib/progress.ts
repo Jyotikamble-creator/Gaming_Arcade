@@ -1,8 +1,8 @@
 /**
- * Game logic and database operations for User Progress
+ * Game logic and database operations for User Progress using Prisma Client
  */
 
-import ScoreModel from '@/models/common/score';
+import { prisma } from '@/lib/api/prisma';
 import type {
   UserProgress,
   GameStats,
@@ -24,11 +24,11 @@ export async function getUserProgress(
   limit: number = 100
 ): Promise<UserProgress> {
   // Fetch user's scores
-  const scores = await ScoreModel
-    .find({ user: userId })
-    .sort({ createdAt: -1 })
-    .limit(limit)
-    .lean();
+  const scores = await prisma.score.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
 
   if (scores.length === 0) {
     return {
@@ -59,7 +59,7 @@ export async function getUserProgress(
     game: s.game as GameType,
     score: s.score,
     createdAt: s.createdAt,
-    _id: s._id?.toString()
+    _id: s.id
   }));
 
   return {
@@ -76,10 +76,10 @@ export async function getUserProgress(
  * Get detailed game statistics
  */
 export async function getGameStats(userId: string): Promise<GameStats[]> {
-  const scores = await ScoreModel
-    .find({ user: userId })
-    .sort({ createdAt: -1 })
-    .lean();
+  const scores = await prisma.score.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  });
 
   if (scores.length === 0) return [];
 
@@ -115,10 +115,10 @@ export async function getGameStats(userId: string): Promise<GameStats[]> {
  * Get user's streak information
  */
 export async function getStreakInfo(userId: string): Promise<StreakInfo> {
-  const scores = await ScoreModel
-    .find({ user: userId })
-    .sort({ createdAt: -1 })
-    .lean();
+  const scores = await prisma.score.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  });
 
   if (scores.length === 0) {
     return {
@@ -219,13 +219,13 @@ export async function getProgressOverTime(
       startDate = new Date(0); // All time
   }
 
-  const scores = await ScoreModel
-    .find({
-      user: userId,
-      createdAt: { $gte: startDate }
-    })
-    .sort({ createdAt: 1 })
-    .lean();
+  const scores = await prisma.score.findMany({
+    where: {
+      userId,
+      createdAt: { gte: startDate }
+    },
+    orderBy: { createdAt: 'asc' },
+  });
 
   // Group by date
   const dateGroups: Record<string, typeof scores> = {};
@@ -257,10 +257,10 @@ export async function getProgressOverTime(
  * Get summary statistics
  */
 export async function getSummaryStats(userId: string): Promise<SummaryStats> {
-  const scores = await ScoreModel
-    .find({ user: userId })
-    .sort({ createdAt: -1 })
-    .lean();
+  const scores = await prisma.score.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  });
 
   if (scores.length === 0) {
     return {
@@ -363,18 +363,18 @@ export function calculateUserRank(totalGamesPlayed: number, totalScore: number):
 export async function getRecentActivity(userId: string, days: number = 30): Promise<RecentScore[]> {
   const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
-  const scores = await ScoreModel
-    .find({
-      user: userId,
-      createdAt: { $gte: startDate }
-    })
-    .sort({ createdAt: -1 })
-    .lean();
+  const scores = await prisma.score.findMany({
+    where: {
+      userId,
+      createdAt: { gte: startDate }
+    },
+    orderBy: { createdAt: 'desc' },
+  });
 
   return scores.map(s => ({
     game: s.game as GameType,
     score: s.score,
     createdAt: s.createdAt,
-    _id: s._id?.toString()
+    _id: s.id
   }));
 }

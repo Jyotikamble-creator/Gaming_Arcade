@@ -1,6 +1,6 @@
-﻿// TowerStats component to display game statistics
+// TowerStats component to display game statistics
 import React from 'react';
-import { TowerStatsProps } from '../../../../src/types/towerStacker';
+import { TowerStatsProps } from '@/types/games/tower-stacker';
 
 const TowerStats: React.FC<TowerStatsProps> = ({ score, level, perfectDrops, highestLevel }) => {
   return (

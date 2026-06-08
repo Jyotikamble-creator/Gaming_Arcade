@@ -16,13 +16,7 @@ import type {
   Environment,
   LogMetadata
 } from "@/types/logger/logger";
-import {
-  ClientRequestError,
-  ServerResponseError,
-  ConnectionError,
-  TimeoutError,
-  SerializationError
-} from "@/lib/errors/client";
+
 
 /**
  * Default logger configuration
@@ -548,7 +542,7 @@ export class Logger implements ILogger {
   /**
    * Error logging
    */
-  error(message: string, error?: Error | string, context?: Record<string, any>, tag?: string): void {
+  error(message: string, error?: any, context?: Record<string, any>, tag?: string): void {
     const errorContext = this.processError(error, context);
     this.log('error', message, errorContext, tag);
   }
@@ -556,7 +550,7 @@ export class Logger implements ILogger {
   /**
    * Critical logging
    */
-  critical(message: string, error?: Error | string, context?: Record<string, any>, tag?: string): void {
+  critical(message: string, error?: any, context?: Record<string, any>, tag?: string): void {
     const errorContext = this.processError(error, context);
     this.log('critical', message, errorContext, tag);
   }
@@ -575,7 +569,7 @@ export class Logger implements ILogger {
   /**
    * Process error object for logging
    */
-  private processError(error?: Error | string, context?: Record<string, any>): Record<string, any> {
+  private processError(error?: any, context?: Record<string, any>): Record<string, any> {
     const errorContext = { ...context };
 
     if (error instanceof Error) {
@@ -586,9 +580,10 @@ export class Logger implements ILogger {
       };
 
       // Add specific error properties
-      if (error instanceof ClientRequestError || error instanceof ServerResponseError) {
-        errorContext.error.status = error.status;
-        errorContext.error.statusText = error.statusText;
+      // Add specific error properties
+      if (error && typeof error === 'object') {
+        if ('status' in error) errorContext.error.status = (error as any).status;
+        if ('statusText' in error) errorContext.error.statusText = (error as any).statusText;
       }
     } else if (typeof error === 'string') {
       errorContext.error = { message: error };
@@ -838,6 +833,15 @@ class PerformanceLogger implements IPerformanceLogger {
 // Export singleton instances for backward compatibility
 export const clientLogger = new ClientLogger();
 export const logger = new Logger();
+
+export const LogTags = {
+  SAVE_SCORE: 'SAVE_SCORE',
+  FETCH_SCORES: 'FETCH_SCORES',
+  MY_SCORES: 'MY_SCORES',
+  FETCH_PROGRESS: 'FETCH_PROGRESS',
+  WORD_GUESS: 'WORD_GUESS',
+  TOKEN_MANAGER: 'TOKEN_MANAGER'
+} as any;
 
 // Export default
 export default clientLogger;

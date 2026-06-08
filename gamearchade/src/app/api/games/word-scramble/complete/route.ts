@@ -1,29 +1,36 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { completeGameSession } from '@/lib/games/word-scramble';
 
 export async function POST(request: NextRequest) {
-  return NextResponse.json(
-    { error: 'This game endpoint is under migration to Prisma' },
-    { status: 503 }
-  );
-}
+  try {
+    const body = await request.json().catch(() => ({}));
+    const { sessionId } = body;
 
-export async function GET(request: NextRequest) {
-  return NextResponse.json(
-    { error: 'This game endpoint is under migration to Prisma' },
-    { status: 503 }
-  );
-}
+    if (!sessionId) {
+      return NextResponse.json(
+        { error: 'Missing required field: sessionId' },
+        { status: 400 }
+      );
+    }
 
-export async function PUT(request: NextRequest) {
-  return NextResponse.json(
-    { error: 'This game endpoint is under migration to Prisma' },
-    { status: 503 }
-  );
-}
+    const session = await completeGameSession(sessionId);
 
-export async function DELETE(request: NextRequest) {
-  return NextResponse.json(
-    { error: 'This game endpoint is under migration to Prisma' },
-    { status: 503 }
-  );
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      session
+    }, { status: 200 });
+  } catch (error: any) {
+    console.error('[WORD-SCRAMBLE] Error completing game:', error);
+    return NextResponse.json(
+      { error: 'Failed to complete game session', message: error.message },
+      { status: 500 }
+    );
+  }
 }

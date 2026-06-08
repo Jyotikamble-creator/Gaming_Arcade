@@ -193,7 +193,7 @@ export function useQuiz(): UseQuizReturn {
 
   const startQuiz = useCallback((difficulty: QuizDifficulty) => {
     // Get questions for this difficulty level and shuffle
-    const selectedQuestions = [...questionBank[difficulty]].sort(() => Math.random() - 0.5);
+    const selectedQuestions = [...(questionBank[difficulty as keyof typeof questionBank] || questionBank.medium)].sort(() => Math.random() - 0.5);
 
     setQuizState({
       questions: selectedQuestions,

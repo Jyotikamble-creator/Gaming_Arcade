@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 // Component to display Sudoku game statistics including difficulty, time, mistakes, and hints used
 import React from 'react';
@@ -9,7 +9,7 @@ const SudokuStats: React.FC<SudokuStatsProps> = ({
   time,
   mistakes,
   hintsUsed,
-  maxHints,
+  maxHints = 3,
   maxMistakes = 3
 }) => {
   // Helper function to format time in mm:ss

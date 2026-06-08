@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/AuthProvider';
 // Components
 import Instructions from '@/components/shared/Instructions';

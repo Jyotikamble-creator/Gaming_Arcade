@@ -4,7 +4,7 @@
 export interface IScore {
   _id: string;
   game: string;
-  user?: Types.ObjectId;
+  user?: string;
   playerName: string;
   score: number;
   meta: Record<string, any>;

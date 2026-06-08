@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 // Component to render the Sudoku board with cells, highlights, notes, and pause overlay
 import React from 'react';
@@ -58,7 +58,7 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
   }
 
   // Helper function to render cell content
-  function renderCellContent(row: number, col: number): JSX.Element | null {
+  function renderCellContent(row: number, col: number): React.ReactNode {
     const value = board[row][col];
     const key = `${row}-${col}`;
     const cellNotes = notes[key] || [];

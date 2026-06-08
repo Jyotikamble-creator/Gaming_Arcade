@@ -3,11 +3,12 @@
 
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 // Fallback type definitions for when type files are missing
-type ApiResponse<T = any> = {
+export type ApiResponse<T = any> = {
   success: boolean;
   data: T;
   message?: string;
   timestamp?: string;
+  error?: string;
 };
 
 type ApiErrorResponse = {
@@ -382,6 +383,36 @@ export class GameApiClient {
     };
   }
 }
+
+export class ApiError extends Error {
+  status: number;
+  data: any;
+  constructor(message: string, status: number = 500, data: any = null) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.data = data;
+  }
+}
+
+export const apiClient = {
+  get: async <T = any>(url: string, config?: any): Promise<ApiResponse<T>> => {
+    const res = await API.get<T>(url, config);
+    return { success: true, data: res.data };
+  },
+  post: async <T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> => {
+    const res = await API.post<T>(url, data, config);
+    return { success: true, data: res.data };
+  },
+  put: async <T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> => {
+    const res = await API.put<T>(url, data, config);
+    return { success: true, data: res.data };
+  },
+  delete: async <T = any>(url: string, config?: any): Promise<ApiResponse<T>> => {
+    const res = await API.delete<T>(url, config);
+    return { success: true, data: res.data };
+  }
+};
 
 // Export singleton instance
 export const gameApiClient = new GameApiClient();

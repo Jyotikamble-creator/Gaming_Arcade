@@ -27,5 +27,5 @@ export default function WordScramblePage() {
     return null;
   }
 
-  return <WordScrambleGamePage />;
+  return <WordScrambleGamePage user={user!} />;
 }

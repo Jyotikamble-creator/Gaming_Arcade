@@ -1,6 +1,4 @@
 // Whack-a-Mole Game Core Logic
-// TODO: Replace with Prisma ORM
-// import { WhackSession } from "@/models/games/whack-a-mole";
 import { prisma } from '@/lib/api/prisma';
 import { 
   generateMoleId, 
@@ -9,6 +7,33 @@ import {
   getMoleColors,
   validateHitAccuracy 
 } from "@/utility/games/whack-a-mole";
+import type {
+  WhackMolePosition,
+  WhackMoleConfig,
+  WhackMole,
+  WhackGameGrid,
+  WhackGameSession,
+  WhackMoleHit,
+  WhackPowerUp,
+  WhackPowerUpEffect,
+  WhackGameSettings,
+  WhackGameStatistics,
+  WhackSessionResult,
+  WhackAchievement,
+  WhackPerformanceMetrics,
+  WhackGameConfiguration,
+  WhackMoleType,
+  WhackMoleAnimation,
+  WhackSpecialEffect,
+  WhackGameMode,
+  WhackDifficulty,
+  WhackPowerUpType,
+  WhackGrade,
+  WhackRank,
+  WhackStartRequest,
+  WhackHitRequest,
+  WhackUpdateRequest
+} from '@/types/games/whack-a-mole';
 
 // Game configuration
 const GAME_CONFIG: WhackGameConfiguration = {
@@ -30,14 +55,14 @@ const GAME_CONFIG: WhackGameConfiguration = {
     chaos: 90
   },
   spawnRates: {
-    easy: 1500,    // milliseconds between spawns
+    easy: 1500,
     normal: 1200,
     hard: 1000,
     expert: 800,
     insane: 600
   },
   moleVisibilityTime: {
-    easy: 2000,    // milliseconds visible
+    easy: 2000,
     normal: 1500,
     hard: 1200,
     expert: 1000,
@@ -62,8 +87,8 @@ const GAME_CONFIG: WhackGameConfiguration = {
     giant: 5,
     mini: 40
   },
-  powerUpFrequency: 0.1,      // 10% chance
-  specialMoleFrequency: 0.2   // 20% chance
+  powerUpFrequency: 0.1,
+  specialMoleFrequency: 0.2
 };
 
 // Default settings
@@ -80,6 +105,135 @@ const DEFAULT_SETTINGS: WhackGameSettings = {
   enableSpecialMoles: true,
   autoRestart: false
 };
+
+function mapToSession(dbSession: any): WhackGameSession {
+  const state = JSON.parse(dbSession.state || '{}');
+  return {
+    sessionId: dbSession.sessionId,
+    userId: dbSession.userId || '',
+    gameMode: state.gameMode || 'classic',
+    difficulty: (dbSession.difficulty || 'normal') as WhackDifficulty,
+    gridSize: state.gridSize ?? 9,
+    duration: dbSession.duration || state.duration || 30,
+    startTime: dbSession.startedAt,
+    endTime: dbSession.completedAt || undefined,
+    isActive: state.isActive ?? !dbSession.completed,
+    isPaused: state.isPaused ?? false,
+    pausedTime: state.pausedTime ?? 0,
+    currentScore: dbSession.score,
+    molesSpawned: state.molesSpawned ?? 0,
+    molesHit: state.molesHit ?? 0,
+    molesMissed: state.molesMissed ?? 0,
+    perfectHits: state.perfectHits ?? 0,
+    streakCurrent: state.streakCurrent ?? 0,
+    streakBest: state.streakBest ?? 0,
+    comboMultiplier: state.comboMultiplier ?? 1,
+    totalReactionTime: state.totalReactionTime ?? 0,
+    fastestReaction: state.fastestReaction ?? 0,
+    slowestReaction: state.slowestReaction ?? 0,
+    powerUpsUsed: state.powerUpsUsed ?? 0,
+    specialMolesHit: state.specialMolesHit ?? 0,
+    moleHistory: state.moleHistory || [],
+    powerUps: state.powerUps || [],
+    settings: state.settings || DEFAULT_SETTINGS,
+    statistics: state.statistics || {
+      accuracy: 0,
+      averageReactionTime: 0,
+      molesPerSecond: 0,
+      scorePerSecond: 0,
+      perfectHitRate: 0,
+      consistency: 0,
+      efficiency: 0,
+      endurance: 0,
+      precision: 0,
+      focus: 0,
+      overallRating: 0
+    },
+    achievements: state.achievements || []
+  };
+}
+
+function addMoleHitToSession(sessionState: any, hit: WhackMoleHit) {
+  const moleHistory = sessionState.moleHistory || [];
+  moleHistory.push(hit);
+  sessionState.moleHistory = moleHistory;
+
+  sessionState.molesHit = (sessionState.molesHit || 0) + 1;
+  sessionState.molesSpawned = (sessionState.molesSpawned || 0) + 1;
+  sessionState.currentScore = (sessionState.currentScore || 0) + hit.points;
+
+  if (hit.isPerfect) {
+    sessionState.perfectHits = (sessionState.perfectHits || 0) + 1;
+  }
+  if (hit.isSpecial) {
+    sessionState.specialMolesHit = (sessionState.specialMolesHit || 0) + 1;
+  }
+
+  sessionState.totalReactionTime = (sessionState.totalReactionTime || 0) + hit.reactionTime;
+  if (!sessionState.fastestReaction || hit.reactionTime < sessionState.fastestReaction) {
+    sessionState.fastestReaction = hit.reactionTime;
+  }
+  if (!sessionState.slowestReaction || hit.reactionTime > sessionState.slowestReaction) {
+    sessionState.slowestReaction = hit.reactionTime;
+  }
+
+  updateWhackStatistics(sessionState);
+}
+
+function addMoleMissToSession(sessionState: any) {
+  sessionState.molesMissed = (sessionState.molesMissed || 0) + 1;
+  sessionState.molesSpawned = (sessionState.molesSpawned || 0) + 1;
+  sessionState.streakCurrent = 0;
+  sessionState.comboMultiplier = 1;
+  updateWhackStatistics(sessionState);
+}
+
+function updateWhackStatistics(sessionState: any) {
+  const molesHit = sessionState.molesHit || 0;
+  const molesMissed = sessionState.molesMissed || 0;
+  const molesSpawned = sessionState.molesSpawned || 1;
+  const perfectHits = sessionState.perfectHits || 0;
+  const totalReactionTime = sessionState.totalReactionTime || 0;
+
+  const accuracy = molesSpawned > 0 ? molesHit / molesSpawned : 0;
+  const averageReactionTime = molesHit > 0 ? totalReactionTime / molesHit : 0;
+  const perfectHitRate = molesHit > 0 ? perfectHits / molesHit : 0;
+
+  const duration = sessionState.duration || 30;
+  const molesPerSecond = duration > 0 ? molesHit / duration : 0;
+  const scorePerSecond = duration > 0 ? (sessionState.currentScore || 0) / duration : 0;
+
+  let consistency = 1.0;
+  const history: WhackMoleHit[] = sessionState.moleHistory || [];
+  if (history.length > 1) {
+    const times = history.map(h => h.reactionTime);
+    const mean = times.reduce((a, b) => a + b, 0) / times.length;
+    const variance = times.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / times.length;
+    const stdDev = Math.sqrt(variance);
+    consistency = Math.max(0, 1 - (stdDev / (mean || 1)));
+  }
+
+  const focus = accuracy;
+  const endurance = Math.min(1.0, duration / 180);
+  const precision = accuracy * consistency;
+  const efficiency = perfectHitRate;
+
+  const overallRating = (accuracy * 0.3 + (1 - Math.min(1, averageReactionTime / 1000)) * 0.3 + consistency * 0.2 + precision * 0.2);
+
+  sessionState.statistics = {
+    accuracy,
+    averageReactionTime,
+    molesPerSecond,
+    scorePerSecond,
+    perfectHitRate,
+    consistency,
+    efficiency,
+    endurance,
+    precision,
+    focus,
+    overallRating: Math.round(overallRating * 100) / 100
+  };
+}
 
 /**
  * Get game configuration
@@ -98,20 +252,16 @@ export async function createWhackGameSession(request: WhackStartRequest): Promis
   const duration = GAME_CONFIG.durations[gameMode];
   const settings = { ...DEFAULT_SETTINGS, ...customSettings };
   
-  // Initialize power-ups if enabled
   const powerUps: WhackPowerUp[] = [];
   if (settings.enablePowerUps) {
     powerUps.push(...generateInitialPowerUps());
   }
   
-  const session: WhackGameSession = {
-    sessionId: `whack_${userId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    userId,
+  const state = {
     gameMode,
     difficulty,
     gridSize,
     duration,
-    startTime: new Date(),
     isActive: true,
     isPaused: false,
     pausedTime: 0,
@@ -147,11 +297,20 @@ export async function createWhackGameSession(request: WhackStartRequest): Promis
     achievements: []
   };
   
-  // Save to database
-  const sessionDoc = new WhackSession(session);
-  await sessionDoc.save();
+  const session = await prisma.gameSession.create({
+    data: {
+      userId: userId || null,
+      sessionId: `whack_${userId || 'guest'}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      game: 'whack-a-mole',
+      difficulty,
+      state: JSON.stringify(state),
+      startedAt: new Date(),
+      completed: false,
+      score: 0
+    }
+  });
   
-  return sessionDoc.toObject();
+  return mapToSession(session);
 }
 
 /**
@@ -165,22 +324,18 @@ export function generateRandomMole(
   const rows = Math.sqrt(gridSize);
   const cols = rows;
   
-  // Random position
   const row = Math.floor(Math.random() * rows);
   const col = Math.floor(Math.random() * cols);
   const index = row * cols + col;
   
   const position: WhackMolePosition = { row, col, index };
   
-  // Determine mole type
   const moleType = getRandomMoleType(enableSpecialMoles);
   
-  // Calculate visibility time and points
   const baseVisibilityTime = GAME_CONFIG.moleVisibilityTime[difficulty];
   const visibilityTime = calculateMoleVisibilityTime(moleType, baseVisibilityTime);
   const points = calculateMolePoints(moleType, GAME_CONFIG.pointValues);
   
-  // Get mole appearance
   const colors = getMoleColors();
   const color = colors[moleType] || colors.normal;
   
@@ -226,53 +381,47 @@ export async function processWhackMoleHit(params: {
 }> {
   const { sessionId, moleId, hitPosition, reactionTime, timestamp } = params;
   
-  const session = await WhackSession.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) {
     return { success: false, error: "Session not found", points: 0, streakCount: 0, comboMultiplier: 1, isPerfect: false, newScore: 0 };
   }
   
-  if (!session.isActive || session.isPaused) {
+  const state = JSON.parse(session.state || '{}');
+  if (session.completed || state.isPaused) {
     return { success: false, error: "Game is not active", points: 0, streakCount: 0, comboMultiplier: 1, isPerfect: false, newScore: 0 };
   }
   
-  // Find the mole (this would be tracked in a real-time system)
-  // For now, we'll simulate a valid hit
-  const moleType = getRandomMoleType(session.settings.enableSpecialMoles);
+  const moleType = getRandomMoleType(state.settings?.enableSpecialMoles ?? true);
   const basePoints = GAME_CONFIG.pointValues[moleType];
-  
-  // Calculate accuracy (distance from center)
-  const accuracy = validateHitAccuracy(hitPosition, { x: 0.5, y: 0.5 }); // Assume center target
-  
-  // Determine if perfect hit (within 200ms and high accuracy)
+  const accuracy = validateHitAccuracy(hitPosition, { x: 0.5, y: 0.5 });
   const isPerfect = reactionTime <= 200 && accuracy >= 0.9;
   
-  // Calculate points with multipliers
   let points = basePoints;
   if (isPerfect) {
-    points *= 1.5; // Perfect hit bonus
+    points *= 1.5;
   }
-  points *= session.comboMultiplier;
+  points *= (state.comboMultiplier || 1);
   points = Math.round(points);
   
-  // Update streak
-  let newStreak = session.streakCurrent;
-  let newComboMultiplier = session.comboMultiplier;
+  let newStreak = state.streakCurrent || 0;
+  let newComboMultiplier = state.comboMultiplier || 1;
   
   if (isPerfect) {
     newStreak += 1;
-    session.streakBest = Math.max(session.streakBest, newStreak);
+    state.streakBest = Math.max(state.streakBest || 0, newStreak);
     newComboMultiplier = Math.min(5, 1 + Math.floor(newStreak / 5) * 0.5);
   } else {
     newStreak = 0;
     newComboMultiplier = 1;
   }
   
-  // Create hit record
   const hit: WhackMoleHit = {
     moleId,
     moleType,
-    hitPosition: { row: 0, col: 0, index: 0 }, // Would be calculated from actual position
+    hitPosition: { row: 0, col: 0, index: 0 },
     reactionTime,
     accuracy,
     points,
@@ -283,25 +432,30 @@ export async function processWhackMoleHit(params: {
     isSpecial: moleType !== 'normal'
   };
   
-  // Update session
-  session.streakCurrent = newStreak;
-  session.comboMultiplier = newComboMultiplier;
-  await session.addMoleHit(hit);
+  state.streakCurrent = newStreak;
+  state.comboMultiplier = newComboMultiplier;
+  addMoleHitToSession(state, hit);
   
-  // Check for power-up trigger
   let powerUpTriggered: WhackPowerUp | undefined;
-  if (newStreak > 0 && newStreak % 10 === 0 && session.settings.enablePowerUps) {
-    powerUpTriggered = triggerRandomPowerUp(session);
+  if (newStreak > 0 && newStreak % 10 === 0 && state.settings?.enablePowerUps) {
+    powerUpTriggered = triggerRandomPowerUp(state);
   }
   
-  // Check for achievements
   let achievement: WhackAchievement | undefined;
-  const newAchievements = await checkWhackAchievements(session.toObject());
+  const newAchievements = await checkWhackAchievements(mapToSession({ ...session, state: JSON.stringify(state) }));
   if (newAchievements.length > 0) {
-    achievement = newAchievements[0]; // Return first new achievement
-    session.achievements.push(...newAchievements);
-    await session.save();
+    achievement = newAchievements[0];
+    state.achievements = state.achievements || [];
+    state.achievements.push(...newAchievements);
   }
+  
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      state: JSON.stringify(state),
+      score: state.currentScore || 0
+    }
+  });
   
   return {
     success: true,
@@ -309,7 +463,7 @@ export async function processWhackMoleHit(params: {
     streakCount: newStreak,
     comboMultiplier: newComboMultiplier,
     isPerfect,
-    newScore: session.currentScore,
+    newScore: updatedSession.score,
     powerUpTriggered,
     achievement
   };
@@ -322,51 +476,81 @@ export async function updateWhackGameSession(
   sessionId: string, 
   updateData: { action: string; data: any }
 ): Promise<WhackGameSession | null> {
-  const session = await WhackSession.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) {
     return null;
   }
+
+  const state = JSON.parse(session.state || '{}');
   
   switch (updateData.action) {
     case 'miss':
-      await session.addMoleMiss();
+      addMoleMissToSession(state);
       break;
     case 'powerup':
-      session.powerUpsUsed += 1;
-      await session.save();
+      state.powerUpsUsed = (state.powerUpsUsed || 0) + 1;
       break;
   }
+
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      state: JSON.stringify(state)
+    }
+  });
   
-  return session.toObject();
+  return mapToSession(updatedSession);
 }
 
 /**
  * Pause game session
  */
 export async function pauseWhackSession(sessionId: string): Promise<WhackGameSession | null> {
-  const session = await WhackSession.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) {
     return null;
   }
   
-  await session.pauseGame();
-  return session.toObject();
+  const state = JSON.parse(session.state || '{}');
+  state.isPaused = true;
+
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      state: JSON.stringify(state)
+    }
+  });
+  return mapToSession(updatedSession);
 }
 
 /**
  * Resume game session
  */
 export async function resumeWhackSession(sessionId: string): Promise<WhackGameSession | null> {
-  const session = await WhackSession.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) {
     return null;
   }
   
-  await session.resumeGame();
-  return session.toObject();
+  const state = JSON.parse(session.state || '{}');
+  state.isPaused = false;
+
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      state: JSON.stringify(state)
+    }
+  });
+  return mapToSession(updatedSession);
 }
 
 /**
@@ -379,61 +563,77 @@ export async function completeWhackGameSession(params: {
 }): Promise<WhackSessionResult | null> {
   const { sessionId, endTime, finalScore } = params;
   
-  const session = await WhackSession.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) {
     return null;
   }
   
-  if (!session.isActive) {
-    return null; // Already completed
+  if (session.completed) {
+    return null;
   }
-  
-  // Update final score if provided
+
+  const state = JSON.parse(session.state || '{}');
+  state.isActive = false;
+
   if (finalScore !== undefined) {
-    session.currentScore = finalScore;
+    state.currentScore = finalScore;
   }
-  
-  // End the game
-  await session.endGame();
-  
-  // Calculate performance metrics
-  const performance = calculateWhackPerformanceMetrics(session.toObject());
-  
-  // Determine grade and rank
-  const grade = calculateWhackGrade(session.statistics);
-  const rank = calculateWhackRank(session.statistics);
-  
-  // Check for achievements
-  const achievements = await checkWhackAchievements(session.toObject());
-  session.achievements.push(...achievements);
-  await session.save();
-  
-  // Check if personal best
-  const userSessions = await WhackSession.find({ 
-    userId: session.userId, 
-    isActive: false,
-    _id: { $ne: session._id }
-  }).sort({ currentScore: -1 });
-  
-  const personalBest = userSessions.length === 0 || 
-    session.currentScore > userSessions[0].currentScore;
-  
-  // Generate analysis
-  const improvements = generateImprovements(session.toObject());
-  const weakAreas = identifyWeakAreas(session.toObject());
-  const strongAreas = identifyStrongAreas(session.toObject());
-  const nextRecommendation = generateNextRecommendation(session.toObject());
-  
-  // Get comparison data
-  const comparison = await getComparisonData(session.toObject());
-  
+
+  updateWhackStatistics(state);
+
+  const tempSession = mapToSession({ ...session, state: JSON.stringify(state) });
+  const performance = calculateWhackPerformanceMetrics(tempSession);
+  const grade = calculateWhackGrade(state.statistics);
+  const rank = calculateWhackRank(state.statistics);
+  const achievements = await checkWhackAchievements(tempSession);
+  state.achievements = state.achievements || [];
+  state.achievements.push(...achievements);
+
+  const score = state.currentScore || 0;
+
+  let personalBest = false;
+  if (session.userId) {
+    const userSessions = await prisma.gameSession.findMany({
+      where: { 
+        userId: session.userId, 
+        game: 'whack-a-mole',
+        completed: true
+      },
+      orderBy: { score: 'desc' },
+      take: 1
+    });
+    personalBest = userSessions.length === 0 || score > userSessions[0].score;
+  }
+
+  const finalSession = mapToSession({ ...session, state: JSON.stringify(state) });
+  const improvements = generateImprovements(finalSession);
+  const weakAreas = identifyWeakAreas(finalSession);
+  const strongAreas = identifyStrongAreas(finalSession);
+  const nextRecommendation = generateNextRecommendation(finalSession);
+  const comparison = await getComparisonData(finalSession);
+
+  const duration = Math.floor((endTime.getTime() - session.startedAt.getTime()) / 1000);
+
+  await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      completed: true,
+      completedAt: endTime,
+      duration,
+      score,
+      state: JSON.stringify(state)
+    }
+  });
+
   const result: WhackSessionResult = {
     sessionId,
-    finalScore: session.currentScore,
+    finalScore: score,
     rank,
     grade,
-    statistics: session.statistics,
+    statistics: state.statistics,
     performance,
     achievements,
     personalBest,
@@ -443,7 +643,7 @@ export async function completeWhackGameSession(params: {
     nextRecommendation,
     comparison
   };
-  
+
   return result;
 }
 
@@ -549,10 +749,10 @@ function generateInitialPowerUps(): WhackPowerUp[] {
   ];
 }
 
-function triggerRandomPowerUp(session: any): WhackPowerUp {
-  const availablePowerUps = session.powerUps.filter((pu: WhackPowerUp) => 
+function triggerRandomPowerUp(state: any): WhackPowerUp {
+  const availablePowerUps = state.powerUps.filter((pu: WhackPowerUp) => 
     !pu.isActive && 
-    (!pu.lastUsed || (Date.now() - pu.lastUsed.getTime() > pu.cooldown))
+    (!pu.lastUsed || (Date.now() - new Date(pu.lastUsed).getTime() > pu.cooldown))
   );
   
   if (availablePowerUps.length > 0) {
@@ -563,14 +763,14 @@ function triggerRandomPowerUp(session: any): WhackPowerUp {
     return powerUp;
   }
   
-  return session.powerUps[0]; // Fallback
+  return state.powerUps[0];
 }
 
 export function calculateWhackPerformanceMetrics(session: WhackGameSession): WhackPerformanceMetrics {
   const stats = session.statistics;
   
   return {
-    speed: Math.min(1, Math.max(0, 1 - (stats.averageReactionTime - 200) / 1000)), // Faster = better
+    speed: Math.min(1, Math.max(0, 1 - (stats.averageReactionTime - 200) / 1000)),
     accuracy: stats.accuracy,
     consistency: stats.consistency,
     endurance: stats.endurance,
@@ -609,7 +809,6 @@ export function calculateWhackRank(stats: WhackGameStatistics): WhackRank {
 export async function checkWhackAchievements(session: WhackGameSession): Promise<WhackAchievement[]> {
   const achievements: WhackAchievement[] = [];
   
-  // Speed achievements
   if (session.statistics.averageReactionTime <= 150) {
     achievements.push({
       id: 'lightning_fast',
@@ -625,7 +824,6 @@ export async function checkWhackAchievements(session: WhackGameSession): Promise
     });
   }
   
-  // Accuracy achievements
   if (session.statistics.accuracy >= 0.9) {
     achievements.push({
       id: 'sharpshooter',
@@ -641,7 +839,6 @@ export async function checkWhackAchievements(session: WhackGameSession): Promise
     });
   }
   
-  // Streak achievements
   if (session.streakBest >= 20) {
     achievements.push({
       id: 'streak_master',
@@ -717,8 +914,6 @@ async function getComparisonData(session: WhackGameSession): Promise<{
   percentileRank: number;
   globalRank?: number;
 }> {
-  // This would query the database for comparison statistics
-  // For now, return mock data
   return {
     averageScore: 500,
     percentileRank: 75,

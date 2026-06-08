@@ -3,7 +3,8 @@ import {
   WordScrambleDifficulty,
   WordScrambleGameMode,
   WordScrambleCategory,
-  WordScrambleData
+  WordScrambleData,
+  WORD_SCRAMBLE_CONSTANTS
 } from '@/types/games/word-scramble';
 
 /**
@@ -421,7 +422,7 @@ export function analyzeWordPattern(word: string): {
   const consonants = chars.filter(char => !vowelChars.includes(char));
   
   // Find double letters
-  const doubleLetters = [];
+  const doubleLetters: string[] = [];
   for (let i = 0; i < chars.length - 1; i++) {
     if (chars[i] === chars[i + 1] && !doubleLetters.includes(chars[i])) {
       doubleLetters.push(chars[i]);

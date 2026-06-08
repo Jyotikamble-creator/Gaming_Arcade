@@ -1,6 +1,4 @@
 // Typing Test Game Core Logic
-// TODO: Replace with Prisma ORM
-// import { TypingSession } from "@/models/games/typing";
 import { prisma } from '@/lib/api/prisma';
 import { 
   calculateWPM, 
@@ -9,6 +7,26 @@ import {
   generatePassageId,
   getDefaultPassages 
 } from "@/utility/games/typing";
+import type {
+  TypingPassage,
+  TypingCharacter,
+  TypingWord,
+  TypingStatistics,
+  TypingGameSession,
+  TypingMistake,
+  TypingGameSettings,
+  TypingPerformanceMetrics,
+  TypingSessionResult,
+  TypingAchievement,
+  TypingDifficulty,
+  TypingCategory,
+  TypingGameMode,
+  TypingGrade,
+  TypingRank,
+  TypingPassageRequest,
+  TypingSessionRequest,
+  TypingUpdateRequest
+} from '@/types/games/typing';
 
 // Default game settings
 const DEFAULT_SETTINGS: TypingGameSettings = {
@@ -26,6 +44,125 @@ const DEFAULT_SETTINGS: TypingGameSettings = {
   keyboardLayout: 'qwerty'
 };
 
+function mapToSession(dbSession: any): TypingGameSession {
+  const state = JSON.parse(dbSession.state || '{}');
+  let timeLimit: number | undefined;
+  try {
+    const meta = JSON.parse(dbSession.meta || '{}');
+    if (typeof meta.timeLimit === 'number') {
+      timeLimit = meta.timeLimit;
+    }
+  } catch (e) {}
+
+  return {
+    sessionId: dbSession.sessionId,
+    userId: dbSession.userId || '',
+    passageId: state.passageId || '',
+    passage: state.passage,
+    startTime: dbSession.startedAt,
+    endTime: dbSession.completedAt || undefined,
+    isCompleted: dbSession.completed,
+    isPaused: state.isPaused ?? false,
+    currentPosition: state.currentPosition ?? 0,
+    typedText: state.typedText || '',
+    words: state.words || [],
+    characters: state.characters || [],
+    statistics: state.statistics || {
+      wpm: 0,
+      netWpm: 0,
+      grossWpm: 0,
+      accuracy: 0,
+      errorRate: 0,
+      totalCharacters: 0,
+      correctCharacters: 0,
+      incorrectCharacters: 0,
+      totalWords: 0,
+      correctWords: 0,
+      incorrectWords: 0,
+      extraCharacters: 0,
+      missedCharacters: 0,
+      totalKeystrokes: 0,
+      backspaces: 0,
+      timeElapsed: 0
+    },
+    gameMode: state.gameMode || 'standard',
+    timeLimit,
+    wordLimit: state.wordLimit,
+    settings: state.settings || DEFAULT_SETTINGS,
+    mistakes: state.mistakes || [],
+    achievements: state.achievements || []
+  };
+}
+
+function updateSessionStatistics(sessionState: any, endTime?: Date) {
+  const typedText = sessionState.typedText || '';
+  const passageText = sessionState.passage?.text || '';
+  const characters: TypingCharacter[] = sessionState.characters || [];
+  const start = new Date(sessionState.startTime);
+  const end = endTime || new Date();
+  const timeElapsed = Math.max(1000, end.getTime() - start.getTime()); // at least 1 second to avoid division by zero
+
+  const totalKeystrokes = typedText.length + (sessionState.statistics?.backspaces || 0);
+
+  const correctChars = characters.filter(c => c.status === 'correct').length;
+  const incorrectChars = characters.filter(c => c.status === 'incorrect').length;
+  const extraChars = characters.filter(c => c.status === 'extra').length;
+
+  const totalCharacters = typedText.length;
+  const accuracy = totalCharacters > 0 ? correctChars / totalCharacters : 0;
+  const errorRate = totalCharacters > 0 ? incorrectChars / totalCharacters : 0;
+
+  const grossWpm = calculateWPM(totalCharacters, timeElapsed, true);
+  const netWpm = Math.max(0, grossWpm - Math.round((incorrectChars / 5) / (timeElapsed / 60000)));
+
+  const typedWords = typedText.trim().split(/\s+/).filter((w: string) => w.length > 0);
+  const passageWords = passageText.trim().split(/\s+/).filter((w: string) => w.length > 0);
+  let correctWords = 0;
+  let incorrectWords = 0;
+
+  typedWords.forEach((word: string, idx: number) => {
+    if (word === passageWords[idx]) {
+      correctWords++;
+    } else {
+      incorrectWords++;
+    }
+  });
+
+  const totalWords = typedWords.length;
+
+  sessionState.statistics = {
+    wpm: netWpm,
+    netWpm,
+    grossWpm,
+    accuracy,
+    errorRate,
+    totalCharacters,
+    correctCharacters: correctChars,
+    incorrectCharacters: incorrectChars,
+    totalWords,
+    correctWords,
+    incorrectWords,
+    extraCharacters: extraChars,
+    missedCharacters: Math.max(0, passageText.length - typedText.length),
+    totalKeystrokes,
+    backspaces: sessionState.statistics?.backspaces || 0,
+    timeElapsed
+  };
+}
+
+function addMistakeToSession(sessionState: any, position: number, expected: string, actual: string) {
+  const mistakes = sessionState.mistakes || [];
+  mistakes.push({
+    position,
+    expected,
+    typed: actual,
+    timestamp: new Date(),
+    wordIndex: Math.max(0, expected.split(/\s+/).length - 1),
+    characterIndex: position
+  });
+  sessionState.mistakes = mistakes;
+}
+
 /**
  * Get a typing passage based on criteria
  */
@@ -35,17 +172,13 @@ export async function getTypingPassage(request: TypingPassageRequest): Promise<T
     category = 'random', 
     minWords = 10, 
     maxWords = 100,
-    language = 'english',
-    excludeUsed = false,
-    userId 
+    language = 'english'
   } = request;
 
-  // Get default passages
   const passages = getDefaultPassages();
   
-  // Filter passages based on criteria
   let filteredPassages = passages.filter(passage => {
-    if (difficulty !== 'random' && passage.difficulty !== difficulty) return false;
+    if ((difficulty as string) !== 'random' && passage.difficulty !== difficulty) return false;
     if (category !== 'random' && passage.category !== category) return false;
     if (passage.wordCount < minWords || passage.wordCount > maxWords) return false;
     if (passage.language !== language) return false;
@@ -53,7 +186,6 @@ export async function getTypingPassage(request: TypingPassageRequest): Promise<T
     return true;
   });
 
-  // If no passages found, relax constraints
   if (filteredPassages.length === 0) {
     filteredPassages = passages.filter(passage => 
       passage.language === language && 
@@ -62,15 +194,10 @@ export async function getTypingPassage(request: TypingPassageRequest): Promise<T
     );
   }
 
-  // If still no passages, use any passage
   if (filteredPassages.length === 0) {
     filteredPassages = passages;
   }
 
-  // TODO: If excludeUsed and userId provided, filter out used passages
-  // This would require tracking user's typing history
-
-  // Select random passage
   const randomIndex = Math.floor(Math.random() * filteredPassages.length);
   const selectedPassage = filteredPassages[randomIndex];
 
@@ -103,11 +230,9 @@ export async function getRandomTypingPassages(
 export async function createTypingSession(request: TypingSessionRequest): Promise<TypingGameSession> {
   const { userId, passageId, gameMode, timeLimit, wordLimit, settings } = request;
   
-  // Get passage
   let passage: TypingPassage;
   
   if (passageId) {
-    // Find specific passage
     const passages = getDefaultPassages();
     const foundPassage = passages.find(p => generatePassageId(p.text) === passageId);
     
@@ -117,24 +242,19 @@ export async function createTypingSession(request: TypingSessionRequest): Promis
     
     passage = { ...foundPassage, id: passageId };
   } else {
-    // Get random passage
     passage = await getTypingPassage({});
   }
 
-  // Initialize characters array
   const characters: TypingCharacter[] = passage.text.split('').map(char => ({
     char,
     status: 'untyped'
   }));
 
-  // Create session
-  const session: TypingGameSession = {
-    sessionId: `typing_${userId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    userId,
+  const sessionId = `typing_${userId || 'guest'}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+  const state = {
     passageId: passage.id,
     passage,
-    startTime: new Date(),
-    isCompleted: false,
     isPaused: false,
     currentPosition: 0,
     typedText: '',
@@ -153,7 +273,7 @@ export async function createTypingSession(request: TypingSessionRequest): Promis
       correctWords: 0,
       incorrectWords: 0,
       extraCharacters: 0,
-      missedCharacters: 0,
+      missedCharacters: passage.text.length,
       totalKeystrokes: 0,
       backspaces: 0,
       timeElapsed: 0
@@ -166,60 +286,62 @@ export async function createTypingSession(request: TypingSessionRequest): Promis
     achievements: []
   };
 
-  // Save to database
-  const sessionDoc = new TypingSession(session);
-  await sessionDoc.save();
+  const session = await prisma.gameSession.create({
+    data: {
+      userId: userId || null,
+      sessionId,
+      game: 'typing',
+      difficulty: passage.difficulty,
+      state: JSON.stringify(state),
+      startedAt: new Date(),
+      completed: false,
+      score: 0
+    }
+  });
   
-  return sessionDoc.toObject();
+  return mapToSession(session);
 }
 
 /**
  * Update typing session with new input
  */
 export async function updateTypingSession(request: TypingUpdateRequest): Promise<TypingGameSession | null> {
-  const { sessionId, currentPosition, typedText, timestamp, keystroke } = request;
+  const { sessionId, currentPosition, typedText, keystroke } = request;
   
-  const session = await TypingSession.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) {
     return null;
   }
 
-  if (session.isCompleted || session.isPaused) {
-    return session.toObject();
+  const state = JSON.parse(session.state || '{}');
+  if (session.completed || state.isPaused) {
+    return mapToSession(session);
   }
 
-  // Update session data
-  session.currentPosition = currentPosition;
-  session.typedText = typedText;
+  state.currentPosition = currentPosition;
+  state.typedText = typedText;
 
-  // Update characters status
-  const passageText = session.passage.text;
-  const updatedCharacters = passageText.split('').map((char, index) => {
+  const passageText = state.passage.text;
+  const updatedCharacters = passageText.split('').map((char: string, index: number) => {
     if (index < typedText.length) {
       const typedChar = typedText[index];
       return {
         char,
-        status: (typedChar === char ? 'correct' : 'incorrect') as any,
-        timestamp: new Date(),
-        timeTaken: keystroke?.timeTaken || 0
-      };
-    } else if (index < typedText.length) {
-      return {
-        char,
-        status: 'extra' as any,
+        status: typedChar === char ? 'correct' : 'incorrect',
         timestamp: new Date(),
         timeTaken: keystroke?.timeTaken || 0
       };
     } else {
       return {
         char,
-        status: 'untyped' as any
+        status: 'untyped'
       };
     }
   });
 
-  // Add extra characters if typed text is longer
   if (typedText.length > passageText.length) {
     for (let i = passageText.length; i < typedText.length; i++) {
       updatedCharacters.push({
@@ -231,22 +353,26 @@ export async function updateTypingSession(request: TypingUpdateRequest): Promise
     }
   }
 
-  session.characters = updatedCharacters;
+  state.characters = updatedCharacters;
 
-  // Update statistics
-  session.updateStatistics();
-
-  // Check for mistakes
-  if (keystroke && !keystroke.isCorrect) {
-    session.addMistake(
-      currentPosition, 
-      passageText[currentPosition] || '', 
-      keystroke.key
-    );
+  if (keystroke?.key === 'Backspace') {
+    state.statistics.backspaces = (state.statistics.backspaces || 0) + 1;
   }
 
-  await session.save();
-  return session.toObject();
+  updateSessionStatistics(state);
+
+  if (keystroke && !keystroke.isCorrect) {
+    addMistakeToSession(state, currentPosition, passageText[currentPosition] || '', keystroke.key);
+  }
+
+  const updatedSession = await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      state: JSON.stringify(state)
+    }
+  });
+
+  return mapToSession(updatedSession);
 }
 
 /**
@@ -259,58 +385,68 @@ export async function completeTypingSession(params: {
 }): Promise<TypingSessionResult | null> {
   const { sessionId, finalText, endTime } = params;
   
-  const session = await TypingSession.findOne({ sessionId });
+  const session = await prisma.gameSession.findUnique({
+    where: { sessionId }
+  });
   
   if (!session) {
     return null;
   }
 
-  if (session.isCompleted) {
-    return null; // Already completed
+  if (session.completed) {
+    return null;
   }
 
-  // Update final data
-  session.typedText = finalText;
-  session.endTime = endTime;
-  session.isCompleted = true;
+  const state = JSON.parse(session.state || '{}');
+  state.typedText = finalText;
+  state.isCompleted = true;
 
-  // Calculate final statistics
-  await session.updateStatistics();
+  updateSessionStatistics(state, endTime);
 
-  // Calculate performance metrics
-  const performance = calculatePerformanceMetrics(session.toObject());
-  
-  // Determine grade
-  const grade = calculateTypingGrade(session.statistics);
-  
-  // Determine rank
-  const rank = calculateTypingRank(session.statistics);
-  
-  // Check for achievements
-  const achievements = await checkTypingAchievements(session.toObject());
-  session.achievements = achievements;
-  
-  // Check if personal best
-  const userSessions = await TypingSession.find({ 
-    userId: session.userId, 
-    isCompleted: true,
-    _id: { $ne: session._id }
-  }).sort({ 'statistics.wpm': -1 });
-  
-  const personalBest = userSessions.length === 0 || 
-    session.statistics.wpm > userSessions[0].statistics.wpm;
+  const finalStatistics = state.statistics;
+  const performance = calculatePerformanceMetrics(state);
+  const grade = calculateTypingGrade(finalStatistics);
+  const rank = calculateTypingRank(finalStatistics);
+  const achievements = await checkTypingAchievements(state);
+  state.achievements = achievements;
 
-  // Generate improvements and recommendations
-  const improvements = generateImprovements(session.toObject());
-  const weakAreas = identifyWeakAreas(session.toObject());
-  const strongAreas = identifyStrongAreas(session.toObject());
-  const nextRecommendation = generateNextRecommendation(session.toObject());
+  const score = finalStatistics.wpm;
 
-  await session.save();
+  let personalBest = false;
+  if (session.userId) {
+    const userSessions = await prisma.gameSession.findMany({
+      where: { 
+        userId: session.userId, 
+        game: 'typing',
+        completed: true
+      },
+      orderBy: { score: 'desc' },
+      take: 1
+    });
+    personalBest = userSessions.length === 0 || score > userSessions[0].score;
+  }
+
+  const improvements = generateImprovements(state);
+  const weakAreas = identifyWeakAreas(state);
+  const strongAreas = identifyStrongAreas(state);
+  const nextRecommendation = generateNextRecommendation(state);
+
+  const duration = Math.floor((endTime.getTime() - session.startedAt.getTime()) / 1000);
+
+  await prisma.gameSession.update({
+    where: { sessionId },
+    data: {
+      completed: true,
+      completedAt: endTime,
+      duration,
+      score,
+      state: JSON.stringify(state)
+    }
+  });
 
   const result: TypingSessionResult = {
     sessionId,
-    finalStatistics: session.statistics,
+    finalStatistics,
     performance,
     grade,
     improvements,
@@ -331,13 +467,10 @@ export async function completeTypingSession(params: {
 export function calculatePerformanceMetrics(session: TypingGameSession): TypingPerformanceMetrics {
   const { statistics, mistakes, characters } = session;
   
-  // Speed rating (0-1)
-  const speedRating = Math.min(1, statistics.wpm / 100); // 100 WPM = perfect speed
+  const speedRating = Math.min(1, statistics.wpm / 100);
   
-  // Accuracy rating (0-1)
   const accuracyRating = statistics.accuracy;
   
-  // Consistency rating based on typing rhythm
   let consistencyRating = 1.0;
   if (characters.length > 10) {
     const timings = characters
@@ -348,21 +481,17 @@ export function calculatePerformanceMetrics(session: TypingGameSession): TypingP
       const avgTiming = timings.reduce((a, b) => a + b, 0) / timings.length;
       const variance = timings.reduce((sum, timing) => sum + Math.pow(timing - avgTiming, 2), 0) / timings.length;
       const stdDev = Math.sqrt(variance);
-      consistencyRating = Math.max(0, 1 - (stdDev / avgTiming)); // Lower deviation = higher consistency
+      consistencyRating = Math.max(0, 1 - (stdDev / avgTiming));
     }
   }
   
-  // Rhythm rating (similar to consistency but focuses on keystroke intervals)
-  const rhythmRating = consistencyRating; // Simplified for now
+  const rhythmRating = consistencyRating;
   
-  // Stamina rating (performance over time - simplified)
-  const staminaRating = statistics.timeElapsed > 60000 ? // Over 1 minute
+  const staminaRating = statistics.timeElapsed > 60000 ? 
     Math.max(0.5, 1 - (mistakes.length / statistics.totalCharacters)) : 1.0;
   
-  // Adaptability rating (simplified)
   const adaptabilityRating = 1.0 - (mistakes.length / Math.max(1, statistics.totalCharacters));
   
-  // Overall rating (weighted average)
   const overallRating = (
     speedRating * 0.3 +
     accuracyRating * 0.25 +
@@ -390,7 +519,6 @@ export function calculateTypingGrade(statistics: TypingStatistics): TypingGrade 
   const { wpm, accuracy } = statistics;
   const accuracyPercent = accuracy * 100;
   
-  // Combined score based on WPM and accuracy
   const combinedScore = (wpm * 0.7) + (accuracyPercent * 0.3);
   
   if (combinedScore >= 85 && accuracyPercent >= 95) return 'SSS';
@@ -426,7 +554,6 @@ export async function checkTypingAchievements(session: TypingGameSession): Promi
   const { statistics, mistakes } = session;
   const achievements: TypingAchievement[] = [];
   
-  // Speed achievements
   if (statistics.wpm >= 20) {
     achievements.push({
       id: 'speed_20',
@@ -492,7 +619,6 @@ export async function checkTypingAchievements(session: TypingGameSession): Promi
     });
   }
   
-  // Accuracy achievements
   if (statistics.accuracy >= 0.95) {
     achievements.push({
       id: 'accuracy_95',
@@ -532,8 +658,7 @@ export async function checkTypingAchievements(session: TypingGameSession): Promi
     });
   }
   
-  // Endurance achievements
-  if (statistics.timeElapsed >= 300000) { // 5 minutes
+  if (statistics.timeElapsed >= 300000) {
     achievements.push({
       id: 'endurance_5min',
       name: 'Marathon Typist',
@@ -568,7 +693,6 @@ export function generateImprovements(session: TypingGameSession): string[] {
     improvements.push("Work on finger positioning and reduce typing errors");
   }
   
-  // Analyze common mistake patterns
   const commonMistakes = mistakes.reduce((acc, mistake) => {
     acc[mistake.expected] = (acc[mistake.expected] || 0) + 1;
     return acc;

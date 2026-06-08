@@ -152,8 +152,8 @@ export interface ILogger {
   debug(message: string, context?: Record<string, any>, tag?: string): void;
   info(message: string, context?: Record<string, any>, tag?: string): void;
   warn(message: string, context?: Record<string, any>, tag?: string): void;
-  error(message: string, error?: Error | string, context?: Record<string, any>, tag?: string): void;
-  critical(message: string, error?: Error | string, context?: Record<string, any>, tag?: string): void;
+  error(message: string, error?: any, context?: Record<string, any>, tag?: string): void;
+  critical(message: string, error?: any, context?: Record<string, any>, tag?: string): void;
   
   // Utility methods
   setLevel(level: LogLevel): void;

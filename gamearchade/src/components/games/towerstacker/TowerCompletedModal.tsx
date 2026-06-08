@@ -1,9 +1,23 @@
-﻿// TowerCompletedModal component to show game completion modal
+// TowerCompletedModal component to show game completion modal
 import React from 'react';
-import { TowerCompletedModalProps } from '../../../../src/types/towerStacker';
-import { getPerformanceRating, GAME_CONFIG } from '../../../../src/utils/towerStackerUtils';
+import { TowerCompletedModalProps } from '@/types/games/tower-stacker';
+import { GAME_CONFIG } from '@/utility/games/tower-stacker';
 
 const TowerCompletedModal: React.FC<TowerCompletedModalProps> = ({ score, level, perfectDrops, onPlayAgain }) => {
+  const getPerformanceRating = (lvl: number) => {
+    if (lvl >= 20) {
+      return { text: 'Tower Master!', color: 'text-yellow-400' };
+    } else if (lvl >= 15) {
+      return { text: 'Sky Scraper Builder!', color: 'text-blue-400' };
+    } else if (lvl >= 10) {
+      return { text: 'Excellent!', color: 'text-green-400' };
+    } else if (lvl >= 5) {
+      return { text: 'Great!', color: 'text-purple-400' };
+    } else {
+      return { text: 'Beginner', color: 'text-gray-400' };
+    }
+  };
+
   const rating = getPerformanceRating(level);
 
   return (
