@@ -294,6 +294,14 @@ Add all required environment variables inside the Vercel Dashboard before deploy
 
 ---
 
+## 🌐 Live Demo
+
+Happy to share that the project is successfully deployed to the vercel  with whole frontend,backend and database to the neonDB.
+
+🚀 **Website:** https://gaming-archade.vercel.app/
+
+---
+
 # 📸 Screenshots
 
 ## Landing Page
